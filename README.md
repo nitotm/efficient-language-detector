@@ -122,7 +122,7 @@ These are the results, first, execution time and then accuracy.
 -->
 <img width="800" src="https://raw.githubusercontent.com/nitotm/efficient-language-detector/main/tests/table_accuracy.svg">
 
-<sup style="color:#08e">1.</sup> <sup style="color:#777">Lingua could have a small advantage in this tests as it participates with 54 languages, 6 less.</sup>  
+<sup style="color:#08e">1.</sup> <sup style="color:#777">Lingua could have a small advantage as it participates with 54 languages, 6 less.</sup>  
 <sup style="color:#08e">2.</sup> <sup style="color:#777">CLD2 and CLD3, return a list of languages, the ones not included in this test where discarded, but usually they return one language, I believe they have a disadvantage. 
 Also, I confirm the results of CLD2 for short text are correct, contrary to the test on the *Lingua* page, they did not use the parameter "bestEffort = True", their benchmark for CLD2 is unfair.
 
