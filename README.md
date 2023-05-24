@@ -90,7 +90,7 @@ I compared *ELD* with a different variety of detectors, since the interesting pa
 | https://github.com/patrickschur/language-detection       | 5.2.0         | PHP          |
 
 Tests: **Tweets**: *760KB*, short sentences of 140 chars max.; **Big test**: *10MB*, sentences in all 60 languages supported; **Sentences**: *8MB*, this is the *Lingua* sentences test, minus unsupported languages.  
-Short sentences is what *ELD* and most detectors aim to detect, as very short text is unreliable, but I included the *Lingua* **Word pairs** *1.5MB*, and **Single words** *880KB* tests to see how they all compare beyond their reliable limits.
+Short sentences is what *ELD* and most detectors focus on, as very short text is unreliable, but I included the *Lingua* **Word pairs** *1.5MB*, and **Single words** *880KB* tests to see how they all compare beyond their reliable limits.
 
 These are the results, first, execution time and then accuracy.
 
@@ -127,7 +127,7 @@ These are the results, first, execution time and then accuracy.
 Also, I confirm the results of CLD2 for short text are correct, contrary to the test on the *Lingua* page, they did not use the parameter "bestEffort = True", their benchmark for CLD2 is unfair.
 
 *Lingua* is the average accuracy winner, but at what cost, the same test that in *ELD* or *CLD2* lasts 2 seconds, in Lingua takes more than 5 hours! It acts like a brute-force software. 
-Also its lead comes from single and pair words, which most detectors don't intend to, as it is unreliable.
+Also its lead comes from single and pair words, which are unreliable regardless.
 
 I added *ELD-L* for comparison, which has a 2.3x bigger database, but only increases execution time marginally, a testament to the efficiency of the algorithm. *ELD-L* is not the main database as it does not improve language detection in sentences.
 
