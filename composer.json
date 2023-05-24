@@ -1,0 +1,23 @@
+{
+  "name": "nitotm/efficient-language-detector",
+  "type": "library",
+  "description": "Fast and accurate natural language detection. Detector written in PHP. Nito-ELD, ELD.",
+  "keywords": ["language", "detection", "detector", "language detector", "language detection", "language identification"],
+  "homepage": "https://github.com/nitotm/efficient-language-detector",
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "Nito T.M.",
+      "homepage": "https://github.com/nitotm"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "nitotm\\eld\\": "src"
+    }
+  },
+  "require": {
+    "php": ">=7.0",
+    "ext-mbstring": "*"
+  }
+}
