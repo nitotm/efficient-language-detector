@@ -40,11 +40,12 @@ var_dump($eld->detect('Hola, cómo te llamas?'));
 ['language' => false, 'error' => 'Some error', 'scores'=>[]]; 
 ```
 
-- To get the best guess, deactivate minimum length & confidence threshold; used for benchmarking.
+- To get the best guess, deactive minimum length & confidence threshold; used for benchmarking.
 ```php
 $eld->detect('To', false, false, 0, 1);
 // To improve readability moving forward, PHP8 Named Parameters can be used
 $eld->detect(text: 'To', cleanText: false, checkConfidence: false, minByteLength: 0, minNgrams: 1);
+// cleanText: true, Removes Urls, domains, emails, alphanumerical & numbers
 ```
 
 - To retrieve the whole list of languages detected and their score, we will set `$returnScores` to `true`, just once
@@ -106,7 +107,7 @@ These are the results, first, execution time and then accuracy.
 | **franc**           |     1.2"     |      8"      |      7.8"    |     2.8"     |     2"       |
 | **patrickschur**    |    15"       |     93"      |     82"      |    40"       |    35"       |
 -->
-<img width="800" src="https://raw.githubusercontent.com/nitotm/efficient-language-detector/main/tests/table_time.svg">
+<img width="800" src="https://raw.githubusercontent.com/nitotm/efficient-language-detector/main/benchmarks/table_time.svg">
 
 <!-- Accuracy table
 |                     | Tweets       | Big test     | Sentences    | Word pairs   | Single words |
@@ -120,7 +121,7 @@ These are the results, first, execution time and then accuracy.
 | **franc**           | 89.8%        | 92.0%        | 90.5%        | 65.9%        | 52.9%        |
 | **patrickschur**    | 89.7%        | 82.0%        | 87.4%        | 66.7%        | 52.9%        |
 -->
-<img width="800" src="https://raw.githubusercontent.com/nitotm/efficient-language-detector/main/tests/table_accuracy.svg">
+<img width="800" src="https://raw.githubusercontent.com/nitotm/efficient-language-detector/main/benchmarks/table_accuracy.svg">
 
 <sup style="color:#08e">1.</sup> <sup style="color:#777">Lingua could have a small advantage as it participates with 54 languages, 6 less.</sup>  
 <sup style="color:#08e">2.</sup> <sup style="color:#777">CLD2 and CLD3, return a list of languages, the ones not included in this test where discarded, but usually they return one language, I believe they have a disadvantage. 
@@ -133,7 +134,7 @@ I added *ELD-L* for comparison, which has a 2.3x bigger database, but only incre
 
 Here is the average, per test, of Tweets, Big test & Sentences.
 
-![Sentences tests average](https://raw.githubusercontent.com/nitotm/efficient-language-detector/main/tests/sentences-tests-average.png)
+![Sentences tests average](https://raw.githubusercontent.com/nitotm/efficient-language-detector/main/benchmarks/sentences-tests-average.png)
 <!--- Sentences average
 |                     | Time         | Accuracy     |
 |:--------------------|:------------:|:------------:|

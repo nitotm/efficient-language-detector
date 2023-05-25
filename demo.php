@@ -35,6 +35,7 @@ var_dump($eld->detect('To', false, false, 0, 1));
 /*
 To improve readability moving forward, PHP8 Named Parameters can be used
 print_r($eld->detect(text: 'To', cleanText: false, checkConfidence: false, minByteLength: 12, minNgrams: 3));
+cleanText: true, Removes Urls, domains, emails, alphanumerical & numbers
 */
 
 // To retrieve the whole list of languages detected and their score, we will set $returnScores to True, just once
