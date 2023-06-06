@@ -1,23 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Test</title>
-    <meta charset="utf-8">
-</head>
-<body>
-<pre>
 <?php
 
 require_once __DIR__.'/../src/languageDetector.php';
+
 use nitotm\eld\languageDetector;
 
 $eld = new languageDetector();
 $files = ['tweets.txt', 'big-test.txt', 'sentences.txt', 'word-pairs.txt', 'single-words.txt'];
 
+print (PHP_SAPI === 'cli' ? '' : "<pre>" . PHP_EOL);
 
 foreach ($files as $key => $file) {
 
-    $content = file_get_contents($file);
+    $content = file_get_contents(__DIR__ . '/' . $file);
     $lines = explode("\n", trim($content));
     $texts = [];
 
@@ -36,12 +30,14 @@ foreach ($files as $key => $file) {
         }
     }
     $time = microtime(true) - $start;
-    print $file . ' - Correct ratio: ' . round(($correct / $total) * 100, 2) . '% Time: ' . $time . "\n\n";
+    print $file . ' - Correct ratio: ' . round(($correct / $total) * 100, 2) . '% Time: ' . $time . PHP_EOL.PHP_EOL;
 
 }
 
+print (PHP_SAPI === 'cli' ? '' : "</pre>" . PHP_EOL);
+
 /*
-Results for v1.0.0, ngrams-m.php
+Results for v1.0.0, PHP 7.4.4, ngrams-m.php
 
 ﻿tweets.txt - Correct ratio: 99.28% Time: 0.30713295936584
 
@@ -56,8 +52,3 @@ single-words.txt - Correct ratio: 73.31% Time: 0.47791314125061
     If correct ratio is inferior, use $eld = new languageDetector('ngrams-m.safe.php'); to see if it fixes the problem.
 
 */
-
-?>
-</pre>
-</body>
-</html>

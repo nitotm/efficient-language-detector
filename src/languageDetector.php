@@ -16,11 +16,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-namespace nitotm\eld;
+namespace Nitotm\ELD;
 
-require_once 'languagesData.php';
+require_once __DIR__.'/LanguageData.php';
 
-class languageDetector extends languagesData
+class LanguageDetector extends LanguageData
 {
     public $returnScores = false;
 
@@ -157,7 +157,7 @@ class languageDetector extends languagesData
             $results = $this->calcScores($txtNgrams, $numNgrams);
 
             if ($this->subset) {
-                $results = $this->filterLangsSubset($results);
+                $results = $this->filterLangSubset($results);
             }
             arsort($results);
 

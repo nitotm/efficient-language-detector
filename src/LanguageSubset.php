@@ -17,21 +17,21 @@ limitations under the License.
 */
 
 /* 
-To reduce the languages to be detected, there are 3 different options, they only need to be execute once.
+To reduce the languages to be detected, there are 3 different options, they only need to be executed once.
 
-The fastest option to regularly use the same languages subset, will be to add as an argument the file stored (and returned) by langsSubset(), when creating an instance of the languageDetector class. In this case the subset ngrams database will be loaded directly, and not the default database. Also, you can use this option to load different ngram databases.
+The fastest option to regularly use the same language subset, will be to add as an argument the file stored (and returned) by langSubset(), when creating an instance of the languageDetector class. In this case the subset ngrams database will be loaded directly, and not the default database. Also, you can use this option to load different ngram databases.
 */
 
-namespace nitotm\eld;
+namespace Nitotm\ELD;
 
-class languagesSubset
+class LanguageSubset
 {
     protected $subset = false;
     protected $loadedSubset = false;
     private $defaultNgrams = false;
 
-    // dynamicLangsSubset() Will execute the detector normally, but at the end it will filter the excluded languages.
-    public function dynamicLangsSubset($langs)
+    // dynamicLangSubset() Will execute the detector normally, but at the end it will filter the excluded languages.
+    public function dynamicLangSubset($langs)
     {
         if ($langs) {
             $this->subset = [];
@@ -49,8 +49,8 @@ class languagesSubset
         return $this->subset;
     }
 
-    // langsSubset($langs,$save=true) Will previously remove the excluded languages form the ngrams database; for a single detection might be slower than dynamicLangsSubset(), but for multiple strings will be faster. if $save option is true (default), the new ngrams subset will be stored, and next loaded for the same languages subset, increasing startup speed.
-    public function langsSubset($langs, $save = true, $safe = false)
+    // langSubset($langs,$save=true) Will previously remove the excluded languages form the ngrams database; for a single detection might be slower than dynamicLangSubset(), but for multiple strings will be faster. if $save option is true (default), the new ngrams subset will be stored, and next loaded for the same language subset, increasing startup speed.
+    public function langSubset($langs, $save = true, $safe = false)
     {
         if ( ! $langs) {
             if ($this->loadedSubset) {
@@ -58,14 +58,14 @@ class languagesSubset
                 $this->loadedSubset = false;
             }
 
-            return;
+            return true;
         }
 
-        $langs_array = $this->dynamicLangsSubset($langs);
+        $langs_array = $this->dynamicLangSubset($langs);
         if ( ! $langs_array) {
             return 'No languages found';
         }
-        $this->subset = false; // We use dynamicLangsSubset() to filter languages, but set dynamic subset to false
+        $this->subset = false; // We use dynamicLangSubset() to filter languages, but set dynamic subset to false
 
         if ($this->defaultNgrams === false) {
             $this->defaultNgrams = $this->ngrams;
@@ -80,7 +80,7 @@ class languagesSubset
             if (file_exists($file_name)) {
                 require $file_name;
 
-                return;
+                return true;
             }
             if ($this->ngrams !== $this->defaultNgrams) {
                 $this->ngrams = $this->defaultNgrams;
@@ -112,7 +112,7 @@ class languagesSubset
         return true;
     }
 
-    protected function filterLangsSubset($results)
+    protected function filterLangSubset($results)
     {
         foreach ($results as $key => $value) {
             if ( ! in_array($key, $this->subset)) {

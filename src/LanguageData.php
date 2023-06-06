@@ -16,11 +16,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-namespace nitotm\eld;
+namespace Nitotm\ELD;
 
-require_once 'languagesSubset.php';
+require_once __DIR__.'/LanguageSubset.php';
 
-class languagesData extends languagesSubset
+class LanguageData extends LanguageSubset
 {
     protected $ngrams;
 
@@ -56,7 +56,7 @@ class languagesData extends languagesSubset
 
     function __construct($subsetFile = false)
     {
-        // Opcache needs to be actived so the load of this database array does not add overhead.
+        // Opcache needs to be active, so the load of this database array does not add overhead.
         require __DIR__.'/ngrams/'.(! $subsetFile ? 'ngrams-m.php' : $subsetFile); 
         // Internal reference: _ngrams_newAddEnd4gramExtra_1-4_2824 + _ngrams_charUtf8_1-1_2291
     }
