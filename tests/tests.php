@@ -7,7 +7,7 @@
 
 require_once __DIR__.'/TestClass.php';
 
-$tests = new Nitotm\ELD\Tests\TestClass();
+$tests = new Nitotm\Eld\Tests\TestClass();
 
 $GLOBALS['autoload_'] = isset($GLOBALS['autoload_']);
 
@@ -15,7 +15,7 @@ $tests->addTest('Load ELD and create instance', function () {
     if ( ! $GLOBALS['autoload_']) {
         require_once __DIR__.'/../src/LanguageDetector.php';
     }
-    $eld = new Nitotm\ELD\LanguageDetector();
+    $eld = new Nitotm\Eld\LanguageDetector();
 
     if ( ! $eld) {
         throw new Exception("LanguageDetector() instance not created");
@@ -26,7 +26,7 @@ $tests->addTest('Simple language detection', function () {
     if ( ! $GLOBALS['autoload_']) {
         require_once __DIR__.'/../src/LanguageDetector.php';
     }
-    $eld = new Nitotm\ELD\LanguageDetector();
+    $eld = new Nitotm\Eld\LanguageDetector();
 
     $result = $eld->detect('Hola, cómo te llamas?');
 
@@ -39,7 +39,7 @@ $tests->addTest('Get scores of multiple languages', function () {
     if ( ! $GLOBALS['autoload_']) {
         require_once __DIR__.'/../src/LanguageDetector.php';
     }
-    $eld               = new Nitotm\ELD\LanguageDetector();
+    $eld               = new Nitotm\Eld\LanguageDetector();
     $eld->returnScores = true;
 
     $result = $eld->detect('How are you? Bien, gracias');
@@ -55,7 +55,7 @@ $tests->addTest('Language detection, without minimum length', function () {
     if ( ! $GLOBALS['autoload_']) {
         require_once __DIR__.'/../src/LanguageDetector.php';
     }
-    $eld = new Nitotm\ELD\LanguageDetector();
+    $eld = new Nitotm\Eld\LanguageDetector();
 
     $result = $eld->detect('To', false, false, 0, 1);
 
@@ -68,7 +68,7 @@ $tests->addTest('Create dynamicLangSubset(), and detect', function () {
     if ( ! $GLOBALS['autoload_']) {
         require_once __DIR__.'/../src/LanguageDetector.php';
     }
-    $eld               = new Nitotm\ELD\LanguageDetector();
+    $eld               = new Nitotm\Eld\LanguageDetector();
     $eld->returnScores = true;
 
     $langSubset = ['en'];
@@ -88,7 +88,7 @@ $tests->addTest('Create dynamicLangSubset(), disable it, and detect', function (
     if ( ! $GLOBALS['autoload_']) {
         require_once __DIR__.'/../src/LanguageDetector.php';
     }
-    $eld               = new Nitotm\ELD\LanguageDetector();
+    $eld               = new Nitotm\Eld\LanguageDetector();
     $eld->returnScores = true;
 
     $langSubset = ['en'];
@@ -108,7 +108,7 @@ $tests->addTest('Create langSubset(), and detect', function () {
     if ( ! $GLOBALS['autoload_']) {
         require_once __DIR__.'/../src/LanguageDetector.php';
     }
-    $eld               = new Nitotm\ELD\LanguageDetector();
+    $eld               = new Nitotm\Eld\LanguageDetector();
     $eld->returnScores = true;
 
     $langSubset = ['en'];
@@ -128,7 +128,7 @@ $tests->addTest('Create langSubset(), disable it, and detect', function () {
     if ( ! $GLOBALS['autoload_']) {
         require_once __DIR__.'/../src/LanguageDetector.php';
     }
-    $eld               = new Nitotm\ELD\LanguageDetector();
+    $eld               = new Nitotm\Eld\LanguageDetector();
     $eld->returnScores = true;
 
     $langSubset = ['en'];
@@ -148,7 +148,7 @@ $tests->addTest('Check if langSubset() is able to save subset file', function ()
     if ( ! $GLOBALS['autoload_']) {
         require_once __DIR__.'/../src/LanguageDetector.php';
     }
-    $eld = new Nitotm\ELD\LanguageDetector();
+    $eld = new Nitotm\Eld\LanguageDetector();
 
     // Should already exist
     if ( ! file_exists(__DIR__.'/../src/ngrams/ngrams.17ba0791499db908433b80f37c5fbc89b870084b.php')) {
@@ -171,7 +171,7 @@ $tests->addTest('Create instance with diferent ngrams database, and detect', fun
     if ( ! $GLOBALS['autoload_']) {
         require_once __DIR__.'/../src/LanguageDetector.php';
     }
-    $eld = new Nitotm\ELD\LanguageDetector('ngrams.2f37045c74780aba1d36d6717f3244dc025fb935.php');
+    $eld = new Nitotm\Eld\LanguageDetector('ngrams.2f37045c74780aba1d36d6717f3244dc025fb935.php');
 
     $result = $eld->detect('Hola, cómo te llamas?');
 
@@ -185,7 +185,7 @@ $tests->addTest("Testing accuracy: ngrams-m.php database, for big-test.txt", fun
         require_once __DIR__.'/../src/LanguageDetector.php';
     }
 
-    $eld     = new Nitotm\ELD\LanguageDetector('ngrams-m.php');
+    $eld     = new Nitotm\Eld\LanguageDetector('ngrams-m.php');
     $total   = 0;
     $correct = 0;
     $handle  = fopen(__DIR__.'/../benchmarks/big-test.txt', "r");

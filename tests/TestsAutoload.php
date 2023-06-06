@@ -1,9 +1,9 @@
 <?php
 /* To execute: 
-   new Nitotm\ELD\Tests\TestsAutoload();
+   new Nitotm\Eld\Tests\TestsAutoload();
 */
 
-namespace Nitotm\ELD\Tests;
+namespace Nitotm\Eld\Tests;
 
 $GLOBALS['autoload_'] = true;
 
@@ -14,4 +14,3 @@ class TestsAutoload
         require_once __DIR__.'/tests.php';
     }
 }
-

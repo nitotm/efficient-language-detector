@@ -20,12 +20,12 @@
   ],
   "autoload": {
     "psr-4": {
-      "Nitotm\\ELD\\": "src"
+      "Nitotm\\Eld\\": "src"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Nitotm\\ELD\\Tests\\": "tests"
+      "Nitotm\\Eld\\Tests\\": "tests"
     }
   },
   "require": {

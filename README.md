@@ -30,7 +30,7 @@ Alternatively, download / clone the files will work just fine.
 
 ```php
 // require_once 'src/LanguageDetector.php'; To load ELD without composer/autoload. Update path.
-$eld = new Nitotm\ELD\LanguageDetector;
+$eld = new Nitotm\Eld\LanguageDetector;
 
 var_dump($eld->detect('Hola, cómo te llamas?'));
 ```
@@ -57,6 +57,7 @@ var_dump($eld->detect('How are you? Bien, gracias'));
 
 
 - To reduce the languages to be detected, there are 3 different options, they only need to be executed once. (Check available [languages](#languages) below)
+
 ```php
 $langSubset = ['en','es','fr','it','nl','de'];
 
@@ -74,7 +75,7 @@ $eld->langSubset(false);
 
 // Finally the fastest way to regularly use a language subset: we create the instance with a file
 // The file in the argument can be a subset by langSubset() or another database like ngrams_L.php
-$eld_l = new Nitotm\ELD\LanguageDetector('ngrams-L.php');
+$eld_l = new Nitotm\Eld\LanguageDetector('ngrams-L.php');
 ```
 
 ## Benchmarks
@@ -154,8 +155,9 @@ Here is the average, per benchmark, of Tweets, Big test & Sentences.
 $ php efficient-language-detector/tests/tests.php # Update path
 ```
 - Also, for composer "autoload-dev", the following line will also execute the unit tests
+
 ```php
-new Nitotm\ELD\Tests\TestsAutoload();
+new Nitotm\Eld\Tests\TestsAutoload();
 ```
 - To run the accuracy benchmarks run the `benchmarks/bench.php` file .
 

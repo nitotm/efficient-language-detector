@@ -19,9 +19,9 @@ limitations under the License.
 print (PHP_SAPI === 'cli' ? '' : "<pre>") . PHP_EOL;
 
 require_once 'src/LanguageDetector.php';
-// use nitotm\eld\languageDetector;
+// use Nitotm\Eld\LanguageDetector;
 
-$eld = new Nitotm\ELD\LanguageDetector;
+$eld = new Nitotm\Eld\LanguageDetector;
 
 // detect() expects a UTF-8 string, and returns an array, with a value named 'language', which will be either an ISO 639-1 code or false
 var_dump($eld->detect('Hola, cómo te llamas?'));
@@ -62,6 +62,6 @@ $eld->langSubset($langSubset); // returns subset file name if saved
 $eld->langSubset(false);
 
 // Finally the fastest option to regularly use the same language subset, will be to add as an argument the file stored (and returned) by langSubset(), when creating an instance of the class. In this case the subset Ngrams database will be loaded directly, and not the default database. Also, you can use this option to load different ngram databases stored at src/ngrams/
-$elds = new Nitotm\ELD\LanguageDetector('ngrams.2f37045c74780aba1d36d6717f3244dc025fb935.php');
+$elds = new Nitotm\Eld\LanguageDetector('ngrams.2f37045c74780aba1d36d6717f3244dc025fb935.php');
 
 print (PHP_SAPI === 'cli' ? '' : "</pre>");

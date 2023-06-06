@@ -2,9 +2,9 @@
 
 require_once __DIR__.'/../src/languageDetector.php';
 
-use nitotm\eld\languageDetector;
+use Nitotm\Eld\LanguageDetector;
 
-$eld = new languageDetector();
+$eld = new LanguageDetector();
 $files = ['tweets.txt', 'big-test.txt', 'sentences.txt', 'word-pairs.txt', 'single-words.txt'];
 
 print (PHP_SAPI === 'cli' ? '' : "<pre>" . PHP_EOL);

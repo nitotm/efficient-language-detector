@@ -22,7 +22,7 @@ To reduce the languages to be detected, there are 3 different options, they only
 The fastest option to regularly use the same language subset, will be to add as an argument the file stored (and returned) by langSubset(), when creating an instance of the languageDetector class. In this case the subset ngrams database will be loaded directly, and not the default database. Also, you can use this option to load different ngram databases.
 */
 
-namespace Nitotm\ELD;
+namespace Nitotm\Eld;
 
 class LanguageSubset
 {
