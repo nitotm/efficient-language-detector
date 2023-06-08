@@ -77,7 +77,7 @@ $tests->addTest('Detection, test error minimum length', function () {
         throw new Exception("Expected: false, but got: ".($result['language'] ?? ''));
     }
 });
-       
+
 $tests->addTest('Clean text', function () {
     if ( ! $GLOBALS['autoload_']) {
         require_once __DIR__.'/../src/LanguageDetector.php';
@@ -85,13 +85,13 @@ $tests->addTest('Clean text', function () {
     $eld = new Nitotm\Eld\LanguageDetector();
 
     $text = "https://www.google.com/\n".
-            "mail@gmail.com\n".
-            "google.com/search?q=search&source=hp\n".
-            "12345 A12345\n";
+        "mail@gmail.com\n".
+        "google.com/search?q=search&source=hp\n".
+        "12345 A12345\n";
 
     $result = trim($eld->cleanTxt($text));
 
-    if ( $result !== '') {
+    if ($result !== '') {
         throw new Exception("Expected: empty string, but got ".$result);
     }
 });
@@ -102,7 +102,7 @@ $tests->addTest('Check minimum confidence', function () {
     }
     $eld = new Nitotm\Eld\LanguageDetector('ngrams-m.php');
 
-    $result = $eld->detect('zxz zcz zvz zbz znz zmz zlz zsz zdz zkz zjz pelo', false, True, 0, 1);
+    $result = $eld->detect('zxz zcz zvz zbz znz zmz zlz zsz zdz zkz zjz pelo', false, true, 0, 1);
 
     if ( ! isset($result['language']) || $result['language'] !== false) {
         throw new Exception("Expected: false, but got: ".($result['language'] ?? ''));
@@ -193,7 +193,7 @@ $tests->addTest('Check if langSubset() is able to save subset file', function ()
     if ( ! $GLOBALS['autoload_']) {
         require_once __DIR__.'/../src/LanguageDetector.php';
     }
-    $eld = new Nitotm\Eld\LanguageDetector();
+    $eld  = new Nitotm\Eld\LanguageDetector();
     $file = __DIR__.'/../src/ngrams/ngrams.17ba0791499db908433b80f37c5fbc89b870084b.php';
 
     // Should already exist
