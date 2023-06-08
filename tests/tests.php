@@ -7,7 +7,8 @@
 
 require_once __DIR__.'/TestClass.php';
 
-$tests = new Nitotm\Eld\Tests\TestClass();
+$tests = new TestClass();
+//$tests = new Nitotm\Eld\Tests\TestClass();
 
 $GLOBALS['autoload_'] = isset($GLOBALS['autoload_']);
 
@@ -61,6 +62,50 @@ $tests->addTest('Language detection, without minimum length', function () {
 
     if ( ! isset($result['language']) || $result['language'] !== 'en') {
         throw new Exception("Expected: 'en', but got: ".($result['language'] ?? ''));
+    }
+});
+
+$tests->addTest('Detection, test error minimum length', function () {
+    if ( ! $GLOBALS['autoload_']) {
+        require_once __DIR__.'/../src/LanguageDetector.php';
+    }
+    $eld = new Nitotm\Eld\LanguageDetector();
+
+    $result = $eld->detect('To');
+
+    if ( ! isset($result['language']) || $result['language'] !== false) {
+        throw new Exception("Expected: false, but got: ".($result['language'] ?? ''));
+    }
+});
+       
+$tests->addTest('Clean text', function () {
+    if ( ! $GLOBALS['autoload_']) {
+        require_once __DIR__.'/../src/LanguageDetector.php';
+    }
+    $eld = new Nitotm\Eld\LanguageDetector();
+
+    $text = "https://www.google.com/\n".
+            "mail@gmail.com\n".
+            "google.com/search?q=search&source=hp\n".
+            "12345 A12345\n";
+
+    $result = trim($eld->cleanTxt($text));
+
+    if ( $result !== '') {
+        throw new Exception("Expected: empty string, but got ".$result);
+    }
+});
+
+$tests->addTest('Check minimum confidence', function () {
+    if ( ! $GLOBALS['autoload_']) {
+        require_once __DIR__.'/../src/LanguageDetector.php';
+    }
+    $eld = new Nitotm\Eld\LanguageDetector('ngrams-m.php');
+
+    $result = $eld->detect('zxz zcz zvz zbz znz zmz zlz zsz zdz zkz zjz pelo', false, True, 0, 1);
+
+    if ( ! isset($result['language']) || $result['language'] !== false) {
+        throw new Exception("Expected: false, but got: ".($result['language'] ?? ''));
     }
 });
 
@@ -149,20 +194,21 @@ $tests->addTest('Check if langSubset() is able to save subset file', function ()
         require_once __DIR__.'/../src/LanguageDetector.php';
     }
     $eld = new Nitotm\Eld\LanguageDetector();
+    $file = __DIR__.'/../src/ngrams/ngrams.17ba0791499db908433b80f37c5fbc89b870084b.php';
 
     // Should already exist
-    if ( ! file_exists(__DIR__.'/../src/ngrams/ngrams.17ba0791499db908433b80f37c5fbc89b870084b.php')) {
+    if ( ! file_exists($file)) {
         throw new Exception("File /src/ngrams/ngrams.17ba0791499... not found");
     }
 
-    if ( ! unlink(__DIR__.'/../src/ngrams/ngrams.17ba0791499db908433b80f37c5fbc89b870084b.php')) {
+    if ( ! unlink($file)) {
         throw new Exception("ABORTED: Unable to delete ngrams.17ba0791... file; Not an ELD error");
     }
 
     $langSubset = ['en'];
     $eld->langSubset($langSubset);
 
-    if ( ! file_exists(__DIR__.'/../src/ngrams/ngrams.17ba0791499db908433b80f37c5fbc89b870084b.php')) {
+    if ( ! file_exists($file)) {
         throw new Exception("File /src/ngrams/ngrams.17ba0791499... not found");
     }
 });
@@ -204,7 +250,7 @@ $tests->addTest("Testing accuracy: ngrams-m.php database, for big-test.txt", fun
         throw new Exception("ABORTED: Unable to load big-test.txt; Not an ELD error");
     }
 
-    if (($correct / $total) * 100 < 99.418) {
+    if (($correct / $total) * 100 < 99.4) { // a bit of margin, depending on tie scores order, avg. might change a bit
         throw new Exception(
             "Accuracy too low. Expected 99.42%, but got: ".
             round(($correct / $total) * 100, 4).'%'

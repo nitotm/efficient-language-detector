@@ -1,6 +1,8 @@
 <?php
-/* To execute: 
-   new Nitotm\Eld\Tests\TestsAutoload();
+/* 	To execute with autoload-dev: 
+   		new Nitotm\Eld\Tests\TestsAutoload();
+	In this document
+   		new TestsAutoload();
 */
 
 namespace Nitotm\Eld\Tests;
