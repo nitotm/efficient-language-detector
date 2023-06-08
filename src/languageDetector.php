@@ -165,8 +165,8 @@ class LanguageDetector extends LanguageData
                 $top_lang = key($results);
 
                 if ($checkConfidence) {
-                    // A minimum of a 17% per ngram score from average
-                    if ($this->avgScore[$top_lang] * 0.17 > ($results[$top_lang] / $numNgrams)
+                    // A minimum of a 24% per ngram score from average
+                    if ($this->avgScore[$top_lang] * 0.24 > ($results[$top_lang] / $numNgrams)
                         || 0.01 > abs($results[$top_lang] - next($results))) {
                         return [
                             'language' => false,
