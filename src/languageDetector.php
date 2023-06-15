@@ -35,7 +35,7 @@ class LanguageDetector extends LanguageData
         $str = preg_replace('@[hw]((ttps?://(www\.)?)|ww\.)([^\s/?\.#-]+\.?)+(/\S*)?@i', ' ', $str);
         // Remove emails
         $str = preg_replace('/[a-zA-Z0-9.!$%&’+_`-]+@[A-Za-z0-9.-]+\.[A-Za-z0-9-]{2,64}/', ' ', $str);
-        // Remove domains
+        // Remove .com domains
         $str = preg_replace('/([A-Za-z0-9-]+\.)+com(\/\S*|[^\pL])/', ' ', $str);
 
         // Remove alphanumerical/number codes
