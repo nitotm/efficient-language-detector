@@ -83,7 +83,7 @@ $eld_l = new Nitotm\Eld\LanguageDetector('ngrams-L.php');
 I compared *ELD* with a different variety of detectors, since the interesting part is the algorithm.
 
 | URL                                                      | Version       | Language     |
-| :-                                                       | :-            | :-           |
+|:---------------------------------------------------------|:--------------|:-------------|
 | https://github.com/nitotm/efficient-language-detector/   | 1.0.0         | PHP          |
 | https://github.com/pemistahl/lingua-py                   | 1.3.2         | Python       |
 | https://github.com/CLD2Owners/cld2                       | Aug 21, 2015  | C++          |
@@ -154,7 +154,7 @@ Here is the average, per benchmark, of Tweets, Big test & Sentences.
 ```bash
 $ php efficient-language-detector/tests/tests.php # Update path
 ```
-- Also, for composer "autoload-dev", the following line will also execute the unit tests
+- Also, for composer "autoload-dev", the following line will also execute the tests
 
 ```php
 new Nitotm\Eld\Tests\TestsAutoload();
