@@ -5,83 +5,68 @@
     Or open the file through a server in the Browser
 */
 
-require_once __DIR__.'/TestClass.php';
+require_once __DIR__ . '/TestClass.php';
 
 $tests = new TestClass();
-//$tests = new Nitotm\Eld\Tests\TestClass();
 
-$GLOBALS['autoload_'] = isset($GLOBALS['autoload_']);
+// Mostly functional testing, when functions are more mature I will add some more unit tests
+
+if (!isset($GLOBALS['autoload_'])) {
+    require_once __DIR__ . '/../src/LanguageDetector.php';
+}
 
 $tests->addTest('Load ELD and create instance', function () {
-    if ( ! $GLOBALS['autoload_']) {
-        require_once __DIR__.'/../src/LanguageDetector.php';
-    }
     $eld = new Nitotm\Eld\LanguageDetector();
 
-    if ( ! $eld) {
+    if (!$eld) {
         throw new Exception("LanguageDetector() instance not created");
     }
 }, true);
 
 $tests->addTest('Simple language detection', function () {
-    if ( ! $GLOBALS['autoload_']) {
-        require_once __DIR__.'/../src/LanguageDetector.php';
-    }
     $eld = new Nitotm\Eld\LanguageDetector();
 
     $result = $eld->detect('Hola, cómo te llamas?');
 
-    if ( ! isset($result['language']) || $result['language'] !== 'es') {
-        throw new Exception("Expected: 'es', but got: ".($result['language'] ?? ''));
+    if (!isset($result['language']) || $result['language'] !== 'es') {
+        throw new Exception("Expected: 'es', but got: " . ($result['language'] ?? ''));
     }
 });
 
 $tests->addTest('Get scores of multiple languages', function () {
-    if ( ! $GLOBALS['autoload_']) {
-        require_once __DIR__.'/../src/LanguageDetector.php';
-    }
-    $eld               = new Nitotm\Eld\LanguageDetector();
+    $eld = new Nitotm\Eld\LanguageDetector();
     $eld->returnScores = true;
 
     $result = $eld->detect('How are you? Bien, gracias');
 
-    if ( ! isset($result['scores']) || count($result['scores']) < 2) {
+    if (!isset($result['scores']) || count($result['scores']) < 2) {
         throw new Exception(
-            "Expected: >1 scores, but got: ".(isset($result['scores']) ? count($result['scores']) : '0')
+            "Expected: >1 scores, but got: " . (isset($result['scores']) ? count($result['scores']) : '0')
         );
     }
 });
 
 $tests->addTest('Language detection, without minimum length', function () {
-    if ( ! $GLOBALS['autoload_']) {
-        require_once __DIR__.'/../src/LanguageDetector.php';
-    }
     $eld = new Nitotm\Eld\LanguageDetector();
 
     $result = $eld->detect('To', false, false, 0, 1);
 
-    if ( ! isset($result['language']) || $result['language'] !== 'en') {
-        throw new Exception("Expected: 'en', but got: ".($result['language'] ?? ''));
+    if (!isset($result['language']) || $result['language'] !== 'en') {
+        throw new Exception("Expected: 'en', but got: " . ($result['language'] ?? ''));
     }
 });
 
-$tests->addTest('Detection, test error minimum length', function () {
-    if ( ! $GLOBALS['autoload_']) {
-        require_once __DIR__.'/../src/LanguageDetector.php';
-    }
+$tests->addTest('Test minimum length error', function () {
     $eld = new Nitotm\Eld\LanguageDetector();
 
     $result = $eld->detect('To');
 
-    if ( ! isset($result['language']) || $result['language'] !== false) {
-        throw new Exception("Expected: false, but got: ".($result['language'] ?? ''));
+    if (!isset($result['language']) || $result['language'] !== false) {
+        throw new Exception("Expected: false, but got: " . ($result['language'] ?? ''));
     }
 });
 
 $tests->addTest('Clean text', function () {
-    if ( ! $GLOBALS['autoload_']) {
-        require_once __DIR__.'/../src/LanguageDetector.php';
-    }
     $eld = new Nitotm\Eld\LanguageDetector();
 
     $text = "https://www.google.com/\n".
@@ -92,28 +77,22 @@ $tests->addTest('Clean text', function () {
     $result = trim($eld->cleanTxt($text));
 
     if ($result !== '') {
-        throw new Exception("Expected: empty string, but got ".$result);
+        throw new Exception("Expected: empty string, but got " . $result);
     }
 });
 
 $tests->addTest('Check minimum confidence', function () {
-    if ( ! $GLOBALS['autoload_']) {
-        require_once __DIR__.'/../src/LanguageDetector.php';
-    }
     $eld = new Nitotm\Eld\LanguageDetector('ngrams-m.php');
 
     $result = $eld->detect('zxz zcz zvz zbz znz zmz zlz zsz zdz zkz zjz pelo', false, true, 0, 1);
 
-    if ( ! isset($result['language']) || $result['language'] !== false) {
-        throw new Exception("Expected: false, but got: ".($result['language'] ?? ''));
+    if (!isset($result['language']) || $result['language'] !== false) {
+        throw new Exception("Expected: false, but got: " . ($result['language'] ?? ''));
     }
 });
 
 $tests->addTest('Create dynamicLangSubset(), and detect', function () {
-    if ( ! $GLOBALS['autoload_']) {
-        require_once __DIR__.'/../src/LanguageDetector.php';
-    }
-    $eld               = new Nitotm\Eld\LanguageDetector();
+    $eld = new Nitotm\Eld\LanguageDetector();
     $eld->returnScores = true;
 
     $langSubset = ['en'];
@@ -121,19 +100,15 @@ $tests->addTest('Create dynamicLangSubset(), and detect', function () {
 
     $result = $eld->detect('How are you? Bien, gracias');
 
-    if ( ! isset($result['scores']) || count($result['scores']) !== 1) {
+    if (!isset($result['scores']) || count($result['scores']) !== 1) {
         throw new Exception(
-            "Expected: 1 score, but got: ".
-            (isset($result['scores']) ? count($result['scores']) : '0')
+            "Expected: 1 score, but got: " . (isset($result['scores']) ? count($result['scores']) : '0')
         );
     }
 });
 
 $tests->addTest('Create dynamicLangSubset(), disable it, and detect', function () {
-    if ( ! $GLOBALS['autoload_']) {
-        require_once __DIR__.'/../src/LanguageDetector.php';
-    }
-    $eld               = new Nitotm\Eld\LanguageDetector();
+    $eld = new Nitotm\Eld\LanguageDetector();
     $eld->returnScores = true;
 
     $langSubset = ['en'];
@@ -142,18 +117,15 @@ $tests->addTest('Create dynamicLangSubset(), disable it, and detect', function (
 
     $result = $eld->detect('How are you? Bien, gracias');
 
-    if ( ! isset($result['scores']) || count($result['scores']) < 2) {
+    if (!isset($result['scores']) || count($result['scores']) < 2) {
         throw new Exception(
-            "Expected: >1 scores, but got: ".(isset($result['scores']) ? count($result['scores']) : '0')
+            "Expected: >1 scores, but got: " . (isset($result['scores']) ? count($result['scores']) : '0')
         );
     }
 });
 
 $tests->addTest('Create langSubset(), and detect', function () {
-    if ( ! $GLOBALS['autoload_']) {
-        require_once __DIR__.'/../src/LanguageDetector.php';
-    }
-    $eld               = new Nitotm\Eld\LanguageDetector();
+    $eld = new Nitotm\Eld\LanguageDetector();
     $eld->returnScores = true;
 
     $langSubset = ['en'];
@@ -161,19 +133,15 @@ $tests->addTest('Create langSubset(), and detect', function () {
 
     $result = $eld->detect('How are you? Bien, gracias');
 
-    if ( ! isset($result['scores']) || count($result['scores']) !== 1) {
+    if (!isset($result['scores']) || count($result['scores']) !== 1) {
         throw new Exception(
-            "Expected: 1 score, but got: ".
-            (isset($result['scores']) ? count($result['scores']) : '0')
+            "Expected: 1 score, but got: " . (isset($result['scores']) ? count($result['scores']) : '0')
         );
     }
 });
 
 $tests->addTest('Create langSubset(), disable it, and detect', function () {
-    if ( ! $GLOBALS['autoload_']) {
-        require_once __DIR__.'/../src/LanguageDetector.php';
-    }
-    $eld               = new Nitotm\Eld\LanguageDetector();
+    $eld = new Nitotm\Eld\LanguageDetector();
     $eld->returnScores = true;
 
     $langSubset = ['en'];
@@ -182,59 +150,49 @@ $tests->addTest('Create langSubset(), disable it, and detect', function () {
 
     $result = $eld->detect('How are you? Bien, gracias');
 
-    if ( ! isset($result['scores']) || count($result['scores']) < 2) {
+    if (!isset($result['scores']) || count($result['scores']) < 2) {
         throw new Exception(
-            "Expected: >1 scores, but got: ".(isset($result['scores']) ? count($result['scores']) : '0')
+            "Expected: >1 scores, but got: " . (isset($result['scores']) ? count($result['scores']) : '0')
         );
     }
 });
 
 $tests->addTest('Check if langSubset() is able to save subset file', function () {
-    if ( ! $GLOBALS['autoload_']) {
-        require_once __DIR__.'/../src/LanguageDetector.php';
-    }
-    $eld  = new Nitotm\Eld\LanguageDetector();
-    $file = __DIR__.'/../src/ngrams/ngrams.17ba0791499db908433b80f37c5fbc89b870084b.php';
+    $eld = new Nitotm\Eld\LanguageDetector();
+    $file = __DIR__ . '/../src/ngrams/ngrams.17ba0791499db908433b80f37c5fbc89b870084b.php';
 
     // Should already exist
-    if ( ! file_exists($file)) {
+    if (!file_exists($file)) {
         throw new Exception("File /src/ngrams/ngrams.17ba0791499... not found");
     }
 
-    if ( ! unlink($file)) {
+    if (!unlink($file)) {
         throw new Exception("ABORTED: Unable to delete ngrams.17ba0791... file; Not an ELD error");
     }
 
     $langSubset = ['en'];
     $eld->langSubset($langSubset);
 
-    if ( ! file_exists($file)) {
+    if (!file_exists($file)) {
         throw new Exception("File /src/ngrams/ngrams.17ba0791499... not found");
     }
 });
 
 $tests->addTest('Create instance with diferent ngrams database, and detect', function () {
-    if ( ! $GLOBALS['autoload_']) {
-        require_once __DIR__.'/../src/LanguageDetector.php';
-    }
     $eld = new Nitotm\Eld\LanguageDetector('ngrams.2f37045c74780aba1d36d6717f3244dc025fb935.php');
 
     $result = $eld->detect('Hola, cómo te llamas?');
 
-    if ( ! isset($result['language']) || $result['language'] !== 'es') {
-        throw new Exception("Expected: 'es', but got: ".($result['language'] ?? ''));
+    if (!isset($result['language']) || $result['language'] !== 'es') {
+        throw new Exception("Expected: 'es', but got: " . ($result['language'] ?? ''));
     }
 });
 
 $tests->addTest("Testing accuracy: ngrams-m.php database, for big-test.txt", function () {
-    if ( ! $GLOBALS['autoload_']) {
-        require_once __DIR__.'/../src/LanguageDetector.php';
-    }
-
-    $eld     = new Nitotm\Eld\LanguageDetector('ngrams-m.php');
-    $total   = 0;
+    $eld = new Nitotm\Eld\LanguageDetector('ngrams-m.php');
+    $total = 0;
     $correct = 0;
-    $handle  = fopen(__DIR__.'/../benchmarks/big-test.txt', "r");
+    $handle = fopen(__DIR__ . '/../benchmarks/big-test.txt', "r");
     if ($handle) {
         while (($line = fgets($handle)) !== false) {
             $values = explode("\t", trim($line));
@@ -251,10 +209,7 @@ $tests->addTest("Testing accuracy: ngrams-m.php database, for big-test.txt", fun
     }
 
     if (($correct / $total) * 100 < 99.4) { // a bit of margin, depending on tie scores order, avg. might change a bit
-        throw new Exception(
-            "Accuracy too low. Expected 99.42%, but got: ".
-            round(($correct / $total) * 100, 4).'%'
-        );
+        throw new Exception("Accuracy too low. Expected 99.42%, but got: ". round(($correct / $total) * 100, 4) .'%');
     }
 });
 
