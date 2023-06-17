@@ -52,9 +52,9 @@ class LanguageSubset
     // langSubset($langs,$save=true) Will previously remove the excluded languages form the ngrams database; for a single detection might be slower than dynamicLangSubset(), but for multiple strings will be faster. if $save option is true (default), the new ngrams subset will be stored, and next loaded for the same language subset, increasing startup speed.
     public function langSubset($langs, $save = true, $safe = false)
     {
-        if ( ! $langs) {
+        if (!$langs) {
             if ($this->loadedSubset) {
-                $this->ngrams       = $this->defaultNgrams;
+                $this->ngrams = $this->defaultNgrams;
                 $this->loadedSubset = false;
             }
 
@@ -62,7 +62,7 @@ class LanguageSubset
         }
 
         $langs_array = $this->dynamicLangSubset($langs);
-        if ( ! $langs_array) {
+        if (!$langs_array) {
             return 'No languages found';
         }
         $this->subset = false; // We use dynamicLangSubset() to filter languages, but set dynamic subset to false
@@ -72,7 +72,7 @@ class LanguageSubset
         }
 
         $new_subset = hash('sha1', implode(',', $langs_array));
-        $file_name  = __DIR__.'/ngrams/ngrams.'.$new_subset.'.php';
+        $file_name = __DIR__ . '/ngrams/ngrams.' . $new_subset . '.php';
 
         if ($this->loadedSubset !== $new_subset) {
             $this->loadedSubset = $new_subset;
@@ -88,21 +88,21 @@ class LanguageSubset
 
             foreach ($this->ngrams as $ngram => $langsID) {
                 foreach ($langsID as $id => $value) {
-                    if ( ! in_array($id, $langs_array)) {
+                    if (!in_array($id, $langs_array)) {
                         unset($this->ngrams[$ngram][$id]);
                     }
                 }
-                if ( ! $this->ngrams[$ngram]) {
+                if (!$this->ngrams[$ngram]) {
                     unset($this->ngrams[$ngram]);
                 }
             }
         }
 
         if ($save) {
-            if ( ! file_exists($file_name)) { // in case $this->loadedSubset !== $new_subset, and was previously saved
+            if (!file_exists($file_name)) { // in case $this->loadedSubset !== $new_subset, and was previously saved
                 file_put_contents($file_name,
-                    '<?php'."\r\n".'// Do not edit unless you ensure you are using UTF-8 encoding'."\r\n"
-                    .'$this->ngrams='.$this->ngram_export($this->ngrams, $safe).';'
+                    '<?php' . "\r\n" . '// Do not edit unless you ensure you are using UTF-8 encoding' . "\r\n"
+                    . '$this->ngrams=' . $this->ngram_export($this->ngrams, $safe) . ';'
                 );
             }
 
@@ -115,7 +115,7 @@ class LanguageSubset
     protected function filterLangSubset($results)
     {
         foreach ($results as $key => $value) {
-            if ( ! in_array($key, $this->subset)) {
+            if (!in_array($key, $this->subset)) {
                 unset($results[$key]);
             }
         }
@@ -128,11 +128,11 @@ class LanguageSubset
         if (is_array($var)) {
             $toImplode = array();
             foreach ($var as $key => $value) {
-                $toImplode[] = ($safe === true ? '"\\x'.substr(chunk_split(bin2hex($key), 2, '\\x'), 0, -2).'"'
-                        : var_export($key, true)).'=>'.$this->ngram_export($value);
+                $toImplode[] = ($safe === true ? '"\\x' . substr(chunk_split(bin2hex($key), 2, '\\x'), 0, -2) . '"'
+                        : var_export($key, true)) . '=>' . $this->ngram_export($value);
             }
 
-            return '['.implode(',', $toImplode).']';
+            return '[' . implode(',', $toImplode) . ']';
         } else {
             return var_export($var, true);
         }
