@@ -96,7 +96,13 @@ readonly class LanguageDetectorWithTools extends LanguageDetector
         $this->out('- memory peak', ceil($memory / 1024 / 1024));
     }
 
-    protected function out($msg, ...$meta):void
+    /**
+     * @param string           $msg
+     * @param string|int|float ...$meta
+     *
+     * @return void
+     */
+    protected function out(string $msg, ...$meta):void
     {
         if ($meta !== []) {
             $msg .= ": " . implode(": ", $meta);

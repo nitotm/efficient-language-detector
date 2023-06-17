@@ -22,7 +22,9 @@ final readonly class LanguageResult
         );
     }
 
-    /** @param array<string,float> $scores */
+    /**
+     * @param array<string,float> $scores
+     */
     public function __construct(
         public ?string $language = null,
         public ?float $score = null,
@@ -32,23 +34,25 @@ final readonly class LanguageResult
     ) {
     }
 
-    /** @return array<mixed,mixed> */
+    /**
+     * @return array<mixed,mixed>
+     */
     public function dump(bool $directly = false):array
     {
         try {
-            return (array)json_decode(json_encode($this, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
+            $dump = (array)json_decode(json_encode($this, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
             $dump = [
                 "failed to dump",
                 $e::class,
                 $e->getMessage(),
             ];
-            if ($directly) {
-                /** @noinspection ForgottenDebugOutputInspection */
-                var_dump($dump);
-            }
-
-            return $dump;
         }
+        if ($directly) {
+            /** @noinspection ForgottenDebugOutputInspection */
+            var_dump($dump);
+        }
+
+        return $dump;
     }
 }
