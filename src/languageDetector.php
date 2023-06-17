@@ -18,11 +18,18 @@ limitations under the License.
 
 namespace Nitotm\Eld;
 
-require_once __DIR__.'/LanguageData.php';
+require_once __DIR__ . '/LanguageData.php';
 
 class LanguageDetector extends LanguageData
 {
     public $returnScores = false;
+    protected $wordStart;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->wordStart = [' '] + array_fill(1, 70, '');
+    }
 
     protected function tokenizer($str)
     {
@@ -57,13 +64,10 @@ class LanguageDetector extends LanguageData
 
     protected function getByteNgrams($str)
     {
-        $str         = mb_strtolower($str, 'UTF-8');
-        $tokens      = [];
+        $str = mb_strtolower($str, 'UTF-8');
+        $tokens = [];
         $countNgrams = 0;
-        // Word start. Local declaration improves speed. Much faster than ($j==0 ? ' ' : '')
-        $start = [' ','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',
-            '','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',
-            '','',''];
+        $start = $this->wordStart;
 
         foreach ($this->tokenizer($str) as $word) {
             $len = strlen($word);
@@ -72,9 +76,9 @@ class LanguageDetector extends LanguageData
             }
 
             for ($j = 0; ($j + 4) < $len; $j += 3, ++$tmp, ++$countNgrams) {
-                $tmp = &$tokens[$start[$j].substr($word, $j, 4)];
+                $tmp = &$tokens[$start[$j] . substr($word, $j, 4)];
             }
-            $tmp = &$tokens[$start[$j].substr($word, ($len != 3 ? $len - 4 : 0)).' '];
+            $tmp = &$tokens[$start[$j] . substr($word, ($len != 3 ? $len - 4 : 0)) . ' '];
             $tmp++;
             $countNgrams++;
         }
@@ -91,7 +95,7 @@ class LanguageDetector extends LanguageData
     protected function calcScores($txtNgrams, $numNgrams)
     {
         $langScore = $this->langScore;
-        $results   = [];
+        $results = [];
 
         foreach ($txtNgrams as $bytes => $frequency) {
             if (isset($this->ngrams[$bytes])) {
@@ -140,7 +144,7 @@ class LanguageDetector extends LanguageData
         }
         $minNgrams = ($minNgrams > 0 ? $minNgrams : 1);
         // Normalize special characters/word separators
-        $text       = trim(preg_replace('/[^\pL]+(?<![\x27\x60\x{2019}])/u', ' ', mb_substr($text, 0, 1000, 'UTF-8')));
+        $text = trim(preg_replace('/[^\pL]+(?<![\x27\x60\x{2019}])/u', ' ', mb_substr($text, 0, 1000, 'UTF-8')));
         $thisLength = strlen($text);
 
         if ($thisLength > 350) {
@@ -170,13 +174,13 @@ class LanguageDetector extends LanguageData
                         || 0.01 > abs($results[$top_lang] - next($results))) {
                         return [
                             'language' => false,
-                            'error'    => 'No language has been identified with sufficient confidence, set checkConfidence to false to avoid this error',
-                            'scores'   => []
+                            'error' => 'No language has been identified with sufficient confidence, set checkConfidence to false to avoid this error',
+                            'scores' => []
                         ];
                     }
                 }
 
-                if ( ! $this->returnScores) {
+                if (!$this->returnScores) {
                     return ['language' => $this->langCodes[$top_lang]];
                 } else {
                     return ['language' => $this->langCodes[$top_lang], 'scores' => $this->getScores($results)];
