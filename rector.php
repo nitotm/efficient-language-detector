@@ -1,4 +1,5 @@
 <?php
+// this is only a configuration file to be included by vendor/bin/rector
 
 declare(strict_types = 1);
 

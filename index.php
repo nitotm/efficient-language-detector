@@ -7,6 +7,10 @@ namespace Nitotm\Eld;
 
 include __DIR__ . "/vendor/autoload.php";
 
+if (PHP_SAPI !== 'cli') {
+    echo "<pre>";
+}
+
 $languageData = new LanguageData();
 $languageSubset = new LanguageSubset($languageData);
 $languageSubset->limitTo(['en', 'es', 'fr', 'it', 'nl', 'de']);

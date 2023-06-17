@@ -2,7 +2,7 @@ default: test
 
 init: get-phpcpd composer-update
 
-test: rector phpcpd phpmd phpstan psalm
+validate: rector phpcpd phpmd phpstan psalm
 
 rector:
 	./vendor/bin/rector -n
@@ -25,8 +25,17 @@ get-phpcpd:
 
 composer-update:
 	composer update
+
 fix: fix-rector
 
 fix-rector:
 	./vendor/bin/rector
 
+benchmark:
+	php benchmark.php
+
+test:
+	php tests.php
+
+example:
+	php index.php

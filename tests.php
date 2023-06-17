@@ -1,9 +1,9 @@
 <?php
-/** @noinspection ThrowRawExceptionInspection */
-
 /** legal notice: https://github.com/nitotm/efficient-language-detector/blob/main/LEGAL.md */
 
 declare(strict_types = 1);
+
+include __DIR__ . "/vendor/autoload.php";
 
 use Nitotm\Eld\LanguageData;
 use Nitotm\Eld\LanguageDetectorWithTools;
@@ -11,7 +11,9 @@ use Nitotm\Eld\LanguageResult;
 use Nitotm\Eld\LanguageSubset;
 use Nitotm\EldTests\TestClass;
 
-include dirname(__DIR__) . "/vendor/autoload.php";
+if (PHP_SAPI !== 'cli') {
+    echo "<pre>";
+}
 
 $tests = new TestClass();
 
