@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<psalm
+        errorLevel="1"
+        findUnusedBaselineEntry="true"
+        findUnusedCode="false"
+        findDeadCode="false"
+>
+    <projectFiles>
+        <directory name="src"/>
+    </projectFiles>
+</psalm>

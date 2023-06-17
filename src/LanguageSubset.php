@@ -1,142 +1,147 @@
 <?php
-/*
-Copyright 2019 Nito T.M.
-Author URL: https://github.com/nitotm
+/** legal notice: https://github.com/nitotm/efficient-language-detector/blob/main/legal.md */
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
-/* 
-To reduce the languages to be detected, there are 3 different options, they only need to be executed once.
-
-The fastest option to regularly use the same language subset, will be to add as an argument the file stored (and returned) by langSubset(), when creating an instance of the languageDetector class. In this case the subset ngrams database will be loaded directly, and not the default database. Also, you can use this option to load different ngram databases.
-*/
+declare(strict_types = 1);
 
 namespace Nitotm\Eld;
 
 class LanguageSubset
 {
-    protected $subset = false;
-    protected $loadedSubset = false;
-    private $defaultNgrams = false;
+    /** @var null|string[] */
+    public ?array $subset = null;
+    protected ?string $loadedSubset = null;
+    /** @var array<string|int,array<int,int>> $defaultNgrams */ // TODO is key int or string? code is unclear, I cannot construct type
+    private ?array $defaultNgrams = null;
 
-    // dynamicLangSubset() Will execute the detector normally, but at the end it will filter the excluded languages.
-    public function dynamicLangSubset($langs)
+    public function __construct(
+        private readonly LanguageData $languageData,
+    ) {
+    }
+
+    /**
+     * @param string[] $langs
+     *
+     * @return string[]
+     */
+    public function limitTo(array $langs = []):array
     {
-        if ($langs) {
-            $this->subset = [];
-            foreach ($langs as $value) {
-                $lang = array_search($value, $this->langCodes);
-                if ($lang !== false) {
-                    $this->subset[] = $lang;
-                }
+        $this->subset = [];
+        foreach ($langs as $lang) {
+            if (in_array($lang, $this->languageData->langCodes, true)) {
+                $this->subset[] = $lang;
             }
-            sort($this->subset);
-        } else {
-            $this->subset = false;
         }
+        sort($this->subset);
 
         return $this->subset;
     }
 
-    // langSubset($langs,$save=true) Will previously remove the excluded languages form the ngrams database; for a single detection might be slower than dynamicLangSubset(), but for multiple strings will be faster. if $save option is true (default), the new ngrams subset will be stored, and next loaded for the same language subset, increasing startup speed.
-    public function langSubset($langs, $save = true, $safe = false)
+    /**
+     * @param null|string[] $langs
+     */
+    public function langSubset(?array $langs = null, bool $save = true, bool $safe = false):bool|string
     {
-        if (!$langs) {
-            if ($this->loadedSubset) {
-                $this->ngrams = $this->defaultNgrams;
-                $this->loadedSubset = false;
+        if ($langs === null) {
+            if ($this->loadedSubset !== null && $this->defaultNgrams !== null) {
+                $this->languageData->ngrams = $this->defaultNgrams;
+                $this->loadedSubset = null;
             }
 
             return true;
         }
 
-        $langs_array = $this->dynamicLangSubset($langs);
-        if (!$langs_array) {
+        $languages = $this->limitTo($langs);
+        if ($languages === []) {
             return 'No languages found';
         }
-        $this->subset = false; // We use dynamicLangSubset() to filter languages, but set dynamic subset to false
+        $this->subset = null; // We use dynamicLangSubset() to filter languages, but set dynamic subset to false
 
-        if ($this->defaultNgrams === false) {
-            $this->defaultNgrams = $this->ngrams;
+        if ($this->defaultNgrams === null) {
+            $this->defaultNgrams = $this->languageData->ngrams;
         }
 
-        $new_subset = hash('sha1', implode(',', $langs_array));
-        $file_name = __DIR__ . '/ngrams/ngrams.' . $new_subset . '.php';
+        $newsubset = hash('sha1', implode(',', $languages));
+        $filename = LanguageData::getFullFilenameForNgramFile('ngrams.' . $newsubset . '.php');
 
-        if ($this->loadedSubset !== $new_subset) {
-            $this->loadedSubset = $new_subset;
+        if ($this->loadedSubset !== $newsubset) {
+            $this->loadedSubset = $newsubset;
 
-            if (file_exists($file_name)) {
-                require $file_name;
+            if (file_exists($filename)) {
+                $this->languageData->ngrams = include $filename;
 
                 return true;
             }
-            if ($this->ngrams !== $this->defaultNgrams) {
-                $this->ngrams = $this->defaultNgrams;
+            if ($this->languageData->ngrams !== $this->defaultNgrams) {
+                $this->languageData->ngrams = $this->defaultNgrams;
             }
 
-            foreach ($this->ngrams as $ngram => $langsID) {
-                foreach ($langsID as $id => $value) {
-                    if (!in_array($id, $langs_array)) {
-                        unset($this->ngrams[$ngram][$id]);
+            /**
+             * @var array<int,int> $langsID
+             */
+            foreach ($this->languageData->ngrams as $ngram => $langsID) {
+                foreach (array_keys($langsID) as $id) {
+                    if (!in_array($id, $languages, true)) {
+                        unset($this->languageData->ngrams[$ngram][$id]);
                     }
                 }
-                if (!$this->ngrams[$ngram]) {
-                    unset($this->ngrams[$ngram]);
+                if (isset($this->languageData->ngrams[$ngram])) {
+                    unset($this->languageData->ngrams[$ngram]);
                 }
             }
         }
 
         if ($save) {
-            if (!file_exists($file_name)) { // in case $this->loadedSubset !== $new_subset, and was previously saved
-                file_put_contents($file_name,
-                    '<?php' . "\r\n" . '// Do not edit unless you ensure you are using UTF-8 encoding' . "\r\n"
-                    . '$this->ngrams=' . $this->ngram_export($this->ngrams, $safe) . ';'
+            if (!file_exists($filename)) { // in case $this->loadedSubset !== $newsubset, and was previously saved
+                file_put_contents(
+                    $filename,
+                    "<?php // utf-8 \r\n"
+                    . "/** legal notice: https://github.com/nitotm/efficient-language-detector/blob/main/legal.md */\r\n"
+                    . "return " . $this->ngram_export($this->languageData->ngrams, $safe) . ';'
                 );
             }
 
-            return $file_name;
+            return $filename;
         }
 
         return true;
     }
 
-    protected function filterLangSubset($results)
+    /**
+     * @param array<string,int> $results
+     *
+     * @return array<string,float>
+     */
+    public function filterLangSubset(array $results):array
     {
-        foreach ($results as $key => $value) {
-            if (!in_array($key, $this->subset)) {
-                unset($results[$key]);
+        if ($this->subset !== null) {
+            foreach (array_keys($results) as $key) {
+                if (!in_array($key, $this->subset, true)) {
+                    unset($results[$key]);
+                }
             }
         }
 
         return $results;
     }
 
-    protected function ngram_export($var, $safe = false)
+    /** todo: should not be part of this class */
+    protected function ngram_export(mixed $var, bool $safe = false):string
     {
         if (is_array($var)) {
-            $toImplode = array();
+            $toImplode = [];
+            /**
+             * @var string $key
+             * @var string $value
+             */
             foreach ($var as $key => $value) {
-                $toImplode[] = ($safe === true ? '"\\x' . substr(chunk_split(bin2hex($key), 2, '\\x'), 0, -2) . '"'
+                $toImplode[] = ($safe ? '"\\x' . substr(chunk_split(bin2hex($key), 2, '\\x'), 0, -2) . '"'
                         : var_export($key, true)) . '=>' . $this->ngram_export($value);
             }
 
             return '[' . implode(',', $toImplode) . ']';
-        } else {
-            return var_export($var, true);
         }
-    }
 
+        return var_export($var, true);
+    }
 
 }
