@@ -13,7 +13,7 @@ namespace Nitotm\Eld;
  */
 class LanguageDetectorWithTools extends LanguageDetector
 {
-    private float $startedTime;
+    private readonly float $startedTime;
 
     public function __construct(
         LanguageData $languageData,
@@ -103,10 +103,7 @@ class LanguageDetectorWithTools extends LanguageDetector
     }
 
     /**
-     * @param string           $msg
      * @param string|int|float ...$meta
-     *
-     * @return void
      */
     protected function out(string $msg, ...$meta):void
     {

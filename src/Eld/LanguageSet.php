@@ -9,9 +9,9 @@ use RuntimeException;
 
 class LanguageSet
 {
-    private string $cachedir;
+    private readonly string $cachedir;
     /** @var int[] $langIds */
-    public array $langIds;
+    public array $langIds = [];
 
     /**
      * @param null|string[] $limitTo
@@ -32,7 +32,10 @@ class LanguageSet
         return $this->languageData->getLangIds($this->limitTo ?? $this->languageData->languages);
     }
 
-    /** @return array<string,array<int,int>> */
+    /**
+     * @psalm-suppress MixedInferredReturnType
+     * @return array<string,array<int,int>>
+     */
     public function getNgrams():array
     {
         if ($this->limitTo === null) {
@@ -49,6 +52,10 @@ class LanguageSet
             $file = $this->cachedir . $hash . '.php';
         }
         if ($this->usecache && file_exists($file)) {
+            /**
+             * @psalm-suppress UnresolvableInclude
+             * @psalm-suppress MixedReturnStatement
+             */
             return include $file;
         }
 

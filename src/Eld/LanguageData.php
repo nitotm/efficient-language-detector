@@ -25,10 +25,16 @@ final readonly class LanguageData
         $this->ngramFile = dirname(__DIR__, 2) . "/data/" . ($ngramFile ?? "ngrams-m.php");
     }
 
-    /** @return array<string,array<int,int>> */
+    /**
+     * @return array<string,array<int,int>>
+     */
     public function getNgrams():array
     {
-        /** @var array<string,array<int,int>> $ngrams */
+        /**
+         * @psalm-suppress UnresolvableInclude
+         * @psalm-suppress MixedReturnStatement
+         * @var array<string,array<int,int>> $ngrams
+         */
         $ngrams = include($this->ngramFile);
 
         return $ngrams;

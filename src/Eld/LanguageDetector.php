@@ -95,7 +95,12 @@ class LanguageDetector
      */
     protected function getWords(string $str):array
     {
-        return preg_split('/ /', $str, -1, PREG_SPLIT_NO_EMPTY);
+        $pregSplit = preg_split('/ /', $str, -1, PREG_SPLIT_NO_EMPTY);
+        if ($pregSplit === false) {
+            return [];
+        }
+
+        return $pregSplit;
     }
 
     /**
@@ -106,14 +111,13 @@ class LanguageDetector
         // Remove URLS
         $str = preg_replace('@[hw]((ttps?://(www\.)?)|ww\.)([^\s/?\.#-]+\.?)+(/\S*)?@i', ' ', $str);
         // Remove emails
-        $str = preg_replace('/[a-zA-Z0-9.!$%&’+_`-]+@[A-Za-z0-9.-]+\.[A-Za-z0-9-]{2,64}/u', ' ', $str);
+        $str = preg_replace('/[a-zA-Z0-9.!$%&’+_`-]+@[A-Za-z0-9.-]+\.[A-Za-z0-9-]{2,64}/u', ' ', $str ?? '');
         // Remove .com domains
-        $str = preg_replace('/([A-Za-z0-9-]+\.)+com(\/\S*|[^\pL])/u', ' ', $str);
-
+        $str = preg_replace('/([A-Za-z0-9-]+\.)+com(\/\S*|[^\pL])/u', ' ', $str ?? '');
         // Remove alphanumerical/number codes
-        $str = preg_replace('/[a-zA-Z]*\d+[a-zA-Z0-9]*+/', ' ', $str);
+        $str = preg_replace('/[a-zA-Z]*\d+[a-zA-Z0-9]*+/', ' ', $str ?? '');
 
-        return trim($str);
+        return trim($str ?? '');
     }
 
     /**
@@ -166,7 +170,7 @@ class LanguageDetector
      */
     protected function calculateScores(array $txtNgrams, int $numNgrams):array
     {
-        /** @var array<string,float> $langScores */
+        /** @var array<int,float> $langScores */
         $langScores = [];
         foreach ($this->languageSet->getLangIds() as $langId) {
             $langScores[$langId] = 0.0;
@@ -219,6 +223,4 @@ class LanguageDetector
 
         return $scores;
     }
-
-
 }

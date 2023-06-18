@@ -11,7 +11,8 @@ phpcpd:
 	./phpcpd.phar src
 
 phpmd:
-	./vendor/bin/phpmd src text cleancode,codesize,controversial,design,unusedcode
+	./vendor/bin/phpmd src text codesize,controversial,design,unusedcode
+	./vendor/bin/phpmd src text cleancode
 
 phpstan:
 	php ./vendor/bin/phpstan
