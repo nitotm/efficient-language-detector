@@ -1,0 +1,6 @@
+/vendor/
+/.idea/
+/composer.lock
+/phpcpd.phar
+/phpcs.phar
+/data/cache/
