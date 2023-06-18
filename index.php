@@ -15,7 +15,7 @@ $languageData = new LanguageData();
 $languageSubset = new LanguageSet(
     languageData: $languageData,
     limitTo: ['de', 'en', 'fr', 'it'],
-    usecache: false,
+    usecache: true,
 );
 $languageDetector = new LanguageDetectorWithTools(
     languageData: $languageData,

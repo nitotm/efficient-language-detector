@@ -167,7 +167,7 @@ class LanguageDetector
     protected function calculateScores(array $txtNgrams, int $numNgrams):array
     {
         $langScores = [];
-        foreach ($this->languageSet->langIds as $langId) {
+        foreach ($this->languageSet->getLangIds() as $langId) {
             $langScores[$langId] = 0.0;
         }
 

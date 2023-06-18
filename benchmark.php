@@ -36,7 +36,7 @@ $languageData = new LanguageData(
 );
 $languageSubset = new LanguageSet(
     $languageData,
-    usecache: false,
+    usecache: true,
 );
 $languageDetector = new LanguageDetector(
     languageData: $languageData,

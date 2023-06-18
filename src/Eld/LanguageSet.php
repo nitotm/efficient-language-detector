@@ -26,12 +26,16 @@ class LanguageSet
         $this->cachedir = $cachedir ?? dirname(__DIR__, 2) . '/data/cache/';
     }
 
+    /** @return int[] $langIds */
+    public function getLangIds():array
+    {
+        return $this->languageData->getLangIds($this->limitTo ?? $this->languageData->languages);
+    }
+
     /** @return array{string:array{int:int}} */
     public function getNgrams():array
     {
         if ($this->limitTo === null) {
-            $this->langIds = $this->languageData->languages;
-
             return $this->languageData->getNgrams();
         }
         if (!is_dir($this->cachedir) && !mkdir($this->cachedir) && !is_dir($this->cachedir)) {
