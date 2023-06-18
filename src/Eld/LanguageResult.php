@@ -21,7 +21,7 @@ final readonly class LanguageResult
     }
 
     /**
-     * @param null|array{string:float} $scores
+     * @param null|array<string,float> $scores
      */
     public function __construct(
         public ?string $language = null,
@@ -32,9 +32,9 @@ final readonly class LanguageResult
     ) {
     }
 
-    public function dump()
+    public function dump():void
     {
         /** @noinspection ForgottenDebugOutputInspection */
-        dump($this);
+        @dump($this);
     }
 }

@@ -43,7 +43,7 @@ class LanguageDetectorWithTools extends LanguageDetector
         $this->outstat(__METHOD__, "start");
         $result = parent::detect($text);
         $this->outstat(__METHOD__, "end");
-        $result->dump(true);
+        $result->dump();
 
         return $result;
     }

@@ -7,7 +7,7 @@ namespace Nitotm\Eld;
 
 class LanguageDetector
 {
-    /** @var array{string:array{int:int}} $ngrams */
+    /** @var array<string,array<int,int>> $ngrams */
     private readonly array $ngrams;
 
     public function __construct(
@@ -57,7 +57,6 @@ class LanguageDetector
             }
             $langs = array_keys($langScores);
             $langTop = $langs[0];
-            $langSecond = $langs[1] ?? null;
             $scores = null;
             if ($this->returnScores) {
                 $scores = $this->getScoresAsAssocArray($langScores);
@@ -71,10 +70,11 @@ class LanguageDetector
                 );
             }
             // A minimum of a 24% per ngram score from average
+            $langSecond = $langs[1] ?? null;
             if ($this->languageData->corrections[$langTop] * 0.24 > ($langScores[$langTop] / $numNgrams)) {
                 return LanguageResult::fail(LanguageResult::UNSURE);
             }
-            if ($langSecond !== null && ($langScores[$langTop] - $langScores[$langSecond]) > 0.01) {
+            if ($langSecond !== null && ($langScores[$langTop] - $langScores[$langSecond] < 0.01)) {
                 return LanguageResult::fail(LanguageResult::UNSURE);
             }
 
@@ -91,7 +91,7 @@ class LanguageDetector
     /**
      * performance critical
      *
-     * @return string[]
+     * @return array<int,string>
      */
     protected function getWords(string $str):array
     {
@@ -119,13 +119,13 @@ class LanguageDetector
     /**
      * performance critical
      *
-     * @return array{string:float}
+     * @return array<string,float>
      */
     protected function getNgramDistribution(string $str):array
     {
         $maxlen = 70;
         $str = mb_strtolower($str, 'UTF-8');
-        /** @var array{string:float} $ngramdistribution */
+        /** @var array<string,float> $ngramdistribution */
         $ngramdistribution = [];
         $total = 0;
 
@@ -144,9 +144,9 @@ class LanguageDetector
                     $token = " " . $token;
                 }
                 if ($i === $ctoken) {
-                    $token = $token . " ";
+                    $token .= " ";
                 }
-                $ngramdistribution[$token] = ($ngramdistribution[$token] ?? 0) + 1;
+                $ngramdistribution[$token] = ($ngramdistribution[$token] ?? 0.0) + 1.0;
             }
         }
 
@@ -160,12 +160,13 @@ class LanguageDetector
     }
 
     /**
-     * @param array{string:float} $txtNgrams
+     * @param array<string,float> $txtNgrams
      *
-     * @return array{int:float}
+     * @return array<int,float>
      */
     protected function calculateScores(array $txtNgrams, int $numNgrams):array
     {
+        /** @var array<string,float> $langScores */
         $langScores = [];
         foreach ($this->languageSet->getLangIds() as $langId) {
             $langScores[$langId] = 0.0;
@@ -176,19 +177,19 @@ class LanguageDetector
             $scoremap = $this->ngrams[$ngram] ?? null;
             if ($scoremap !== null) {
                 $relevancy = $this->languageData->getRelevance(count($scoremap));
-                foreach ($scoremap as $lang => $ngramFrequency) {
-                    $langScores[$lang] = ($langScores[$lang] ?? 0) + ($frequency > $ngramFrequency ? $ngramFrequency / $frequency
-                            : $frequency / $ngramFrequency) * $relevancy + 2;
+                foreach ($scoremap as $langId => $ngramFrequency) {
+                    $langScores[$langId] = ($langScores[$langId] ?? 0.0) + ($frequency > $ngramFrequency ? $ngramFrequency / $frequency
+                            : $frequency / $ngramFrequency) * $relevancy + 2.0;
                 }
             }
         }
         // This divisor will produce a final score between 0 - ~1, score could be >1. Can be improved.
         $resultDivisor = $numNgrams * 3.2;
-        foreach ($langScores as $lang => $score) {
+        foreach ($langScores as $langId => $score) {
             if ($score < 0.0001) {
-                unset($langScores[$lang]);
+                unset($langScores[$langId]);
             } else {
-                $langScores[$lang] = $score / $resultDivisor; // * $scoreNormalizer[$lang];
+                $langScores[$langId] = $score / $resultDivisor; // * $scoreNormalizer[$lang];
             }
         }
 
@@ -196,9 +197,9 @@ class LanguageDetector
     }
 
     /**
-     * @param array{int:float} $result
+     * @param array<int,float> $result
      *
-     * @return array{string:float}
+     * @return array<string,float>
      */
     protected function getScoresAsAssocArray(array $result):array
     {

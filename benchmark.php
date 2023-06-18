@@ -29,6 +29,14 @@ sentences.txt - Correct ratio: 98.78% Time: 2.1568570137024
 word-pairs.txt - Correct ratio: 87.56% Time: 0.66023302078247
 single-words.txt - Correct ratio: 73.31% Time: 0.47791314125061
 
+Results eurosat7/efficient-language-detector:main@2023-06-18, PHP 8.2.7, ngrams-m.php
+
+tweets.txt - Correct ratio: 98.93% Duration: 0.29958343505859
+big-test.txt - Correct ratio: 92.05% Duration: 2.1553561687469
+sentences.txt - Correct ratio: 93.31% Duration: 1.957035779953
+word-pairs.txt - Correct ratio: 73.43% Duration: 1.0882313251495
+single-words.txt - Correct ratio: 55.94% Duration: 0.93544888496399
+
 If correct ratio is vastly inferior, try with 'ngrams-m.safe.php'
 */
 $languageData = new LanguageData(
@@ -41,9 +49,6 @@ $languageSubset = new LanguageSet(
 $languageDetector = new LanguageDetector(
     languageData: $languageData,
     languageSet: $languageSubset,
-    returnScores: true,
-    cleanText: false,
-    checkConfidence: false,
     minByteLength: 0,
     minNgrams: 0
 );

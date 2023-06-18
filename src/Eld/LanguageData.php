@@ -17,7 +17,7 @@ final readonly class LanguageData
     public function __construct(
         ?string $ngramFile = null
     ) {
-        /** @var array{string:float} $languageWeights */
+        /** @var array<string,float> $languageWeights */
         $languageWeights = include(dirname(__DIR__, 2) . '/data/language_corrections.php');
         $this->languages = array_keys($languageWeights);
         $this->corrections = array_values($languageWeights);
@@ -25,10 +25,13 @@ final readonly class LanguageData
         $this->ngramFile = dirname(__DIR__, 2) . "/data/" . ($ngramFile ?? "ngrams-m.php");
     }
 
-    /** @return array{string:array{int:int}} */
+    /** @return array<string,array<int,int>> */
     public function getNgrams():array
     {
-        return include($this->ngramFile);
+        /** @var array<string,array<int,int>> $ngrams */
+        $ngrams = include($this->ngramFile);
+
+        return $ngrams;
     }
 
     /**

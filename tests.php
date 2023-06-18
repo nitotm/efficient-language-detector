@@ -1,4 +1,6 @@
 <?php
+/** @noinspection ThrowRawExceptionInspection */
+
 /** legal notice: https://github.com/nitotm/efficient-language-detector/blob/main/LEGAL.md */
 
 declare(strict_types = 1);
@@ -9,7 +11,6 @@ use Nitotm\Eld\LanguageData;
 use Nitotm\Eld\LanguageDetectorWithTools;
 use Nitotm\Eld\LanguageResult;
 use Nitotm\Eld\LanguageSet;
-use Nitotm\EldTests\TestClass;
 use Nitotm\EldTests\TestRunner;
 
 if (PHP_SAPI !== 'cli') {
@@ -38,7 +39,7 @@ $tests->add('Simple language detection', function () {
     $result = $languageDetector->detect('Hola, cómo te llamas?');
 
     if (!$result->isValid || $result->language !== "es") {
-        $result->dump(true);
+        $result->dump();
         throw new Exception("Expected: 'es'");
     }
 });
@@ -55,7 +56,7 @@ $tests->add('Get scores of multiple languages', function () {
     $result = $languageDetector->detect('How are you? Bien, gracias');
 
     if (!$result->isValid || count($result->scores ?? []) < 2) {
-        $result->dump(true);
+        $result->dump();
         throw new Exception("Expected: >1 scores!");
     }
 });
@@ -72,7 +73,7 @@ $tests->add('Language detection, without minimum length', function () {
     $result = $languageDetector->detect('To');
 
     if (!$result->isValid || $result->language !== "en") {
-        $result->dump(true);
+        $result->dump();
         throw new Exception("Expected: 'en'");
     }
 });
@@ -89,7 +90,7 @@ $tests->add('Test minimum length error', function () {
     $result = $languageDetector->detect('To');
 
     if ($result->isValid || $result->errorMessage !== LanguageResult::TOO_SHORT) {
-        $result->dump(true);
+        $result->dump();
         throw new Exception("Expected: too-short error message");
     }
 });
@@ -129,7 +130,7 @@ $tests->add('Check minimum confidence', function () {
     $result = $languageDetector->detect('zxz zcz zvz zbz znz zmz zlz zsz zdz zkz zjz pelo');
 
     if ($result->isValid) {
-        $result->dump(true);
+        $result->dump();
         throw new Exception("Expected: invalid result");
     }
 });
@@ -146,7 +147,7 @@ $tests->add('Create dynamicLangSubset(), and detect', function () {
     $result = $languageDetector->detect('How are you? Bien, gracias');
 
     if (!$result->isValid || count($result->scores ?? []) !== 1) {
-        $result->dump(true);
+        $result->dump();
         throw new Exception("Expected: 1 score!");
     }
 });

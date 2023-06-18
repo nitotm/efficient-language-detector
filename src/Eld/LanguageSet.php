@@ -32,7 +32,7 @@ class LanguageSet
         return $this->languageData->getLangIds($this->limitTo ?? $this->languageData->languages);
     }
 
-    /** @return array{string:array{int:int}} */
+    /** @return array<string,array<int,int>> */
     public function getNgrams():array
     {
         if ($this->limitTo === null) {
@@ -69,7 +69,7 @@ class LanguageSet
     }
 
     /**
-     * @param array{string:array{int:int}} $var
+     * @param array<string,array<int,int>> $var
      */
     protected function export(array $var):string
     {
@@ -77,9 +77,9 @@ class LanguageSet
     }
 
     /**
-     * @param array{string:array{int:int}} $var
+     * @param array<string,array<int,int>> $var
      *
-     * @return array{string:array{int:int}}
+     * @return array<string,array<int,int>>
      */
     private function hardenAndFilter(array $var):array
     {
@@ -92,7 +92,7 @@ class LanguageSet
                 }
                 $var[$hardkey] = $scoremap;
             }
-            if ($key !== $hardkey || $scoremap === null || $scoremap === []) {
+            if ($key !== $hardkey || $scoremap === null || count($scoremap) === 0) {
                 unset($var[$key]);
             }
         }
@@ -101,9 +101,9 @@ class LanguageSet
     }
 
     /**
-     * @param array{int:int} $scoremap
+     * @param array<int,int> $scoremap
      *
-     * @return null|array{int:int}
+     * @return null|array<int,int>
      */
     private function filterScoremap(array $scoremap):?array
     {
