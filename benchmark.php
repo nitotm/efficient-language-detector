@@ -80,10 +80,12 @@ foreach ($files as $file) {
         echo "- - " . $type . ": " . ($result->language ?? "none") . ", expected " . $lang . PHP_EOL;
         $perlang[$lang][$type] = ($perlang[$lang][$type] ?? 0) + 1;
     }
+    fclose($fp);
     $total = $correct + $failed;
     $summary[] = basename($file) . ' - Correct ratio: ' . round(($correct / $total) * 100, 2) . '% Duration: ' . $duration;
 }
 echo PHP_EOL . PHP_EOL . "SUMMARY" . PHP_EOL;
 ksort($perlang);
+/** @noinspection ForgottenDebugOutputInspection */
 dump($perlang);
 echo implode(PHP_EOL, $summary) . PHP_EOL;

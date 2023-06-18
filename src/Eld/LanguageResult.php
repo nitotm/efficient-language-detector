@@ -4,7 +4,6 @@
 declare(strict_types = 1);
 
 namespace Nitotm\Eld;
-
 final readonly class LanguageResult
 {
     public const TOO_SHORT = "Text to short for detection";
@@ -12,16 +11,9 @@ final readonly class LanguageResult
     public const UNSURE = 'No language has been identified with sufficient confidence, bypass with LanguageDetector::checkConfidence=false';
     public const NOCLUE = 'Language not detected';
 
-    public static function fail(string $errorMessage):self
-    {
-        return new LanguageResult(
-            isValid: false,
-            errorMessage: $errorMessage,
-        );
-    }
-
     /**
      * @param null|array<string,float> $scores
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function __construct(
         public ?string $language = null,
@@ -32,9 +24,16 @@ final readonly class LanguageResult
     ) {
     }
 
+    /** @noinspection ForgottenDebugOutputInspection */
     public function dump():void
     {
-        /** @noinspection ForgottenDebugOutputInspection */
-        @dump($this);
+        if (function_exists('dump')) {
+            dump($this);
+
+            return;
+        }
+
+        /** @psalm-suppress ForbiddenCode */
+        var_dump($this);
     }
 }

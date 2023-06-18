@@ -9,6 +9,9 @@ use Closure;
 
 final readonly class TestJob
 {
+    /**
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     */
     public function __construct(
         public Closure $test,
         public string $identifier,

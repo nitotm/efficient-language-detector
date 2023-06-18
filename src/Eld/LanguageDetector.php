@@ -5,6 +5,9 @@ declare(strict_types = 1);
 
 namespace Nitotm\Eld;
 
+/**
+ * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+ */
 class LanguageDetector
 {
     /** @var array<string,array<int,int>> $ngrams */
@@ -27,21 +30,11 @@ class LanguageDetector
      */
     public function detect(string $text):LanguageResult
     {
-        if ($this->cleanText) {
-            $text = $this->cleanupText($text);
-        }
-        $minNgrams = max($this->minNgrams, 1);
-        $text = trim((string)preg_replace('/[^\pL]+(?<![\x27\x60\x{2019}])/u', ' ', mb_substr($text, 0, 1000, 'UTF-8')));
+        $text = $this->getCleanText($text);
         $thisLength = strlen($text);
-
-        if ($thisLength > 350) {
-            $strpos = strpos($text, ' ', 350);
-            if ($strpos === false) {
-                $strpos = 350;
-            }
-            $text = substr($text, 0, min(380, $strpos));
-        } elseif ($thisLength < $this->minByteLength) {
-            return LanguageResult::fail(LanguageResult::TOO_SHORT);
+        $minNgrams = max($this->minNgrams, 1);
+        if ($thisLength < $this->minByteLength) {
+            return $this->fail(LanguageResult::TOO_SHORT);
         }
 
         $txtNgrams = $this->getNgramDistribution($text);
@@ -50,10 +43,8 @@ class LanguageDetector
         if ($numNgrams >= $minNgrams) {
             $langScores = $this->calculateScores($txtNgrams, $numNgrams);
 
-            arsort($langScores);
-
             if (count($langScores) === 0) {
-                return LanguageResult::fail(LanguageResult::NOCLUE);
+                return $this->fail(LanguageResult::NOCLUE);
             }
             $langs = array_keys($langScores);
             $langTop = $langs[0];
@@ -62,20 +53,15 @@ class LanguageDetector
                 $scores = $this->getScoresAsAssocArray($langScores);
             }
 
-            if (!$this->checkConfidence) {
-                return new LanguageResult(
-                    language: $this->languageData->languages[$langTop],
-                    score: current($langScores),
-                    scores: $scores,
-                );
-            }
-            // A minimum of a 24% per ngram score from average
-            $langSecond = $langs[1] ?? null;
-            if ($this->languageData->corrections[$langTop] * 0.24 > ($langScores[$langTop] / $numNgrams)) {
-                return LanguageResult::fail(LanguageResult::UNSURE);
-            }
-            if ($langSecond !== null && ($langScores[$langTop] - $langScores[$langSecond] < 0.01)) {
-                return LanguageResult::fail(LanguageResult::UNSURE);
+            if ($this->checkConfidence) {
+                // A minimum of a 24% per ngram score from average
+                $langSecond = $langs[1] ?? null;
+                if ($this->languageData->corrections[$langTop] * 0.24 > ($langScores[$langTop] / $numNgrams)) {
+                    return $this->fail(LanguageResult::UNSURE);
+                }
+                if ($langSecond !== null && ($langScores[$langTop] - $langScores[$langSecond] < 0.01)) {
+                    return $this->fail(LanguageResult::UNSURE);
+                }
             }
 
             return new LanguageResult(
@@ -85,7 +71,7 @@ class LanguageDetector
             );
         }
 
-        return LanguageResult::fail(LanguageResult::MORE_NGRAMS);
+        return $this->fail(LanguageResult::MORE_NGRAMS);
     }
 
     /**
@@ -109,7 +95,7 @@ class LanguageDetector
     public function cleanupText(string $str):string
     {
         // Remove URLS
-        $str = preg_replace('@[hw]((ttps?://(www\.)?)|ww\.)([^\s/?\.#-]+\.?)+(/\S*)?@i', ' ', $str);
+        $str = preg_replace('@[hw]((ttps?://(www\.)?)|ww\.)([^\s/?.#-]+\.?)+(/\S*)?@i', ' ', $str);
         // Remove emails
         $str = preg_replace('/[a-zA-Z0-9.!$%&’+_`-]+@[A-Za-z0-9.-]+\.[A-Za-z0-9-]{2,64}/u', ' ', $str ?? '');
         // Remove .com domains
@@ -192,10 +178,13 @@ class LanguageDetector
         foreach ($langScores as $langId => $score) {
             if ($score < 0.0001) {
                 unset($langScores[$langId]);
-            } else {
+            }
+            if ($score >= 0.0001) {
                 $langScores[$langId] = $score / $resultDivisor; // * $scoreNormalizer[$lang];
             }
         }
+
+        arsort($langScores);
 
         return $langScores;
     }
@@ -216,11 +205,41 @@ class LanguageDetector
             if ($score < 0.0001) {
                 break; // was sorted by score desc? if not: replace with continue!
             }
-            /** @var string $l */
-            $l = $this->languageData->languages[$key];
-            $scores[$l] = $score;
+            /** @var string $languagename */
+            $languagename = $this->languageData->languages[$key];
+            $scores[$languagename] = $score;
         }
 
         return $scores;
     }
+
+    /**
+     * performance critical
+     */
+    private function getCleanText(string $text):string
+    {
+        if ($this->cleanText) {
+            $text = $this->cleanupText($text);
+        }
+        $text = trim((string)preg_replace('/[^\pL]+(?<![\x27\x60\x{2019}])/u', ' ', mb_substr($text, 0, 1000, 'UTF-8')));
+        $thisLength = strlen($text);
+        if ($thisLength > 350) {
+            $strpos = strpos($text, ' ', 350);
+            if ($strpos === false) {
+                $strpos = 350;
+            }
+            $text = substr($text, 0, min(380, $strpos));
+        }
+
+        return $text;
+    }
+
+    private function fail(string $errorMessage):LanguageResult
+    {
+        return new LanguageResult(
+            isValid: false,
+            errorMessage: $errorMessage,
+        );
+    }
+
 }

@@ -63,12 +63,11 @@ final readonly class LanguageData
      */
     public function getRelevance(int $count):int
     {
+        $relevancy = 1;
         if ($count === 1) {
             $relevancy = 27;
         } elseif ($count < 16) {
             $relevancy = (int)(round((16 - $count) / 2 + 1));
-        } else {
-            $relevancy = 1;
         }
 
         return $relevancy;

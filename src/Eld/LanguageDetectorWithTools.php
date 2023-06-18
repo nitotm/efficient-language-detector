@@ -10,6 +10,7 @@ namespace Nitotm\Eld;
  * but it's easy to setup a kind of profiling
  * and good enough to find most problems.
  * For compareable real time measurents this is not perfectly suited!
+ * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
  */
 class LanguageDetectorWithTools extends LanguageDetector
 {
@@ -17,7 +18,7 @@ class LanguageDetectorWithTools extends LanguageDetector
 
     public function __construct(
         LanguageData $languageData,
-        LanguageSet $languageSubset,
+        LanguageSet $languageSet,
         bool $returnScores = true,
         bool $cleanText = false,
         bool $checkConfidence = false,
@@ -28,7 +29,7 @@ class LanguageDetectorWithTools extends LanguageDetector
         $this->outstat(__METHOD__, "start");
         parent::__construct(
             $languageData,
-            $languageSubset,
+            $languageSet,
             $returnScores,
             $cleanText,
             $checkConfidence,

@@ -16,6 +16,9 @@ final class TestRunner
     private int $passed = 0;
     private int $failed = 0;
 
+    /**
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     */
     public function add(string $testIdentifier, Closure $test, bool $stopOnFail = false):void
     {
         $this->tests[] = new TestJob(test: $test, identifier: $testIdentifier, stopOnError: $stopOnFail);
@@ -62,7 +65,7 @@ final class TestRunner
 
     private function printResult(string $status, string $testIdentifier, string $message = ''):void
     {
-        echo PHP_EOL . "[" . $status . "] " . $testIdentifier . ($message === '' ? '' : ' -> ') . $message . PHP_EOL;
+        echo "[" . $status . "] " . $testIdentifier . ($message === '' ? '' : ' -> ') . $message . PHP_EOL;
     }
 
     private function printSummary(float $executionTime, float $memoryUsage):void

@@ -15,6 +15,7 @@ class LanguageSet
 
     /**
      * @param null|string[] $limitTo
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag) Doing that nice is not worth it right now
      */
     public function __construct(
         private readonly LanguageData $languageData,
@@ -46,11 +47,7 @@ class LanguageSet
         }
         sort($this->limitTo);
         $hash = implode("-", $this->limitTo);
-        if (strlen($hash) > 64) {
-            $file = $this->cachedir . md5($hash) . '.php';
-        } else {
-            $file = $this->cachedir . $hash . '.php';
-        }
+        $file = $this->cachedir . ((strlen($hash) > 64) ? md5($hash) : $hash) . '.php';
         if ($this->usecache && file_exists($file)) {
             /**
              * @psalm-suppress UnresolvableInclude

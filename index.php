@@ -19,7 +19,7 @@ $languageSubset = new LanguageSet(
 );
 $languageDetector = new LanguageDetectorWithTools(
     languageData: $languageData,
-    languageSubset: $languageSubset,
+    languageSet: $languageSubset,
     returnScores: true,
 );
 $languageResult = $languageDetector->detect('Ich lebe in Berlin und esse gerne Sushi und Döner und Massaman Gai!');
