@@ -27,7 +27,13 @@ class LanguageDetectorWithTools extends LanguageDetector
         $this->startedTime = microtime(true);
         $this->outstat(__METHOD__, "start");
         parent::__construct(
-            $languageData, $languageSubset, $returnScores, $cleanText, $checkConfidence, $minByteLength, $minNgrams
+            $languageData,
+            $languageSubset,
+            $returnScores,
+            $cleanText,
+            $checkConfidence,
+            $minByteLength,
+            $minNgrams
         );
         $this->outstat(__METHOD__, "end");
     }
@@ -42,10 +48,10 @@ class LanguageDetectorWithTools extends LanguageDetector
         return $result;
     }
 
-    protected function getTokens(string $str):array
+    protected function getWords(string $str):array
     {
         $this->outstat(__METHOD__, "start");
-        $tokens = parent::getTokens($str);
+        $tokens = parent::getWords($str);
         $this->outstat(__METHOD__, "end");
 
         return $tokens;
@@ -60,10 +66,10 @@ class LanguageDetectorWithTools extends LanguageDetector
         return $cleanupText;
     }
 
-    protected function getByteNgrams(string $str):array
+    protected function getNgramDistribution(string $str):array
     {
         $this->outstat(__METHOD__, "start");
-        $byteNgrams = parent::getByteNgrams($str);
+        $byteNgrams = parent::getNgramDistribution($str);
         $this->outstat(__METHOD__, "end");
 
         return $byteNgrams;

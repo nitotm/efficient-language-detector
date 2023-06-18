@@ -10,14 +10,15 @@ use Nitotm\Eld\LanguageDetectorWithTools;
 use Nitotm\Eld\LanguageResult;
 use Nitotm\Eld\LanguageSet;
 use Nitotm\EldTests\TestClass;
+use Nitotm\EldTests\TestRunner;
 
 if (PHP_SAPI !== 'cli') {
     echo "<pre>";
 }
 
-$tests = new TestClass();
+$tests = new TestRunner();
 
-$tests->addTest('Load ELD and create instance', function () {
+$tests->add('Load ELD and create instance', function () {
     $languageData = new LanguageData();
     $languageSubset = new LanguageSet($languageData);
     $languageDetector = new LanguageDetectorWithTools(
@@ -26,7 +27,7 @@ $tests->addTest('Load ELD and create instance', function () {
     );
 }, true);
 
-$tests->addTest('Simple language detection', function () {
+$tests->add('Simple language detection', function () {
     $languageData = new LanguageData();
     $languageSubset = new LanguageSet($languageData);
     $languageDetector = new LanguageDetectorWithTools(
@@ -42,7 +43,7 @@ $tests->addTest('Simple language detection', function () {
     }
 });
 
-$tests->addTest('Get scores of multiple languages', function () {
+$tests->add('Get scores of multiple languages', function () {
     $languageData = new LanguageData();
     $languageSubset = new LanguageSet($languageData);
     $languageDetector = new LanguageDetectorWithTools(
@@ -59,7 +60,7 @@ $tests->addTest('Get scores of multiple languages', function () {
     }
 });
 
-$tests->addTest('Language detection, without minimum length', function () {
+$tests->add('Language detection, without minimum length', function () {
     $languageData = new LanguageData();
     $languageSubset = new LanguageSet($languageData);
     $languageDetector = new LanguageDetectorWithTools(
@@ -76,7 +77,7 @@ $tests->addTest('Language detection, without minimum length', function () {
     }
 });
 
-$tests->addTest('Test minimum length error', function () {
+$tests->add('Test minimum length error', function () {
     $languageData = new LanguageData();
     $languageSubset = new LanguageSet($languageData);
     $languageDetector = new LanguageDetectorWithTools(
@@ -93,7 +94,7 @@ $tests->addTest('Test minimum length error', function () {
     }
 });
 
-$tests->addTest('Clean text', function () {
+$tests->add('Clean text', function () {
     $languageData = new LanguageData();
     $languageSubset = new LanguageSet($languageData);
     $languageDetector = new LanguageDetectorWithTools(
@@ -115,7 +116,7 @@ $tests->addTest('Clean text', function () {
     }
 });
 
-$tests->addTest('Check minimum confidence', function () {
+$tests->add('Check minimum confidence', function () {
     $languageData = new LanguageData('ngrams-m.php');
     $languageSubset = new LanguageSet($languageData);
     $languageDetector = new LanguageDetectorWithTools(
@@ -133,7 +134,7 @@ $tests->addTest('Check minimum confidence', function () {
     }
 });
 
-$tests->addTest('Create dynamicLangSubset(), and detect', function () {
+$tests->add('Create dynamicLangSubset(), and detect', function () {
     $languageData = new LanguageData('ngrams-m.php');
     $languageSubset = new LanguageSet($languageData, limitTo: ["en"]);
     $languageDetector = new LanguageDetectorWithTools(
@@ -152,7 +153,7 @@ $tests->addTest('Create dynamicLangSubset(), and detect', function () {
 
 /**
  * TODO please continue writing your tests
- * $tests->addTest('Create dynamicLangSubset(), disable it, and detect', function () {
+ * $tests->add('Create dynamicLangSubset(), disable it, and detect', function () {
  * $languageDetector = new Nitotm\Eld\LanguageDetector();
  * $languageDetector->returnScores = true;
  * $langSubset = ['en'];
@@ -165,7 +166,7 @@ $tests->addTest('Create dynamicLangSubset(), and detect', function () {
  * );
  * }
  * });
- * $tests->addTest('Create langSubset(), and detect', function () {
+ * $tests->add('Create langSubset(), and detect', function () {
  * $languageDetector = new Nitotm\Eld\LanguageDetector();
  * $languageDetector->returnScores = true;
  * $langSubset = ['en'];
@@ -177,7 +178,7 @@ $tests->addTest('Create dynamicLangSubset(), and detect', function () {
  * );
  * }
  * });
- * $tests->addTest('Create langSubset(), disable it, and detect', function () {
+ * $tests->add('Create langSubset(), disable it, and detect', function () {
  * $languageDetector = new Nitotm\Eld\LanguageDetector();
  * $languageDetector->returnScores = true;
  * $langSubset = ['en'];
@@ -190,7 +191,7 @@ $tests->addTest('Create dynamicLangSubset(), and detect', function () {
  * );
  * }
  * });
- * $tests->addTest('Check if langSubset() is able to save subset file', function () {
+ * $tests->add('Check if langSubset() is able to save subset file', function () {
  * $languageDetector = new Nitotm\Eld\LanguageDetector();
  * $file = __DIR__ . '/../src/ngrams/ngrams.17ba0791499db908433b80f37c5fbc89b870084b.php';
  * // Should already exist
@@ -206,14 +207,14 @@ $tests->addTest('Create dynamicLangSubset(), and detect', function () {
  * throw new Exception("File /src/ngrams/ngrams.17ba0791499... not found");
  * }
  * });
- * $tests->addTest('Create instance with diferent ngrams database, and detect', function () {
+ * $tests->add('Create instance with diferent ngrams database, and detect', function () {
  * $languageDetector = new Nitotm\Eld\LanguageDetector('ngrams.2f37045c74780aba1d36d6717f3244dc025fb935.php');
  * $result = $languageDetector->detect('Hola, cómo te llamas?');
  * if (!isset($result['language']) || $result['language'] !== 'es') {
  * throw new Exception("Expected: 'es', but got: " . ($result['language'] ?? ''));
  * }
  * });
- * $tests->addTest("Testing accuracy: ngrams-m.php database, for big-test.txt", function () {
+ * $tests->add("Testing accuracy: ngrams-m.php database, for big-test.txt", function () {
  * $languageDetector = new Nitotm\Eld\LanguageDetector('ngrams-m.php');
  * $total = 0;
  * $correct = 0;

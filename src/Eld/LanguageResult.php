@@ -5,8 +5,6 @@ declare(strict_types = 1);
 
 namespace Nitotm\Eld;
 
-use JsonException;
-
 final readonly class LanguageResult
 {
     public const TOO_SHORT = "Text to short for detection";
@@ -34,22 +32,9 @@ final readonly class LanguageResult
     ) {
     }
 
-    public function dump(bool $directly = false):array
+    public function dump()
     {
-        try {
-            $dump = (array)json_decode(json_encode($this, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException $e) {
-            $dump = [
-                "failed to dump",
-                $e::class,
-                $e->getMessage(),
-            ];
-        }
-        if ($directly) {
-            /** @noinspection ForgottenDebugOutputInspection */
-            var_dump($dump);
-        }
-
-        return $dump;
+        /** @noinspection ForgottenDebugOutputInspection */
+        dump($this);
     }
 }

@@ -9,21 +9,20 @@ use Closure;
 use Error;
 use Exception;
 
-class TestClass
+final class TestRunner
 {
-    /** @var TestResult[] $tests */
+    /** @var TestJob[] $tests */
     private array $tests = [];
     private int $passed = 0;
     private int $failed = 0;
 
-    public function addTest(string $testIdentifier, Closure $test, bool $stopOnFail = false):void
+    public function add(string $testIdentifier, Closure $test, bool $stopOnFail = false):void
     {
-        $this->tests[] = new TestResult(test: $test, identifier: $testIdentifier, stop: $stopOnFail);
+        $this->tests[] = new TestJob(test: $test, identifier: $testIdentifier, stopOnError: $stopOnFail);
     }
 
     public function run():void
     {
-        echo(PHP_SAPI === 'cli' ? '' : "<pre>");
         $startTime = microtime(true);
 
         foreach ($this->tests as $test) {
@@ -50,7 +49,7 @@ class TestClass
                 );
             }
 
-            if (!$passed && $test->stop) {
+            if (!$passed && $test->stopOnError) {
                 echo PHP_EOL . "    [ABORTED] Due to the last failure, the tests cannot continue successfully" . PHP_EOL;
                 break;
             }
@@ -59,7 +58,6 @@ class TestClass
         $endTime = microtime(true);
 
         $this->printSummary($endTime - $startTime, memory_get_peak_usage());
-        echo(PHP_SAPI === 'cli' ? '' : '</pre>');
     }
 
     private function printResult(string $status, string $testIdentifier, string $message = ''):void

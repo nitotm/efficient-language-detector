@@ -5,12 +5,14 @@ declare(strict_types = 1);
 
 namespace Nitotm\EldTests;
 
-readonly class TestResult
+use Closure;
+
+final readonly class TestJob
 {
     public function __construct(
-        public \Closure $test,
+        public Closure $test,
         public string $identifier,
-        public bool $stop,
+        public bool $stopOnError = false,
     ) {
     }
 }

@@ -44,7 +44,7 @@ class LanguageDetector
             return LanguageResult::fail(LanguageResult::TOO_SHORT);
         }
 
-        $txtNgrams = $this->getByteNgrams($text);
+        $txtNgrams = $this->getNgramDistribution($text);
         $numNgrams = count($txtNgrams);
 
         if ($numNgrams >= $minNgrams) {
@@ -52,7 +52,7 @@ class LanguageDetector
 
             arsort($langScores);
 
-            if (count($langScores) > 0) {
+            if (count($langScores) === 0) {
                 return LanguageResult::fail(LanguageResult::NOCLUE);
             }
             $langs = array_keys($langScores);
@@ -74,7 +74,7 @@ class LanguageDetector
             if ($this->languageData->corrections[$langTop] * 0.24 > ($langScores[$langTop] / $numNgrams)) {
                 return LanguageResult::fail(LanguageResult::UNSURE);
             }
-            if ($langSecond !== null && 0.01 > abs($langScores[$langTop] - $langScores[$langSecond])) {
+            if ($langSecond !== null && ($langScores[$langTop] - $langScores[$langSecond]) > 0.01) {
                 return LanguageResult::fail(LanguageResult::UNSURE);
             }
 
@@ -93,7 +93,7 @@ class LanguageDetector
      *
      * @return string[]
      */
-    protected function getTokens(string $str):array
+    protected function getWords(string $str):array
     {
         return preg_split('/ /', $str, -1, PREG_SPLIT_NO_EMPTY);
     }
@@ -106,9 +106,9 @@ class LanguageDetector
         // Remove URLS
         $str = preg_replace('@[hw]((ttps?://(www\.)?)|ww\.)([^\s/?\.#-]+\.?)+(/\S*)?@i', ' ', $str);
         // Remove emails
-        $str = preg_replace('/[a-zA-Z0-9.!$%&’+_`-]+@[A-Za-z0-9.-]+\.[A-Za-z0-9-]{2,64}/', ' ', $str);
+        $str = preg_replace('/[a-zA-Z0-9.!$%&’+_`-]+@[A-Za-z0-9.-]+\.[A-Za-z0-9-]{2,64}/u', ' ', $str);
         // Remove .com domains
-        $str = preg_replace('/([A-Za-z0-9-]+\.)+com(\/\S*|[^\pL])/', ' ', $str);
+        $str = preg_replace('/([A-Za-z0-9-]+\.)+com(\/\S*|[^\pL])/u', ' ', $str);
 
         // Remove alphanumerical/number codes
         $str = preg_replace('/[a-zA-Z]*\d+[a-zA-Z0-9]*+/', ' ', $str);
@@ -121,35 +121,42 @@ class LanguageDetector
      *
      * @return array{string:float}
      */
-    protected function getByteNgrams(string $str):array
+    protected function getNgramDistribution(string $str):array
     {
+        $maxlen = 70;
         $str = mb_strtolower($str, 'UTF-8');
-        /** @var array<string,int> $tokens // TODO something is missing here? */
-        $tokens = [];
-        $countNgrams = 0;
-        $start = $this->wordStart;
+        /** @var array{string:float} $ngramdistribution */
+        $ngramdistribution = [];
+        $total = 0;
 
-        foreach ($this->getTokens($str) as $word) {
+        foreach ($this->getWords($str) as $word) {
             $len = strlen($word);
-            if ($len > 70) {
-                $len = 70;
+            if ($len > $maxlen) {
+                $word = substr($word, 0, $maxlen);
             }
 
-            for ($j = 0; ($j + 4) < $len; $j += 3, ++$tmp, ++$countNgrams) {
-                $tmp = $tokens[$start[$j] . substr($word, $j, 4)];
+            $tokens = str_split($word, 4);
+            $ctoken = count($tokens);
+            $total += $ctoken;
+            $ctoken--;
+            foreach ($tokens as $i => $token) {
+                if ($i === 0) {
+                    $token = " " . $token;
+                }
+                if ($i === $ctoken) {
+                    $token = $token . " ";
+                }
+                $ngramdistribution[$token] = ($ngramdistribution[$token] ?? 0) + 1;
             }
-            $tmp = $tokens[$start[$j] . substr($word, ($len !== 3 ? $len - 4 : 0)) . ' '];
-            $tmp++; // TODO unused!
-            $countNgrams++;
         }
 
-        // Frequency is multiplied by 15000 at the ngrams database. A reduced number seems to work better.
         // Linear formulas were tried, decreasing the multiplier for fewer ngram strings, no meaningful improvement.
-        foreach ($tokens as $bytes => $count) {
-            $tokens[$bytes] = $count / $countNgrams * 13200;
+        // TODO what about taking the length of $str and the count of $word instead a fixed 13200
+        foreach ($ngramdistribution as $token => $amount) {
+            $ngramdistribution[$token] = $amount / $total * 13200;
         }
 
-        return $tokens;
+        return $ngramdistribution;
     }
 
     /**
@@ -163,13 +170,14 @@ class LanguageDetector
         foreach ($this->languageSet->langIds as $langId) {
             $langScores[$langId] = 0.0;
         }
+
         foreach ($txtNgrams as $ngram => $frequency) {
             /** @var null|array<int,int> $scoremap */
             $scoremap = $this->ngrams[$ngram] ?? null;
             if ($scoremap !== null) {
                 $relevancy = $this->languageData->getRelevance(count($scoremap));
                 foreach ($scoremap as $lang => $ngramFrequency) {
-                    $langScores[$lang] += ($frequency > $ngramFrequency ? $ngramFrequency / $frequency
+                    $langScores[$lang] = ($langScores[$lang] ?? 0) + ($frequency > $ngramFrequency ? $ngramFrequency / $frequency
                             : $frequency / $ngramFrequency) * $relevancy + 2;
                 }
             }

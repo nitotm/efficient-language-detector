@@ -18,11 +18,11 @@ final readonly class LanguageData
         ?string $ngramFile = null
     ) {
         /** @var array{string:float} $languageWeights */
-        $languageWeights = include(dirname(__DIR__) . '/data/language_corrections.php');
+        $languageWeights = include(dirname(__DIR__, 2) . '/data/language_corrections.php');
         $this->languages = array_keys($languageWeights);
         $this->corrections = array_values($languageWeights);
         $this->count = count($this->languages);
-        $this->ngramFile = dirname(__DIR__) . "/data/" . ($ngramFile ?? "ngrams-m.php");
+        $this->ngramFile = dirname(__DIR__, 2) . "/data/" . ($ngramFile ?? "ngrams-m.php");
     }
 
     /** @return array{string:array{int:int}} */

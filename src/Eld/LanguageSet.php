@@ -5,6 +5,8 @@ declare(strict_types = 1);
 
 namespace Nitotm\Eld;
 
+use RuntimeException;
+
 class LanguageSet
 {
     private string $cachedir;
@@ -18,20 +20,22 @@ class LanguageSet
         private readonly LanguageData $languageData,
         private ?array $limitTo = null,
         private readonly bool $usecache = true,
-        private readonly bool $hardening = true,
+        private readonly bool $hardening = false,
         ?string $cachedir = null,
     ) {
-        $this->cachedir = $cachedir ?? dirname(__DIR__) . '/data/cache/';
+        $this->cachedir = $cachedir ?? dirname(__DIR__, 2) . '/data/cache/';
     }
 
     /** @return array{string:array{int:int}} */
     public function getNgrams():array
     {
         if ($this->limitTo === null) {
+            $this->langIds = $this->languageData->languages;
+
             return $this->languageData->getNgrams();
         }
         if (!is_dir($this->cachedir) && !mkdir($this->cachedir) && !is_dir($this->cachedir)) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $this->cachedir));
+            throw new RuntimeException(sprintf('Directory "%s" was not created', $this->cachedir));
         }
         sort($this->limitTo);
         $hash = implode("-", $this->limitTo);
@@ -76,15 +80,17 @@ class LanguageSet
     private function hardenAndFilter(array $var):array
     {
         foreach ($var as $key => $scoremap) {
+            $hardkey = $key;
             $scoremap = $this->filterScoremap($scoremap);
             if ($scoremap !== null) {
-                $hardkey = $key;
                 if ($this->hardening) {
                     $hardkey = '\\x' . substr(chunk_split(bin2hex($key), 2, '\\x'), 0, -2);
                 }
                 $var[$hardkey] = $scoremap;
             }
-            unset($var[$key]);
+            if ($key !== $hardkey || $scoremap === null || $scoremap === []) {
+                unset($var[$key]);
+            }
         }
 
         return $var;

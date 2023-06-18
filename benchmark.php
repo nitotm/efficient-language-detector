@@ -34,12 +34,22 @@ If correct ratio is vastly inferior, try with 'ngrams-m.safe.php'
 $languageData = new LanguageData(
     'ngrams-m.php' //  -> 'ngrams-m.safe.php'
 );
-$languageSubset = new LanguageSet($languageData);
+$languageSubset = new LanguageSet(
+    $languageData,
+    usecache: false,
+);
 $languageDetector = new LanguageDetector(
     languageData: $languageData,
     languageSet: $languageSubset,
+    returnScores: true,
+    cleanText: false,
+    checkConfidence: false,
+    minByteLength: 0,
+    minNgrams: 0
 );
 
+$summary = [];
+$perlang = [];
 foreach ($files as $file) {
     $duration = 0;
     $correct = 0;
@@ -49,6 +59,7 @@ foreach ($files as $file) {
         echo('cannot read from file ' . $file . PHP_EOL);
         continue;
     }
+    echo "- " . basename($file) . PHP_EOL;
     while (($line = fgets($fp, 4096)) !== false) {
         [$lang, $text] = explode("\t", $line);
         $start = microtime(true);
@@ -56,11 +67,18 @@ foreach ($files as $file) {
         $duration += microtime(true) - $start;
         if ($result->isValid && $result->language === $lang) {
             $correct++;
+            $type = "correct";
         } else {
             $failed++;
-            $result->dump(true);
+            $type = $result->isValid ? "wrong" : "miss";
         }
+        echo "- - " . $type . ": " . ($result->language ?? "none") . ", expected " . $lang . PHP_EOL;
+        $perlang[$lang][$type] = ($perlang[$lang][$type] ?? 0) + 1;
     }
     $total = $correct + $failed;
-    print $file . ' - Correct ratio: ' . round(($correct / $total) * 100, 2) . '% Duration: ' . $duration . PHP_EOL;
+    $summary[] = basename($file) . ' - Correct ratio: ' . round(($correct / $total) * 100, 2) . '% Duration: ' . $duration;
 }
+echo PHP_EOL . PHP_EOL . "SUMMARY" . PHP_EOL;
+ksort($perlang);
+dump($perlang);
+echo implode(PHP_EOL, $summary) . PHP_EOL;

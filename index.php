@@ -12,11 +12,15 @@ if (PHP_SAPI !== 'cli') {
 }
 
 $languageData = new LanguageData();
-$languageSubset = new LanguageSet($languageData, ['en', 'es', 'fr', 'it', 'nl', 'de']);
+$languageSubset = new LanguageSet(
+    languageData: $languageData,
+    limitTo: ['de', 'en', 'fr', 'it'],
+    usecache: false,
+);
 $languageDetector = new LanguageDetectorWithTools(
     languageData: $languageData,
     languageSubset: $languageSubset,
     returnScores: true,
 );
 $languageResult = $languageDetector->detect('Ich lebe in Berlin und esse gerne Sushi und Döner und Massaman Gai!');
-$languageResult->dump(true);
+$languageResult->dump();
