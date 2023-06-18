@@ -34,10 +34,10 @@ If correct ratio is vastly inferior, try with 'ngrams-m.safe.php'
 $languageData = new LanguageData(
     'ngrams-m.php' //  -> 'ngrams-m.safe.php'
 );
-$languageSubset = new LanguageSubset($languageData);
+$languageSubset = new LanguageSet($languageData);
 $languageDetector = new LanguageDetector(
     languageData: $languageData,
-    languageSubset: $languageSubset,
+    languageSet: $languageSubset,
 );
 
 foreach ($files as $file) {
@@ -53,13 +53,13 @@ foreach ($files as $file) {
         [$lang, $text] = explode("\t", $line);
         $start = microtime(true);
         $result = $languageDetector->detect($text);
+        $duration += microtime(true) - $start;
         if ($result->isValid && $result->language === $lang) {
             $correct++;
         } else {
             $failed++;
             $result->dump(true);
         }
-        $duration += microtime(true) - $start;
     }
     $total = $correct + $failed;
     print $file . ' - Correct ratio: ' . round(($correct / $total) * 100, 2) . '% Duration: ' . $duration . PHP_EOL;

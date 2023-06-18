@@ -11,13 +11,13 @@ namespace Nitotm\Eld;
  * and good enough to find most problems.
  * For compareable real time measurents this is not perfectly suited!
  */
-readonly class LanguageDetectorWithTools extends LanguageDetector
+class LanguageDetectorWithTools extends LanguageDetector
 {
     private float $startedTime;
 
     public function __construct(
         LanguageData $languageData,
-        LanguageSubset $languageSubset,
+        LanguageSet $languageSubset,
         bool $returnScores = true,
         bool $cleanText = false,
         bool $checkConfidence = false,

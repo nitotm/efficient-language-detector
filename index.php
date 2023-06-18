@@ -12,8 +12,7 @@ if (PHP_SAPI !== 'cli') {
 }
 
 $languageData = new LanguageData();
-$languageSubset = new LanguageSubset($languageData);
-$languageSubset->limitTo(['en', 'es', 'fr', 'it', 'nl', 'de']);
+$languageSubset = new LanguageSet($languageData, ['en', 'es', 'fr', 'it', 'nl', 'de']);
 $languageDetector = new LanguageDetectorWithTools(
     languageData: $languageData,
     languageSubset: $languageSubset,

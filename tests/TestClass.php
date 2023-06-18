@@ -5,28 +5,30 @@ declare(strict_types = 1);
 
 namespace Nitotm\EldTests;
 
+use Closure;
 use Error;
 use Exception;
 
 class TestClass
 {
-    private $tests = [];
-    private $passed = 0;
-    private $failed = 0;
+    /** @var TestResult[] $tests */
+    private array $tests = [];
+    private int $passed = 0;
+    private int $failed = 0;
 
-    public function addTest($testIdentifier, $test, $stopOnFail = false)
+    public function addTest(string $testIdentifier, Closure $test, bool $stopOnFail = false):void
     {
-        $this->tests[] = ['test' => $test, 'identifier' => $testIdentifier, 'stop' => $stopOnFail];
+        $this->tests[] = new TestResult(test: $test, identifier: $testIdentifier, stop: $stopOnFail);
     }
 
-    public function run()
+    public function run():void
     {
         echo(PHP_SAPI === 'cli' ? '' : "<pre>");
         $startTime = microtime(true);
 
         foreach ($this->tests as $test) {
-            $testFunction = $test['test'];
-            $testIdentifier = $test['identifier'];
+            $testFunction = $test->test;
+            $testIdentifier = $test->identifier;
             $passed = false;
 
             try {
@@ -48,7 +50,7 @@ class TestClass
                 );
             }
 
-            if (!$passed && $test['stop']) {
+            if (!$passed && $test->stop) {
                 echo PHP_EOL . "    [ABORTED] Due to the last failure, the tests cannot continue successfully" . PHP_EOL;
                 break;
             }
@@ -60,12 +62,12 @@ class TestClass
         echo(PHP_SAPI === 'cli' ? '' : '</pre>');
     }
 
-    private function printResult($status, $testIdentifier, $message = '')
+    private function printResult(string $status, string $testIdentifier, string $message = ''):void
     {
         echo PHP_EOL . "[" . $status . "] " . $testIdentifier . ($message === '' ? '' : ' -> ') . $message . PHP_EOL;
     }
 
-    private function printSummary($executionTime, $memoryUsage)
+    private function printSummary(float $executionTime, float $memoryUsage):void
     {
         $total = count($this->tests);
         echo PHP_EOL;
@@ -75,8 +77,8 @@ class TestClass
         echo " Failed: " . $this->failed . PHP_EOL;
         echo " Time  : " . round($executionTime, ($executionTime < 0.01 ? 6 : 3)) . " seconds" . PHP_EOL;
         echo " Memory: " . ($memoryUsage < 1000000 ? round($memoryUsage / 1024, 2) . " KB"
-                : round($memoryUsage / pow(1024, 2), 2) . " MB") . PHP_EOL;
-        echo ' PHP v.: ' . phpversion() . PHP_EOL;
+                : round($memoryUsage / (1024 ** 2), 2) . " MB") . PHP_EOL;
+        echo ' PHP v.: ' . PHP_VERSION . PHP_EOL;
         echo "================================" . PHP_EOL;
     }
 }

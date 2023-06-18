@@ -23,7 +23,7 @@ final readonly class LanguageResult
     }
 
     /**
-     * @param array<string,float> $scores
+     * @param null|array{string:float} $scores
      */
     public function __construct(
         public ?string $language = null,
@@ -34,9 +34,6 @@ final readonly class LanguageResult
     ) {
     }
 
-    /**
-     * @return array<mixed,mixed>
-     */
     public function dump(bool $directly = false):array
     {
         try {

@@ -5,21 +5,21 @@ declare(strict_types = 1);
 
 namespace Nitotm\Eld;
 
-readonly class LanguageDetector
+class LanguageDetector
 {
-    /** @var array<int,string> */
-    protected array $wordStart;
+    /** @var array{string:array{int:int}} $ngrams */
+    private readonly array $ngrams;
 
     public function __construct(
-        private LanguageData $languageData,
-        private LanguageSubset $languageSubset,
-        private bool $returnScores = false,
-        private bool $cleanText = false,
-        private bool $checkConfidence = false,
-        private int $minByteLength = 12,
-        private int $minNgrams = 3
+        private readonly LanguageData $languageData,
+        private readonly LanguageSet $languageSet,
+        private readonly bool $returnScores = false,
+        private readonly bool $cleanText = false,
+        private readonly bool $checkConfidence = false,
+        private readonly int $minByteLength = 12,
+        private readonly int $minNgrams = 3
     ) {
-        $this->wordStart = array_fill(1, $languageData->languagesTotal, '');
+        $this->ngrams = $this->languageSet->getNgrams();
     }
 
     /**
@@ -48,45 +48,41 @@ readonly class LanguageDetector
         $numNgrams = count($txtNgrams);
 
         if ($numNgrams >= $minNgrams) {
-            $results = $this->calculateScores($txtNgrams, $numNgrams);
+            $langScores = $this->calculateScores($txtNgrams, $numNgrams);
 
-            if ($this->languageSubset->subset !== null) {
-                $results = $this->languageSubset->filterLangSubset($results);
+            arsort($langScores);
+
+            if (count($langScores) > 0) {
+                return LanguageResult::fail(LanguageResult::NOCLUE);
             }
-            arsort($results);
+            $langs = array_keys($langScores);
+            $langTop = $langs[0];
+            $langSecond = $langs[1] ?? null;
+            $scores = null;
+            if ($this->returnScores) {
+                $scores = $this->getScoresAsAssocArray($langScores);
+            }
 
-            if ($results !== []) {
-                $langs = array_keys($results);
-                $langTop = $langs[0];
-                $langSecond = $langs[1] ?? null;
-                $scores = null;
-                if ($this->returnScores) {
-                    $scores = $this->getScoresAsAssocArray($results);
-                }
-
-                if (!$this->checkConfidence) {
-                    return new LanguageResult(
-                        language: $this->languageData->langCodes[$langTop],
-                        score: current($results),
-                        scores: $scores,
-                    );
-                }
-                // A minimum of a 24% per ngram score from average
-                if ($this->languageData->avgScore[$langTop] * 0.24 > ($results[$langTop] / $numNgrams)) {
-                    return LanguageResult::fail(LanguageResult::UNSURE);
-                }
-                if ($langSecond !== null && 0.01 > abs($results[$langTop] - $results[$langSecond])) {
-                    return LanguageResult::fail(LanguageResult::UNSURE);
-                }
-
+            if (!$this->checkConfidence) {
                 return new LanguageResult(
-                    language: $this->languageData->langCodes[$langTop],
-                    score: current($results),
+                    language: $this->languageData->languages[$langTop],
+                    score: current($langScores),
                     scores: $scores,
                 );
             }
+            // A minimum of a 24% per ngram score from average
+            if ($this->languageData->corrections[$langTop] * 0.24 > ($langScores[$langTop] / $numNgrams)) {
+                return LanguageResult::fail(LanguageResult::UNSURE);
+            }
+            if ($langSecond !== null && 0.01 > abs($langScores[$langTop] - $langScores[$langSecond])) {
+                return LanguageResult::fail(LanguageResult::UNSURE);
+            }
 
-            return LanguageResult::fail(LanguageResult::NOCLUE);
+            return new LanguageResult(
+                language: $this->languageData->languages[$langTop],
+                score: current($langScores),
+                scores: $scores,
+            );
         }
 
         return LanguageResult::fail(LanguageResult::MORE_NGRAMS);
@@ -123,7 +119,7 @@ readonly class LanguageDetector
     /**
      * performance critical
      *
-     * @return array<string,float>
+     * @return array{string:float}
      */
     protected function getByteNgrams(string $str):array
     {
@@ -157,58 +153,63 @@ readonly class LanguageDetector
     }
 
     /**
-     * @param array<int,float> $txtNgrams
+     * @param array{string:float} $txtNgrams
      *
-     * @return array<int,float>
+     * @return array{int:float}
      */
     protected function calculateScores(array $txtNgrams, int $numNgrams):array
     {
-        $scores = [];
-        foreach ($txtNgrams as $bytes => $frequency) {
-            if (isset($this->languageData->ngrams[$bytes])) {
-                $num_langs = count($this->languageData->ngrams[$bytes]);
-                // Ngram score multiplier, the fewer languages found the more relevancy. Formula can be fine-tuned.
-                if ($num_langs === 1) {
-                    $relevancy = 27;
-                } elseif ($num_langs < 16) {
-                    $relevancy = (16 - $num_langs) / 2 + 1;
-                } else {
-                    $relevancy = 1;
-                }
-                // Most time-consuming loop, do only the strictly necessary inside
-                foreach ($this->languageData->ngrams[$bytes] as $lang => $ngramFrequency) {
-                    $this->languageData->langScore[$lang] += ($frequency > $ngramFrequency ? $ngramFrequency / $frequency
+        $langScores = [];
+        foreach ($this->languageSet->langIds as $langId) {
+            $langScores[$langId] = 0.0;
+        }
+        foreach ($txtNgrams as $ngram => $frequency) {
+            /** @var null|array<int,int> $scoremap */
+            $scoremap = $this->ngrams[$ngram] ?? null;
+            if ($scoremap !== null) {
+                $relevancy = $this->languageData->getRelevance(count($scoremap));
+                foreach ($scoremap as $lang => $ngramFrequency) {
+                    $langScores[$lang] += ($frequency > $ngramFrequency ? $ngramFrequency / $frequency
                             : $frequency / $ngramFrequency) * $relevancy + 2;
                 }
             }
         }
         // This divisor will produce a final score between 0 - ~1, score could be >1. Can be improved.
         $resultDivisor = $numNgrams * 3.2;
-        // $scoreNormalizer = $this->scoreNormalizer; // local access improves speed
-        foreach ($this->languageData->langScore as $lang => $score) {
-            if ($score > 0) {
-                $scores[$lang] = $score / $resultDivisor; // * $scoreNormalizer[$lang];
+        foreach ($langScores as $lang => $score) {
+            if ($score < 0.0001) {
+                unset($langScores[$lang]);
+            } else {
+                $langScores[$lang] = $score / $resultDivisor; // * $scoreNormalizer[$lang];
             }
         }
 
-        return $scores;
+        return $langScores;
     }
 
     /**
-     * @param array<int,float> $result
+     * @param array{int:float} $result
      *
-     * @return array<string,float>
+     * @return array{string:float}
      */
     protected function getScoresAsAssocArray(array $result):array
     {
         $scores = [];
+        /**
+         * @var int   $key
+         * @var float $score
+         */
         foreach ($result as $key => $score) {
             if ($score < 0.0001) {
                 break; // was sorted by score desc? if not: replace with continue!
             }
-            $scores[$this->languageData->langCodes[$key]] = $score;
+            /** @var string $l */
+            $l = $this->languageData->languages[$key];
+            $scores[$l] = $score;
         }
 
         return $scores;
     }
+
+
 }

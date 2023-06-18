@@ -8,7 +8,7 @@ include __DIR__ . "/vendor/autoload.php";
 use Nitotm\Eld\LanguageData;
 use Nitotm\Eld\LanguageDetectorWithTools;
 use Nitotm\Eld\LanguageResult;
-use Nitotm\Eld\LanguageSubset;
+use Nitotm\Eld\LanguageSet;
 use Nitotm\EldTests\TestClass;
 
 if (PHP_SAPI !== 'cli') {
@@ -19,7 +19,7 @@ $tests = new TestClass();
 
 $tests->addTest('Load ELD and create instance', function () {
     $languageData = new LanguageData();
-    $languageSubset = new LanguageSubset($languageData);
+    $languageSubset = new LanguageSet($languageData);
     $languageDetector = new LanguageDetectorWithTools(
         languageData: $languageData,
         languageSubset: $languageSubset,
@@ -28,7 +28,7 @@ $tests->addTest('Load ELD and create instance', function () {
 
 $tests->addTest('Simple language detection', function () {
     $languageData = new LanguageData();
-    $languageSubset = new LanguageSubset($languageData);
+    $languageSubset = new LanguageSet($languageData);
     $languageDetector = new LanguageDetectorWithTools(
         languageData: $languageData,
         languageSubset: $languageSubset,
@@ -44,7 +44,7 @@ $tests->addTest('Simple language detection', function () {
 
 $tests->addTest('Get scores of multiple languages', function () {
     $languageData = new LanguageData();
-    $languageSubset = new LanguageSubset($languageData);
+    $languageSubset = new LanguageSet($languageData);
     $languageDetector = new LanguageDetectorWithTools(
         languageData: $languageData,
         languageSubset: $languageSubset,
@@ -61,7 +61,7 @@ $tests->addTest('Get scores of multiple languages', function () {
 
 $tests->addTest('Language detection, without minimum length', function () {
     $languageData = new LanguageData();
-    $languageSubset = new LanguageSubset($languageData);
+    $languageSubset = new LanguageSet($languageData);
     $languageDetector = new LanguageDetectorWithTools(
         languageData: $languageData,
         languageSubset: $languageSubset,
@@ -78,7 +78,7 @@ $tests->addTest('Language detection, without minimum length', function () {
 
 $tests->addTest('Test minimum length error', function () {
     $languageData = new LanguageData();
-    $languageSubset = new LanguageSubset($languageData);
+    $languageSubset = new LanguageSet($languageData);
     $languageDetector = new LanguageDetectorWithTools(
         languageData: $languageData,
         languageSubset: $languageSubset,
@@ -95,7 +95,7 @@ $tests->addTest('Test minimum length error', function () {
 
 $tests->addTest('Clean text', function () {
     $languageData = new LanguageData();
-    $languageSubset = new LanguageSubset($languageData);
+    $languageSubset = new LanguageSet($languageData);
     $languageDetector = new LanguageDetectorWithTools(
         languageData: $languageData,
         languageSubset: $languageSubset,
@@ -117,7 +117,7 @@ $tests->addTest('Clean text', function () {
 
 $tests->addTest('Check minimum confidence', function () {
     $languageData = new LanguageData('ngrams-m.php');
-    $languageSubset = new LanguageSubset($languageData);
+    $languageSubset = new LanguageSet($languageData);
     $languageDetector = new LanguageDetectorWithTools(
         languageData: $languageData,
         languageSubset: $languageSubset,
@@ -135,8 +135,7 @@ $tests->addTest('Check minimum confidence', function () {
 
 $tests->addTest('Create dynamicLangSubset(), and detect', function () {
     $languageData = new LanguageData('ngrams-m.php');
-    $languageSubset = new LanguageSubset($languageData);
-    $languageSubset->limitTo(["en"]);
+    $languageSubset = new LanguageSet($languageData, limitTo: ["en"]);
     $languageDetector = new LanguageDetectorWithTools(
         languageData: $languageData,
         languageSubset: $languageSubset,
