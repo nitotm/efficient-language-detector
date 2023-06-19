@@ -31,5 +31,8 @@
   "require": {
     "php": "^7.3 || ^8.0",
     "ext-mbstring": "*"
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "3.*"
   }
 }

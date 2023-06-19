@@ -15,8 +15,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
 // This file matches the trained data of the Ngrams database, for new trained databases this file has to be updated.
+declare(strict_types=1);
 
 namespace Nitotm\Eld;
 
@@ -26,7 +26,7 @@ class LanguageData extends LanguageSubset
 {
     protected $ngrams;
 
-    // ISO 639-1 codes 
+    // ISO 639-1 codes
     protected $langCodes
         = [
             'am', 'ar', 'az', 'be', 'bg', 'bn', 'ca', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'eu', 'fa', 'fi', 'fr',
@@ -35,11 +35,22 @@ class LanguageData extends LanguageSubset
             'tr', 'uk', 'ur', 'vi', 'yo', 'zh'
         ];
 
-    //  ['Amharic', 'Arabic', 'Azerbaijani (Latin)', 'Belarusian', 'Bulgarian', 'Bengali', 'Catalan', 'Czech', 'Danish', 'German', 'Greek', 'English', 'Spanish', 'Estonian', 'Basque', 'Persian', 'Finnish', 'French', 'Gujarati', 'Hebrew', 'Hindi', 'Croatian', 'Hungarian', 'Armenian', 'Icelandic', 'Italian', 'Japanese', 'Georgian', 'Kannada', 'Korean', 'Kurdish (Arabic)', 'Lao', 'Lithuanian', 'Latvian', 'Malayalam', 'Marathi', 'Malay (Latin)', 'Dutch', 'Norwegian', 'Oriya', 'Punjabi', 'Polish', 'Portuguese', 'Romanian', 'Russian', 'Slovak', 'Slovene', 'Albanian', 'Serbian (Cyrillic)', 'Swedish', 'Tamil', 'Telugu', 'Thai', 'Tagalog', 'Turkish', 'Ukrainian', 'Urdu', 'Vietnamese', 'Yoruba', 'Chinese'];
+    /*
+      ['Amharic', 'Arabic', 'Azerbaijani (Latin)', 'Belarusian', 'Bulgarian', 'Bengali', 'Catalan', 'Czech', 'Danish',
+      'German', 'Greek', 'English', 'Spanish', 'Estonian', 'Basque', 'Persian', 'Finnish', 'French', 'Gujarati',
+      'Hebrew', 'Hindi', 'Croatian', 'Hungarian', 'Armenian', 'Icelandic', 'Italian', 'Japanese', 'Georgian',
+      'Kannada', 'Korean', 'Kurdish (Arabic)', 'Lao', 'Lithuanian', 'Latvian', 'Malayalam', 'Marathi', 'Malay (Latin)',
+      'Dutch', 'Norwegian', 'Oriya', 'Punjabi', 'Polish', 'Portuguese', 'Romanian', 'Russian', 'Slovak', 'Slovene',
+      'Albanian', 'Serbian (Cyrillic)', 'Swedish', 'Tamil', 'Telugu', 'Thai', 'Tagalog', 'Turkish', 'Ukrainian',
+      'Urdu', 'Vietnamese', 'Yoruba', 'Chinese'];
+     */
 
-    // Deprecated for now. Some languages score higher with the same amount of text, this multiplier evens it out for multi-language strings
-    //protected $scoreNormalizer = [0.7, 1, 1, 1, 1, 0.6, 0.98, 1, 1, 1, 0.9, 1, 1, 1, 1, 1, 1, 1, 0.6, 1, 0.7, 1, 1, 0.9, 1, 1, 0.8, 0.6, 0.6, 1, 1, 0.5, 1, 1, 0.6, 0.7, 1, 0.95, 1, 0.6, 0.6, 1, 1, 1, 1, 1, 1, 0.9, 1, 1, 0.6, 0.6, 0.7, 0.9, 1, 1, 1, 0.8, 1, 1.7];
-
+    /* Deprecated for now.
+      Some languages score higher with the same amount of text, this multiplier evens it out for multi-language strings
+      protected $scoreNormalizer = [0.7, 1, 1, 1, 1, 0.6, 0.98, 1, 1, 1, 0.9, 1, 1, 1, 1, 1, 1, 1, 0.6, 1, 0.7, 1, 1,
+      0.9, 1, 1, 0.8, 0.6, 0.6, 1, 1, 0.5, 1, 1, 0.6, 0.7, 1, 0.95, 1, 0.6, 0.6, 1, 1, 1, 1, 1, 1, 0.9, 1, 1, 0.6, 0.6,
+      0.7, 0.9, 1, 1, 1, 0.8, 1, 1.7];
+     */
     protected $langScore;
     protected $avgScore
         = [
@@ -50,10 +61,10 @@ class LanguageData extends LanguageSubset
             0.0882, 0.0368, 0.0258, 0.0206, 0.0282, 0.0467, 0.0329, 0.0152
         ];
 
-    function __construct(string $ngramsFile = 'ngrams-m.php')
+    public function __construct(?string $ngramsFile = null)
     {
         // Opcache needs to be active, so the load of the database array does not add overhead.
-        require __DIR__ . '/ngrams/' . $ngramsFile;
+        require __DIR__ . '/ngrams/' . ($ngramsFile ?? "ngrams-m.php");
         // Internal reference: _ngrams_newAddEnd4gramExtra_1-4_2824 + _ngrams_charUtf8_1-1_2291
         $this->langScore = array_fill(0, count($this->langCodes), 0);
     }

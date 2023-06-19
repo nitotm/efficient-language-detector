@@ -16,6 +16,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// declare(strict_types = 1);
+
 namespace Nitotm\Eld;
 
 require_once __DIR__ . '/LanguageData.php';
@@ -25,44 +27,54 @@ class LanguageDetector extends LanguageData
     public $returnScores = false;
     protected $wordStart;
 
-    public function __construct()
+
+    public function __construct(?string $ngramsFile = null)
     {
-        parent::__construct();
+        parent::__construct($ngramsFile);
         $this->wordStart = [' '] + array_fill(1, 70, '');
     }
 
-    protected function tokenizer($str)
+    protected function tokenizer(string $str): array
     {
         return preg_split('/ /', $str, -1, PREG_SPLIT_NO_EMPTY);
     }
 
-    public function cleanTxt($str)
+    /**
+     * Removes parts of a string, that may be considered as "noise" for language detection
+     */
+    public function cleanTxt(string $str): string
     {
         // Remove URLS
-        $str = preg_replace('@[hw]((ttps?://(www\.)?)|ww\.)([^\s/?\.#-]+\.?)+(/\S*)?@i', ' ', $str);
+        $str = preg_replace('@[hw]((ttps?://(www\.)?)|ww\.)([^\s/?.#-]+\.?)+(/\S*)?@i', ' ', $str);
         // Remove emails
-        $str = preg_replace('/[a-zA-Z0-9.!$%&’+_`-]+@[A-Za-z0-9.-]+\.[A-Za-z0-9-]{2,64}/', ' ', $str);
+        $str = preg_replace('/[a-zA-Z0-9.!$%&’+_`-]+@[A-Za-z0-9.-]+\.[A-Za-z0-9-]{2,64}/u', ' ', $str ?? '');
         // Remove .com domains
-        $str = preg_replace('/([A-Za-z0-9-]+\.)+com(\/\S*|[^\pL])/', ' ', $str);
+        $str = preg_replace('/([A-Za-z0-9-]+\.)+com(\/\S*|[^\pL])/u', ' ', $str ?? '');
 
         // Remove alphanumerical/number codes
-        return preg_replace('/[a-zA-Z]*[0-9]+[a-zA-Z0-9]*+/', ' ', $str);
+        return preg_replace('/[a-zA-Z]*\d+[a-zA-Z0-9]*+/', ' ', $str ?? '');
     }
 
-    protected function getScores($array)
+    /**
+     * Converts scores index keys to standard ISO 639-1 code
+     */
+    protected function isoScores(array $results): array
     {
         $scores = [];
-        foreach ($array as $key => $value) {
-            if ($value == 0) {
+        foreach ($results as $key => $score) {
+            if ($score === 0) {
                 break;
             }
-            $scores[$this->langCodes[$key]] = $value;
+            $scores[$this->langCodes[$key]] = $score;
         }
 
         return $scores;
     }
 
-    protected function getByteNgrams($str)
+    /**
+     * Gets Ngrams from a given string.
+     */
+    protected function getByteNgrams(string $str): array
     {
         $str = mb_strtolower($str, 'UTF-8');
         $tokens = [];
@@ -78,12 +90,12 @@ class LanguageDetector extends LanguageData
             for ($j = 0; ($j + 4) < $len; $j += 3, ++$tmp, ++$countNgrams) {
                 $tmp = &$tokens[$start[$j] . substr($word, $j, 4)];
             }
-            $tmp = &$tokens[$start[$j] . substr($word, ($len != 3 ? $len - 4 : 0)) . ' '];
+            $tmp = &$tokens[$start[$j] . substr($word, ($len !== 3 ? $len - 4 : 0)) . ' '];
             $tmp++;
             $countNgrams++;
         }
 
-        // Frequency is multiplied by 15000 at the ngrams database. A reduced number seems to work better. 
+        // Frequency is multiplied by 15000 at the ngrams database. A reduced number seems to work better.
         // Linear formulas were tried, decreasing the multiplier for fewer ngram strings, no meaningful improvement.
         foreach ($tokens as $bytes => $count) {
             $tokens[$bytes] = $count / $countNgrams * 13200;
@@ -92,7 +104,10 @@ class LanguageDetector extends LanguageData
         return $tokens;
     }
 
-    protected function calcScores($txtNgrams, $numNgrams)
+    /**
+     * Calculate scores for each language from the given Ngrams
+     */
+    protected function calcScores(array $txtNgrams, int $numNgrams): array
     {
         $langScore = $this->langScore;
         $results = [];
@@ -127,22 +142,29 @@ class LanguageDetector extends LanguageData
         return $results;
     }
 
-    /*
-      detect() returns an array, with a value named 'language', which will be either a ISO 639-1 code or false
-      ['language' => 'en'];
-      ['language' => false, 'error' => 'Some error', 'scores'=>[]];
 
-      When returnScores = true;
-      ['language' => 'en', 'scores' => ['en' => 0.6, 'es' => 0.2]]; 
-    */
-
-    public function detect($text, $cleanText = false, $checkConfidence = false, $minByteLength = 12, $minNgrams = 3)
-    {
+    /**
+     * Returns the language detected for a given string, as an ISO 639-1 code or false
+     * ['language' => 'en'];
+     * ['language' => false, 'error' => 'Some error', 'scores'=>[]];
+     * When returnScores = true;
+     * ['language' => 'en', 'scores' => ['en' => 0.6, 'es' => 0.2]];
+     *
+     * @return (boolean|string|array)[]
+     */
+    public function detect(
+        string $text,
+        bool   $cleanText = false,
+        bool   $checkConfidence = false,
+        int    $minByteLength = 12,
+        int    $minNgrams = 3
+    ): array {
+        // TODO return object, or not mutable return
         if ($cleanText) {
             // Removes Urls, emails, alphanumerical & numbers
             $text = $this->cleanTxt($text);
         }
-        $minNgrams = ($minNgrams > 0 ? $minNgrams : 1);
+        $minNgrams = ($minNgrams > 0 ? $minNgrams : 1); // faster than max()
         // Normalize special characters/word separators
         $text = trim(preg_replace('/[^\pL]+(?<![\x27\x60\x{2019}])/u', ' ', mb_substr($text, 0, 1000, 'UTF-8')));
         $thisLength = strlen($text);
@@ -182,9 +204,9 @@ class LanguageDetector extends LanguageData
 
                 if (!$this->returnScores) {
                     return ['language' => $this->langCodes[$top_lang]];
-                } else {
-                    return ['language' => $this->langCodes[$top_lang], 'scores' => $this->getScores($results)];
                 }
+
+                return ['language' => $this->langCodes[$top_lang], 'scores' => $this->isoScores($results)];
             }
 
             return ['language' => false, 'error' => 'Language not detected', 'scores' => []];

@@ -15,12 +15,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
-/* 
-To reduce the languages to be detected, there are 3 different options, they only need to be executed once.
-
-The fastest option to regularly use the same language subset, will be to add as an argument the file stored (and returned) by langSubset(), when creating an instance of the languageDetector class. In this case the subset ngrams database will be loaded directly, and not the default database. Also, you can use this option to load different ngram databases.
-*/
+declare(strict_types=1);
 
 namespace Nitotm\Eld;
 
@@ -28,17 +23,24 @@ class LanguageSubset
 {
     protected $subset = false;
     protected $loadedSubset = false;
+    protected $ngrams = [];
+    protected $langCodes = [];
     private $defaultNgrams = false;
 
-    // dynamicLangSubset() Will execute the detector normally, but at the end it will filter the excluded languages.
+    /**
+     * When active, detect() will filter the languages not included at $subset, from the scores, with filterLangSubset()
+     *
+     * @param array|bool $langs
+     * @return array|false
+     */
     public function dynamicLangSubset($langs)
     {
         if ($langs) {
             $this->subset = [];
-            foreach ($langs as $value) {
-                $lang = array_search($value, $this->langCodes);
-                if ($lang !== false) {
-                    $this->subset[] = $lang;
+            foreach ($langs as $lang) {
+                $foundLang = array_search($lang, $this->langCodes, true);
+                if ($foundLang !== false) {
+                    $this->subset[] = $foundLang;
                 }
             }
             sort($this->subset);
@@ -49,8 +51,15 @@ class LanguageSubset
         return $this->subset;
     }
 
-    // langSubset($langs,$save=true) Will previously remove the excluded languages form the ngrams database; for a single detection might be slower than dynamicLangSubset(), but for multiple strings will be faster. if $save option is true (default), the new ngrams subset will be stored, and next loaded for the same language subset, increasing startup speed.
-    public function langSubset($langs, $save = true, $safe = false)
+
+    /**
+     * Removes the excluded languages form the ngrams database
+     * if $save option is true, the new ngrams subset will be stored, and next loaded for the same language subset
+     *
+     * @param array|bool $langs
+     * @return string|true
+     */
+    public function langSubset($langs, bool $save = true, bool $safe = false)
     {
         if (!$langs) {
             if ($this->loadedSubset) {
@@ -88,7 +97,7 @@ class LanguageSubset
 
             foreach ($this->ngrams as $ngram => $langsID) {
                 foreach ($langsID as $id => $value) {
-                    if (!in_array($id, $langs_array)) {
+                    if (!in_array($id, $langs_array, true)) {
                         unset($this->ngrams[$ngram][$id]);
                     }
                 }
@@ -100,9 +109,10 @@ class LanguageSubset
 
         if ($save) {
             if (!file_exists($file_name)) { // in case $this->loadedSubset !== $new_subset, and was previously saved
-                file_put_contents($file_name,
+                file_put_contents(
+                    $file_name,
                     '<?php' . "\r\n" . '// Do not edit unless you ensure you are using UTF-8 encoding' . "\r\n"
-                    . '$this->ngrams=' . $this->ngram_export($this->ngrams, $safe) . ';'
+                    . '$this->ngrams=' . $this->ngramExport($this->ngrams, $safe) . ';'
                 );
             }
 
@@ -112,31 +122,35 @@ class LanguageSubset
         return true;
     }
 
-    protected function filterLangSubset($results)
+    /**
+     * Filters languages not included in the subset, from the results scores
+     */
+    protected function filterLangSubset(array $results): array
     {
-        foreach ($results as $key => $value) {
-            if (!in_array($key, $this->subset)) {
-                unset($results[$key]);
+        foreach ($results as $langID => $score) {
+            if (!in_array($langID, $this->subset, true)) {
+                unset($results[$langID]);
             }
         }
 
         return $results;
     }
 
-    protected function ngram_export($var, $safe = false)
+    /**
+     * @param array|int $data
+     */
+    protected function ngramExport($data, bool $safe = false): ?string
     {
-        if (is_array($var)) {
+        if (is_array($data)) {
             $toImplode = array();
-            foreach ($var as $key => $value) {
+            foreach ($data as $key => $value) {
                 $toImplode[] = ($safe === true ? '"\\x' . substr(chunk_split(bin2hex($key), 2, '\\x'), 0, -2) . '"'
-                        : var_export($key, true)) . '=>' . $this->ngram_export($value);
+                        : var_export($key, true)) . '=>' . $this->ngramExport($value);
             }
 
             return '[' . implode(',', $toImplode) . ']';
-        } else {
-            return var_export($var, true);
         }
+
+        return var_export($data, true);
     }
-
-
 }

@@ -4,10 +4,11 @@
 
     Or open the file through a server in the Browser
 */
+declare(strict_types=1);
 
 require_once __DIR__ . '/TestClass.php';
 
-$tests = new TestClass();
+$tests = new Nitotm\Eld\Tests\TestClass();
 
 // Mostly functional testing, when functions are more mature I will add some more unit tests
 
@@ -16,11 +17,7 @@ if (!isset($GLOBALS['autoload_'])) {
 }
 
 $tests->addTest('Load ELD and create instance', function () {
-    $eld = new Nitotm\Eld\LanguageDetector();
-
-    if (!$eld) {
-        throw new Exception("LanguageDetector() instance not created");
-    }
+    new Nitotm\Eld\LanguageDetector();
 }, true);
 
 $tests->addTest('Simple language detection', function () {
@@ -69,9 +66,9 @@ $tests->addTest('Test minimum length error', function () {
 $tests->addTest('Clean text', function () {
     $eld = new Nitotm\Eld\LanguageDetector();
 
-    $text = "https://www.google.com/\n".
-        "mail@gmail.com\n".
-        "google.com/search?q=search&source=hp\n".
+    $text = "https://www.google.com/\n" .
+        "mail@gmail.com\n" .
+        "google.com/search?q=search&source=hp\n" .
         "12345 A12345\n";
 
     $result = trim($eld->cleanTxt($text));
@@ -192,11 +189,11 @@ $tests->addTest("Testing accuracy: ngrams-m.php database, for big-test.txt", fun
     $eld = new Nitotm\Eld\LanguageDetector('ngrams-m.php');
     $total = 0;
     $correct = 0;
-    $handle = fopen(__DIR__ . '/../benchmarks/big-test.txt', "r");
+    $handle = fopen(__DIR__ . '/../benchmarks/big-test.txt', 'rb');
     if ($handle) {
         while (($line = fgets($handle)) !== false) {
             $values = explode("\t", trim($line));
-            if ($eld->detect($values[1], false, false, 0, 1)['language'] == $values[0]) {
+            if ($eld->detect($values[1], false, false, 0, 1)['language'] === $values[0]) {
                 $correct++;
             }
             $total++;
@@ -209,7 +206,7 @@ $tests->addTest("Testing accuracy: ngrams-m.php database, for big-test.txt", fun
     }
 
     if (($correct / $total) * 100 < 99.4) { // a bit of margin, depending on tie scores order, avg. might change a bit
-        throw new Exception("Accuracy too low. Expected 99.42%, but got: ". round(($correct / $total) * 100, 4) .'%');
+        throw new Exception("Accuracy too low. Expected 99.42%, but got: " . round(($correct / $total) * 100, 4) . '%');
     }
 });
 
