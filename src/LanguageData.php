@@ -5,7 +5,7 @@
  * @author Nito T.M. (https://github.com/nitotm)
  * @package nitotm/efficient-language-detector
  */
-// This file matches the trained data of the Ngrams database, for new trained databases this file has to be updated.
+
 declare(strict_types=1);
 
 namespace Nitotm\Eld;

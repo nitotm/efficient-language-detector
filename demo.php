@@ -1,47 +1,26 @@
 <?php
-/*
-Copyright 2019 Nito T.M.
-Author URL: https://github.com/nitotm
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+/**
+ * @copyright 2023 Nito T.M.
+ * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
+ * @author Nito T.M. (https://github.com/nitotm)
+ * @package nitotm/efficient-language-detector
+ */
 
 print (PHP_SAPI === 'cli' ? '' : "<pre>") . PHP_EOL;
 
 require_once 'src/LanguageDetector.php';
 // use Nitotm\Eld\LanguageDetector;
 
-$eld = new Nitotm\Eld\LanguageDetector;
+$eld = new Nitotm\Eld\LanguageDetector();
 
-// detect() expects a UTF-8 string, returns an array, with a value (ISO 639-1 code or false) named 'language'
-var_dump($eld->detect('Hola, cómo te llamas?'));
-// ['language' => 'es'];
-// ['language' => false, 'error' => 'Some error', 'scores'=>[]];
+// detect() expects a UTF-8 string, returns an object, with a value (ISO 639-1 code or null) named 'language'
+var_dump($result = $eld->detect('Hola, cómo te llamas?'));
+// object( language => 'es', scores => ['es' => 0.5, 'et' => 0.2], isReliable() => true )
+// object( language => null|string, scores => null|array, isReliable() => bool )
+var_dump($result->language);
 
-
-// To get the best guess, turn off minimum length, confidence threshold; also used for benchmarking.
-var_dump($eld->detect('To', false, false, 0, 1));
-
-/*
- To improve readability moving forward, PHP8 Named Parameters can be used
- print_r($eld->detect(text: 'To', cleanText: false, checkConfidence: false, minByteLength: 12, minNgrams: 3));
- cleanText: true, Removes Urls, domains, emails, alphanumerical & numbers
-*/
-
-// To retrieve the whole list of languages detected and their score, we will set $returnScores to True, just once
-$eld->returnScores = true;
-var_dump($eld->detect('How are you? Bien, gracias'));
-// ['language' => 'en', 'scores' => ['en' => 0.32, 'es' => 0.31, ...]];
+// cleanText = true: Removes Urls, .com domains, emails, alphanumerical & numbers
+$eld->cleanText = true; // Default is false
 
 /*
  To reduce the languages to be detected, there are 3 different options, they only need to be executed once.
@@ -56,25 +35,29 @@ $langSubset = ['en', 'es', 'fr', 'it', 'nl', 'de'];
 
 // dynamicLangSubset() Will execute the detector normally, but at the end will filter the excluded languages.
 $eld->dynamicLangSubset($langSubset);
+// Returns an object with an ?array property named 'languages', with the validated languages
+
 // to remove the subset
-$eld->dynamicLangSubset(false);
+$eld->dynamicLangSubset();
 
 /*
- langSubset($langs, save: true, safe: false) Will previously remove the excluded languages form the Ngrams database;
+ langSubset($langs, save: true, encode: true) Will previously remove the excluded languages form the Ngrams database
  for a single detection might be slower than dynamicLangSubset(), but for several strings will be faster.
- If $save option is true, default, the new ngrams subset will be stored, and next loaded for the same language subset,
- increasing startup speed. Use $safe=true to store Ngram bytes hex encoded.
+ If $save option is true, default, the new ngrams subset will be stored and cached for next time.
+ $encode=true, default, stores Ngram bytes hex encoded for safety.
 */
-$eld->langSubset($langSubset); // returns subset file name if saved
+var_dump($eld->langSubset($langSubset)); // returns subset file name if saved
+// Object ( success => bool, languages => null|[], error => null|string, file => null|string )
+
 // to remove the subset
-$eld->langSubset(false);
+$eld->langSubset();
 
 /*
- Finally the fastest option to regularly use the same language subset, will be to add as an argument the file stored
+ Finally the optimal way to regularly use the same language subset, will be to add as an argument the file stored
  (and returned) by langSubset(), when creating an instance of the class. In this case the subset Ngrams database will
  be loaded directly, and not the default database. Also, you can use this option to load different ngram databases
- stored at src/ngrams/
+ stored at resources/
  */
-$elds = new Nitotm\Eld\LanguageDetector('ngrams.2f37045c74780aba1d36d6717f3244dc025fb935.php');
+$elds = new Nitotm\Eld\LanguageDetector('ngramsM60-6.5ijqhj4oecso0kwcok4k4kgoscwg80o.php');
 
 print (PHP_SAPI === 'cli' ? '' : "</pre>");
