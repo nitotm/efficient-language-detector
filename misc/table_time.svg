@@ -133,7 +133,7 @@
 	  <path d='M0 180h600v1H0z'/>
 	  <path d='M0 210h600v1H0z'/>
 	  <path d='M0 240h600v1H0z'/>
-	  <path d='M0 270h600v3H0z'/>
+	  <path d='M0 270h600v3H0z' fill='#ccc'/>
 	  <path d='M0 302h600v1H0z'/>
 	</g>
 	<g x='0' y='0' font-size='16' font-weight='700'>
