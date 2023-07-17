@@ -40,8 +40,8 @@ var_dump($eld->detect('Hola, cómo te llamas?'));
 print $eld->detect('Hola, cómo te llamas?')->language;
 // 'es'
 
-// cleanText = true: Removes Urls, .com domains, emails, alphanumerical & numbers; from input text
-$eld->cleanText = true; // Default is false
+// cleanText(true): Removes Urls, .com domains, emails, alphanumerical & numbers; from input text
+$eld->cleanText(true); // Default is false
 ```
 
 - To reduce the languages to be detected, there are 3 different options, they only need to be executed once. (Check available [languages](#languages) below)

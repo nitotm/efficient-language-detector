@@ -19,8 +19,8 @@ var_dump($result = $eld->detect('Hola, cómo te llamas?'));
 // object( language => null|string, scores => null|array, isReliable() => bool )
 var_dump($result->language);
 
-// cleanText = true: Removes Urls, .com domains, emails, alphanumerical & numbers
-$eld->cleanText = true; // Default is false
+// When cleanText(true) Removes Urls, .com domains, emails, alphanumerical & numbers
+$eld->cleanText(true); // Default is false
 
 /*
  To reduce the languages to be detected, there are 3 different options, they only need to be executed once.

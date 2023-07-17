@@ -16,7 +16,7 @@ require_once __DIR__ . '/LanguageResult.php';
  */
 class LanguageDetector extends LanguageData
 {
-    public bool $cleanText = false;
+    protected bool $doCleanText = false;
     private array $wordStart;
 
     public function __construct(?string $ngramsFile = null)
@@ -32,10 +32,11 @@ class LanguageDetector extends LanguageData
      */
     public function detect(string $text): LanguageResult
     {
-        if ($this->cleanText) {
+        if ($this->doCleanText) {
             // Removes Urls, emails, alphanumerical & numbers
             $text = $this->getCleanText($text);
         }
+
         $text = $this->normalizeText($text);
         $textNgrams = $this->getByteNgrams($text);
         $numNgrams = count($textNgrams);
@@ -50,6 +51,11 @@ class LanguageDetector extends LanguageData
             }
         }
         return new LanguageResult();
+    }
+
+    public function cleanText(bool $bool): void
+    {
+        $this->doCleanText = $bool; // Already cast in the argument
     }
 
     /**
@@ -169,4 +175,5 @@ class LanguageDetector extends LanguageData
 
         return $results;
     }
+
 }

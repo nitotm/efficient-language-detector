@@ -61,7 +61,7 @@ $tests->addTest('Language detection, 2 bytes length', function () {
     }
 });
 
-$tests->addTest('Clean text', function () {
+$tests->addTest('getCleanText function', function () {
     $eld = new Nitotm\Eld\LanguageDetector();
 
     $text = "https://www.google.com/\n" .
@@ -73,6 +73,22 @@ $tests->addTest('Clean text', function () {
 
     if ($result !== '') {
         throw new Exception("Expected: empty string, but got " . $result);
+    }
+});
+
+$tests->addTest('Clean text option', function () {
+    $eld = new Nitotm\Eld\LanguageDetector();
+    $eld->cleanText(true);
+
+    $text = "https://www.google.com/\n" .
+        "mail@gmail.com\n" .
+        "google.com/search?q=search&source=hp\n" .
+        "12345 A12345\n";
+
+    $result = $eld->detect($text);
+
+    if ($result->language !== NULL) {
+        throw new Exception("Expected: NULL, but got " . json_encode($result));
     }
 });
 
