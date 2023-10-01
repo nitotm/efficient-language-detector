@@ -17,6 +17,7 @@ require_once __DIR__ . '/LanguageResult.php';
 class LanguageDetector extends LanguageData
 {
     protected bool $doCleanText = false;
+    /** @var array<int, string> $wordStart */
     private array $wordStart;
 
     public function __construct(?string $ngramsFile = null)
@@ -38,24 +39,16 @@ class LanguageDetector extends LanguageData
         }
 
         $text = $this->normalizeText($text);
-        $textNgrams = $this->getByteNgrams($text);
-        $numNgrams = count($textNgrams);
+        $byteNgrams = $this->getByteNgrams($text);
+        $numNgrams = count($byteNgrams);
+        $scores = $this->calculateScores($byteNgrams, $numNgrams);
+        if ($scores) {
+            arsort($scores);
 
-        if ($numNgrams) {
-            $results = $this->calculateScores($textNgrams, $numNgrams);
-
-            if ($results) {
-                arsort($results);
-
-                return new LanguageResult(key($results), $results, $numNgrams, $this->avgScore);
-            }
+            return new LanguageResult(key($scores), $scores, $numNgrams, $this->avgScore);
         }
-        return new LanguageResult();
-    }
 
-    public function cleanText(bool $bool): void
-    {
-        $this->doCleanText = $bool; // Already cast in the argument
+        return new LanguageResult();
     }
 
     /**
@@ -77,7 +70,7 @@ class LanguageDetector extends LanguageData
     protected function normalizeText(string $text): string
     {
         // Normalize special characters/word separators
-        $text = trim(preg_replace('/[^\pL]+(?<![\x27\x60\x{2019}])/u', ' ', $text)); // substr($text, 0, 1000)
+        $text = trim(preg_replace('/[^\pL]+(?<![\x27\x60\x{2019}])/u', ' ', $text)); // Consider substr($text, 0, 1000)
         $thisLength = strlen($text);
 
         if ($thisLength > 350) {
@@ -94,9 +87,12 @@ class LanguageDetector extends LanguageData
 
     /**
      * Gets Ngrams from a given string.
+     *
+     * @return array<string, float>
      */
     protected function getByteNgrams(string $text): array
     {
+        /** @var array<string, float> $byteNgrams */
         $byteNgrams = [];
         $countNgrams = 0;
         $start = $this->wordStart;
@@ -115,7 +111,7 @@ class LanguageDetector extends LanguageData
             $countNgrams++;
         }
 
-        // Frequency is multiplied by 15000 at the Ngrams database. A reduced number seems to work better.
+        // Frequency is multiplied by 15000 at the Ngrams database. A reduced number (13200) seems to work better.
         // Linear formulas were tried, decreasing the multiplier for fewer Ngram strings, no meaningful improvement.
         foreach ($byteNgrams as $bytes => $count) {
             $byteNgrams[$bytes] = $count / $countNgrams * 13200;
@@ -124,26 +120,34 @@ class LanguageDetector extends LanguageData
         return $byteNgrams;
     }
 
+    /**
+     * @return array<int, string>
+     */
     protected function tokenizer(string $str): array
     {
-        return preg_split('/ /', $str, -1, PREG_SPLIT_NO_EMPTY);
+        return preg_split('/ /', $str, -1, PREG_SPLIT_NO_EMPTY) ?: [];
     }
 
     /**
      * Calculate scores for each language from the given Ngrams
+     *
+     * @param array<string, float> $byteNgrams
+     * @return array<string, float>
      */
-    protected function calculateScores(array $textNgrams, int $numNgrams): array
+    protected function calculateScores(array $byteNgrams, int $numNgrams): array
     {
+        /** @var array<int, float> $langScore */
         $langScore = $this->langScore;
-        $results = [];
+        /** @var array<string, float> $scores */
+        $scores = [];
 
-        foreach ($textNgrams as $bytes => $currentFrequency) {
+        foreach ($byteNgrams as $bytes => $currentFrequency) {
             if (isset($this->ngrams[$bytes])) {
                 $langCount = count($this->ngrams[$bytes]);
                 // Ngram score multiplier, the fewer languages found the more relevancy. Formula can be fine-tuned.
                 // TODO consider make a formula that adapts for database language count, on subsets. Testing is needed
                 if ($langCount === 1) {
-                    $relevancy = 27;
+                    $relevancy = 27;  // Handpicked relevance multiplier, trial-error
                 } elseif ($langCount < 16) {
                     $relevancy = (16 - $langCount) / 2 + 1;
                 } else {
@@ -163,17 +167,31 @@ class LanguageDetector extends LanguageData
         // $scoreNormalizer = $this->scoreNormalizer; // local access improves speed
 
         if ($this->subset) {
+            // Filter here, before indexed array used by filterLangSubset, is converted to associative array
             $langScore = $this->filterLangSubset($langScore);
         }
 
         $langCodes = $this->langCodes; // local access improves speed
         foreach ($langScore as $lang => $score) {
             if ($score) {
-                $results[$langCodes[$lang]] = $score / $resultDivisor; // * $scoreNormalizer[$lang];
+                $scores[$langCodes[$lang]] = $score / $resultDivisor; // * $scoreNormalizer[$lang];
             }
         }
 
-        return $results;
+        return $scores;
     }
 
+    public function cleanText(bool $bool): void
+    {
+        $this->doCleanText = $bool; // Already cast in the argument
+    }
+
+    public function info(): array
+    {
+        return [
+            'Data type' => $this->dataType . ($this->isSubset ? '-' . count($this->langCodes) : ''),
+            'Languages' => $this->langCodes,
+            'Dynamic subset' => $this->subset ? $this->isoLanguages($this->subset) : null
+        ];
+    }
 }

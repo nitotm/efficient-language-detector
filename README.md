@@ -30,8 +30,8 @@ Alternatively, download / clone the files will work just fine.
 
 `detect()` expects a UTF-8 string, returns an object, with a value (*ISO 639-1 code* or `null`) named `language`
 ```php
-// require_once 'src/LanguageDetector.php'; To load ELD without composer/autoload. Update path.
 $eld = new Nitotm\Eld\LanguageDetector();
+// require_once 'src/LanguageDetector.php'; To load ELD without composer/autoload. Update path.
 
 var_dump($eld->detect('Hola, cómo te llamas?'));
 // object( language => 'es', scores => ['es' => 0.5, 'et' => 0.2], isReliable() => true )
@@ -40,7 +40,7 @@ var_dump($eld->detect('Hola, cómo te llamas?'));
 print $eld->detect('Hola, cómo te llamas?')->language;
 // 'es'
 
-// cleanText(true): Removes Urls, .com domains, emails, alphanumerical & numbers; from input text
+// if cleanText(True), detect() removes Urls, .com domains, emails, alphanumerical & numbers
 $eld->cleanText(true); // Default is false
 ```
 
@@ -69,7 +69,12 @@ $eld->langSubset();
  Finally the optimal way to regularly use a language subset: we create the instance with a file
  The file in the argument can be a subset by langSubset() or another database like ngramsL60.php
 */
-$eld_l = new Nitotm\Eld\LanguageDetector('ngramsL60.php');
+$eld_L = new Nitotm\Eld\LanguageDetector('ngramsL60.php');
+```
+
+If needed, we can get the current status of eld: languages, database type and subset
+```php
+var_dump($eld->info());
 ```
 
 ## Benchmarks

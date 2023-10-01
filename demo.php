@@ -58,6 +58,9 @@ $eld->langSubset();
  be loaded directly, and not the default database. Also, you can use this option to load different ngram databases
  stored at resources/
  */
-$elds = new Nitotm\Eld\LanguageDetector('ngramsM60-6.5ijqhj4oecso0kwcok4k4kgoscwg80o.php');
+$eld_s = new Nitotm\Eld\LanguageDetector('ngramsM60-6.5ijqhj4oecso0kwcok4k4kgoscwg80o.php');
+
+// If needed, we can get the current status of eld: languages, database type and subset
+var_dump($eld_s->info());
 
 print (PHP_SAPI === 'cli' ? '' : "</pre>");
