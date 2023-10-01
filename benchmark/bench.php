@@ -41,8 +41,6 @@ print 'Average Duration: ' . (array_sum($times) / count($times));
 print (PHP_SAPI === 'cli' ? '' : "</pre>");
 
 /*
-If correct ratio is inferior, use $eld = new languageDetector('ngramsM60.safe.php'); to see if it fixes the problem
-
 Results for v1.0.0, PHP 7.4.4, ngramsM60.php
     tweets.txt       - Correct ratio: 99.28%   Duration: 0.30713295936584
     big-test.txt     - Correct ratio: 99.42%   Duration: 2.4928371906281

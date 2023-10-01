@@ -6,6 +6,7 @@
  * @package nitotm/efficient-language-detector
  */
 
+// Average score of each language in a correct detection, done with an extended version of big-test benchmark.
 return [
     'am' => 0.0661,
     'ar' => 0.0237,

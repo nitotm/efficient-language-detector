@@ -13,10 +13,14 @@ namespace Nitotm\Eld;
 final class SubsetResult
 {
     public bool $success;
+    /** @var null|array<int, string> $languages */
     public ?array $languages;
     public ?string $error;
     public ?string $file;
 
+    /**
+     * @param null|array<int, string> $languages
+     */
     public function __construct(bool $success, ?array $languages = null, ?string $error = null, ?string $file = null)
     {
         $this->success = $success;

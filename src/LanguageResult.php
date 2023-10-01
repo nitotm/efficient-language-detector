@@ -19,13 +19,16 @@ final class LanguageResult
     private ?int $numNgrams;
     private array $avgScore;
 
+    /**
+     * @param null|array<string, float> $scores
+     * @param array<string, float> $avgScore
+     */
     public function __construct(
         ?string $language = null,
-        ?array  $scores = null,
-        ?int    $numNgrams = null,
-        array   $avgScore = []
-    )
-    {
+        ?array $scores = null,
+        ?int $numNgrams = null,
+        array $avgScore = []
+    ) {
         $this->language = $language;
         $this->scores = $scores;
         $this->numNgrams = $numNgrams;

@@ -87,7 +87,7 @@ $tests->addTest('Clean text option', function () {
 
     $result = $eld->detect($text);
 
-    if ($result->language !== NULL) {
+    if ($result->language !== null) {
         throw new Exception("Expected: NULL, but got " . json_encode($result));
     }
 });
