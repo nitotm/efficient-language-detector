@@ -29,6 +29,8 @@ class LanguageData extends LanguageSubset
     /** @var bool $isSubset */
     protected $isSubset;
 
+    private static  array $fileContents = [];
+
     public function __construct(?string $ngramsFile = null)
     {
         // Opcache needs to be active, so the load of the database array does not add overhead.
@@ -38,7 +40,7 @@ class LanguageData extends LanguageSubset
         if ($ngramsFile && !file_exists($folder . $file)) {
             $folder .= 'subset/';
         }
-        $ngramsData = include $folder . $file;
+        $ngramsData = $this->loadFileContents($folder . $file);
         if (empty($ngramsData['ngrams']) || empty($ngramsData['languages'])) {
             throw new RuntimeException(sprintf('File "%s" data is invalid', $file));
         }
@@ -49,7 +51,21 @@ class LanguageData extends LanguageSubset
         /** @var int $maxLang Highest language index key */
         $maxLang = max(array_keys($this->langCodes));
         $this->langScore = array_fill(0, $maxLang + 1, 0.0);
-        $this->avgScore = include __DIR__ . '/../resources/avgScore.php';
+        $this->avgScore = $this->loadFileContents(__DIR__ . '/../resources/avgScore.php');
+    }
+
+    /**
+     * Prevent including the same file multiple times
+     */
+    private function loadFileContents(string $file): array
+    {
+        if (isset(self::$fileContents[$file])) {
+            return self::$fileContents[$file];
+        }
+
+        $data = require_once $file;
+
+        return self::$fileContents[$file] = $data;
     }
 
     /*
