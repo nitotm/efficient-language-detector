@@ -16,6 +16,7 @@ require_once __DIR__ . '/LanguageSubset.php';
 
 class LanguageData extends LanguageSubset
 {
+    private static array $fileContents = [];
     /** @var array<string, array<int, int>> $ngrams */
     protected array $ngrams;
     /** @var array<int, string> $langCodes */
@@ -28,8 +29,6 @@ class LanguageData extends LanguageSubset
     protected string $ngramsFolder = __DIR__ . '/../resources/ngrams/';
     /** @var bool $isSubset */
     protected $isSubset;
-
-    private static  array $fileContents = [];
 
     public function __construct(?string $ngramsFile = null)
     {
@@ -59,13 +58,7 @@ class LanguageData extends LanguageSubset
      */
     private function loadFileContents(string $file): array
     {
-        if (isset(self::$fileContents[$file])) {
-            return self::$fileContents[$file];
-        }
-
-        $data = require_once $file;
-
-        return self::$fileContents[$file] = $data;
+        return self::$fileContents[$file] ?? (self::$fileContents[$file] = require $file);
     }
 
     /*
