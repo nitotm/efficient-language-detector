@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2023 Nito T.M.
+ * @copyright 2024 Nito T.M.
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Nito T.M. (https://github.com/nitotm)
  * @package nitotm/efficient-language-detector

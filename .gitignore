@@ -6,3 +6,4 @@
 psalm.xml
 /other/
 TODO.txt
+*.ignore

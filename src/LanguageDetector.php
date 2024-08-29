@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2023 Nito T.M.
+ * @copyright 2024 Nito T.M.
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Nito T.M. (https://github.com/nitotm)
  * @package nitotm/efficient-language-detector
@@ -8,44 +8,42 @@
 
 namespace Nitotm\Eld;
 
-require_once __DIR__ . '/LanguageData.php';
-require_once __DIR__ . '/LanguageResult.php';
-
 /**
  * Performance critical
  */
 class LanguageDetector extends LanguageData
 {
-    protected bool $doCleanText = false;
-    /** @var array<int, string> $wordStart */
-    private array $wordStart;
+    protected bool $textCleanupEnabled = false;
 
-    public function __construct(?string $ngramsFile = null)
+    public function __construct(?string $databaseFile = null, ?string $outputFormat = null)
     {
-        parent::__construct($ngramsFile);
-        $this->wordStart = [' '] + array_fill(1, 70, '');
+        $this->loadData($databaseFile, $outputFormat);
     }
 
     /**
-     * Returns the language detected for a given UTF-8 string, as an ISO 639-1 code
-     *  LanguageResult object( language => 'es', scores => ['es' => 0.5, 'et' => 0.2], isReliable() => true )
-     *  LanguageResult object( language => null|string, scores => null|array, isReliable() => bool )
+     * Returns the language detected for a given UTF-8 string, as ISO 639-1 code by default, or 'und' for undetermined
+     *  LanguageResult object( language => string, scores() => array<string, float>, isReliable() => bool )
+     *  ( language => 'es', scores() => ['es' => 0.5, 'et' => 0.2], isReliable() => true )
+     *  ( language => 'und', scores() => [], isReliable() => false )
      */
     public function detect(string $text): LanguageResult
     {
-        if ($this->doCleanText) {
+        if ($this->textCleanupEnabled) {
             // Removes Urls, emails, alphanumerical & numbers
-            $text = $this->getCleanText($text);
+            $text = $this->cleanText($text);
         }
-
-        $text = $this->normalizeText($text);
-        $byteNgrams = $this->getByteNgrams($text);
-        $numNgrams = count($byteNgrams);
-        $scores = $this->calculateScores($byteNgrams, $numNgrams);
-        if ($scores) {
-            arsort($scores);
-
-            return new LanguageResult(key($scores), $scores, $numNgrams, $this->avgScore);
+        $words = $this->getWords($text);
+        $byteNgrams = $this->getByteNgrams($words);
+        $scores = $this->calculateScores($byteNgrams);
+        $maxScore = max($scores);
+        if ($maxScore > 1) {
+            return new LanguageResult(
+                $maxScore,
+                $scores,
+                $byteNgrams,
+                $this->outputLanguages,
+                $this->avgScore
+            );
         }
 
         return new LanguageResult();
@@ -54,7 +52,7 @@ class LanguageDetector extends LanguageData
     /**
      * Removes parts of a string, that may be considered as "noise" for language detection
      */
-    public function getCleanText(string $str): string
+    public function cleanText(string $str): string
     {
         // Remove URLS
         $str = preg_replace('@[hw]((ttps?://(www\.)?)|ww\.)([^\s/?.#-]+\.?)+(/\S*)?@i', ' ', $str);
@@ -67,131 +65,101 @@ class LanguageDetector extends LanguageData
         return preg_replace('/[a-zA-Z]*\d+[a-zA-Z0-9]*+/', ' ', $str ?? '');
     }
 
-    protected function normalizeText(string $text): string
+    protected function getWords(string $text): array
     {
-        // Normalize special characters/word separators
-        $text = trim(preg_replace('/[^\pL]+(?<![\x27\x60\x{2019}])/u', ' ', $text)); // Consider substr($text, 0, 1000)
-        $thisLength = strlen($text);
+        $text = mb_strtolower(
+            trim(
+                substr($text, 0, 1000)
+            ),
+            'UTF-8'
+        );
 
-        if ($thisLength > 350) {
-            // Cut to first whitespace after 350 bytes offset, or 380 bytes
-            $text = substr(
-                $text,
-                0,
-                min(380, (strpos($text, ' ', 350) ?: 350))
-            );
-        }
+        // Match words. Treat Chinese, Japanese & Korean logograms as words. Allows non-consecutive apostrophes in words
+        preg_match_all(
+            '/(?:\pL(?<![\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]))+' .
+            '(?:[\x27\x60\x{2019}](?:(?![\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}])\pL)+)*' .
+            '|[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]/u',
+            $text,
+            $words
+        );
 
-        return mb_strtolower($text, 'UTF-8');
+        return $words[0];
     }
 
     /**
-     * Gets Ngrams from a given string.
-     *
-     * @return array<string, float>
+     * Gets Ngrams from the given words
      */
-    protected function getByteNgrams(string $text): array
+    protected function getByteNgrams(array $words): array
     {
-        /** @var array<string, float> $byteNgrams */
+        /** @var array<string, ?int> $byteNgrams */
         $byteNgrams = [];
-        $countNgrams = 0;
-        $start = $this->wordStart;
-
-        foreach ($this->tokenizer($text) as $word) {
+        // $countNgrams = 0;
+        $ngramLength = $this->ngramLength; // Local access is faster
+        $ngramStride = $this->ngramStride;
+        foreach ($words as $word) {
             $len = strlen($word);
-            if ($len > 70) {
-                $len = 70;
-            }
 
-            for ($j = 0; ($j + 4) < $len; $j += 3, ++$tmp, ++$countNgrams) {
-                $tmp = &$byteNgrams[$start[$j] . substr($word, $j, 4)];
+            // Processing whole-word n-grams separately improves speed measurably
+            if ($len <= $ngramLength) {
+                // fastest way to set an index key without checking if exist
+                $tmp = &$byteNgrams[' ' . $word . ' '];
+                // $countNgrams++; $tmp++;
+            } else {
+                $tmp = &$byteNgrams[' ' . substr($word, 0, $ngramLength)]; // $tmp++;
+                for ($j = $ngramStride; ($j + $ngramLength) < $len; $j += $ngramStride) { // , ++$countNgrams, ++$tmp
+                    $tmp = &$byteNgrams[substr($word, $j, $ngramLength)];
+                }
+                $tmp = &$byteNgrams[substr($word, $len - $ngramLength) . ' '];
+                // We would count at least 2 ngrams, start and ending ngram.
+                // $countNgrams+=2; $tmp++;
             }
-            $tmp = &$byteNgrams[$start[$j] . substr($word, ($len !== 3 ? $len - 4 : 0)) . ' '];
-            $tmp++;
-            $countNgrams++;
-        }
-
-        // Frequency is multiplied by 15000 at the Ngrams database. A reduced number (13200) seems to work better.
-        // Linear formulas were tried, decreasing the multiplier for fewer Ngram strings, no meaningful improvement.
-        foreach ($byteNgrams as $bytes => $count) {
-            $byteNgrams[$bytes] = $count / $countNgrams * 13200;
+            // $tmp++; Unnecessary as long as we do not use $frequency at calculateScores()
+            // if ( $countNgrams > 100) { break; } Unnecessary as long as we cut $text at <=1000 bytes
         }
 
         return $byteNgrams;
     }
 
     /**
-     * @return array<int, string>
-     */
-    protected function tokenizer(string $str): array
-    {
-        return preg_split('/ /', $str, -1, PREG_SPLIT_NO_EMPTY) ?: [];
-    }
-
-    /**
      * Calculate scores for each language from the given Ngrams
      *
-     * @param array<string, float> $byteNgrams
-     * @return array<string, float>
+     * @param array<string, ?int> $byteNgrams
+     * @return array<int, float>
      */
-    protected function calculateScores(array $byteNgrams, int $numNgrams): array
+    protected function calculateScores(array $byteNgrams): array
     {
         /** @var array<int, float> $langScore */
         $langScore = $this->langScore;
-        /** @var array<string, float> $scores */
-        $scores = [];
 
-        foreach ($byteNgrams as $bytes => $currentFrequency) {
+        foreach ($byteNgrams as $bytes => $frequency) {
             if (isset($this->ngrams[$bytes])) {
-                $langCount = count($this->ngrams[$bytes]);
-                // Ngram score multiplier, the fewer languages found the more relevancy. Formula can be fine-tuned.
-                // TODO consider make a formula that adapts for database language count, on subsets. Testing is needed
-                if ($langCount === 1) {
-                    $relevancy = 27;  // Handpicked relevance multiplier, trial-error
-                } elseif ($langCount < 16) {
-                    $relevancy = (16 - $langCount) / 2 + 1;
-                } else {
-                    $relevancy = 1;
-                }
-                // Most time-consuming loop, do only the strictly necessary inside
-                foreach ($this->ngrams[$bytes] as $lang => $globalFrequency) {
-                    $langScore[$lang] += ($currentFrequency > $globalFrequency ?
-                            $globalFrequency / $currentFrequency
-                            : $currentFrequency / $globalFrequency
-                        ) * $relevancy + 2;
+                // TODO: $frequency (count), not taken into account for now, more testing is needed
+                foreach ($this->ngrams[$bytes] as $language => $score) {
+                    $langScore[$language] *= $score;
                 }
             }
         }
-        // This divisor will produce a final score between 0 - ~1, score could be >1. Can be improved.
-        $resultDivisor = $numNgrams * 3.2;
-        // $scoreNormalizer = $this->scoreNormalizer; // local access improves speed
 
-        if ($this->subset) {
-            // Filter here, before indexed array used by filterLangSubset, is converted to associative array
-            $langScore = $this->filterLangSubset($langScore);
-        }
-
-        $langCodes = $this->langCodes; // local access improves speed
-        foreach ($langScore as $lang => $score) {
-            if ($score) {
-                $scores[$langCodes[$lang]] = $score / $resultDivisor; // * $scoreNormalizer[$lang];
-            }
-        }
-
-        return $scores;
+        return $langScore;
     }
 
-    public function cleanText(bool $bool): void
+    public function enableTextCleanup(bool $bool): void
     {
-        $this->doCleanText = $bool; // Already cast in the argument
+        $this->textCleanupEnabled = $bool;
     }
 
     public function info(): array
     {
         return [
-            'Data type' => $this->dataType . ($this->isSubset ? '-' . count($this->langCodes) : ''),
-            'Languages' => $this->langCodes,
-            'Dynamic subset' => $this->subset ? $this->isoLanguages($this->subset) : null
+            'Database type' => $this->dataType,
+            'Language count' => count($this->langCodes),
+            'Languages ISO639-1' => $this->langCodes,
+            'Output format' => $this->outputFormat,
+            'Languages IN output format' =>
+                ($this->outputFormat !== EldFormat::ISO639_1 ?
+                    array_intersect_key($this->outputLanguages, $this->langCodes) : 'Same as ISO639-1'
+                ),
+            'Text cleanup enabled' => ($this->textCleanupEnabled ? 'True' : 'False'),
         ];
     }
 }

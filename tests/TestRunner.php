@@ -86,6 +86,7 @@ class TestRunner
         echo " Memory: " . ($memoryUsage < 1000000 ? round($memoryUsage / 1024, 2) . " KB"
                 : round($memoryUsage / (1024 ** 2), 2) . " MB") . PHP_EOL;
         echo ' PHP v.: ' . PHP_VERSION . PHP_EOL;
+        echo ' PHP SAPI: ' . PHP_SAPI . PHP_EOL;
         echo "================================" . PHP_EOL;
     }
 }
