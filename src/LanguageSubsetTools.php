@@ -14,7 +14,7 @@ trait LanguageSubsetTools
 {
     /**
      * Sets a subset and removes the excluded languages form the ngrams database
-     * if $save option is true, the new ngrams subset will be stored, and cached for next time
+     * if $save option is true, the new ngrams subset will be stored, and loaded next time
      *
      * @param null|string[] $languages
      */
@@ -27,29 +27,31 @@ trait LanguageSubsetTools
             }
             return new SubsetResult(true); // if there was already no subset to disable, it also is successful
         }
-
         $langArray = $this->makeSubset($languages);
         if (!$langArray) {
             return new SubsetResult(false, null, 'No language matched this set');
         }
-
         if ($this->defaultNgrams === null) {
             $this->defaultNgrams = $this->ngrams;
         }
-
         $newSubset = $this->uniqueIntegersToString($langArray);
         $baseName = $this->dataType . '_' . count($langArray) . '_' . (!$encode ? 'd' : '') . $newSubset;
         $filePath = $this->ngramsFolder . 'subset/' . $baseName . '.php';
+
         // TODO: if default loaded ngrams are already a subset (and lack languages): send warning or load main database
         if ($this->loadedSubset !== $newSubset) {
             $this->loadedSubset = $newSubset;
-
             if (file_exists($filePath)) {
                 $ngramsData = include $filePath;
                 if (isset($ngramsData['ngrams'])) {
                     $this->ngrams = $ngramsData['ngrams'];
 
-                    return new SubsetResult(true, $this->isoLanguages($langArray), null, $baseName);
+                    return new SubsetResult(
+                        true,
+                        $this->indicesToStrings($langArray, $this->outputLanguages),
+                        null,
+                        $baseName
+                    );
                 }
             }
             if ($this->ngrams !== $this->defaultNgrams) {
@@ -67,18 +69,22 @@ trait LanguageSubsetTools
                 }
             }
         }
-
         $saved = false;
         if ($save) {
             $saved = $this->saveNgrams($filePath, $langArray, $encode);
         }
 
-        return new SubsetResult(true, $this->isoLanguages($langArray), null, ($saved ? $baseName : null));
+        return new SubsetResult(
+            true,
+            $this->indicesToStrings($langArray, $this->outputLanguages),
+            null,
+            ($saved ? $baseName : null)
+        );
     }
 
     /**
-     * Validates an expected array of ISO 639-1 language code strings, given by the user, and creates a subset of the
-     * valid languages compared against the current database available languages
+     * Validates an array of ISO 639-1 language strings or other selected format, given by the user, and creates a
+     * subset of the valid languages compared against the current database available languages
      *
      * @param string[] $languages
      * @return null|int[]
@@ -87,17 +93,15 @@ trait LanguageSubsetTools
     {
         $subset = [];
         if ($languages) {
+            $normalizedOutputLanguages = array_map([$this, 'normalizeLanguage'], $this->outputLanguages);
+
             foreach ($languages as $language) {
                 $normalizedLanguage = $this->normalizeLanguage($language);
                 // $langCodes are always ISO 639-1
                 $foundLang = array_search($normalizedLanguage, $this->langCodes, true);
                 if ($foundLang === false && $this->outputFormat !== EldFormat::ISO639_1) {
-                    // check if it has selected output format, which can be formatted
-                    $foundMatch = array_search(
-                        $this->normalizeLanguage($language),
-                        array_map([$this, 'normalizeLanguage'], $this->outputLanguages),
-                        true
-                    );
+                    // check if it has a different output format, which can be formatted
+                    $foundMatch = array_search($normalizedLanguage, $normalizedOutputLanguages, true);
                     if ($foundMatch !== false && isset($this->langCodes[$foundMatch])) {
                         $foundLang = $foundMatch;
                     }
@@ -150,7 +154,7 @@ trait LanguageSubsetTools
                 // We use base35, to make a seamless union with 'z' later
                 $base35Groups[] = base_convert((string)$uniqueNumber, 10, 35);
             } else {
-                // Empty groups necessary to implode a unique string
+                // Empty groups are necessary to implode a unique string
                 $base35Groups[] = '';
             }
         }
@@ -158,24 +162,21 @@ trait LanguageSubsetTools
     }
 
     /**
-     * Converts ngram database language index (integer) to string output format
+     * Maps integer indices to corresponding string values.
+     * Main use: convert ngram database language index (integer) to string output format
      *
-     * @param int[] $langSet
+     * @param int[] $indices
+     * @param array<int, string> $strings
      * @return array<int, string>
      */
-    protected function isoLanguages(array $langSet): array
+    protected function indicesToStrings(array $indices, array $strings): array
     {
-        $newLangCodes = [];
-        foreach ($langSet as $langID) {
-            $newLangCodes[$langID] = $this->outputLanguages[$langID]; //$this->langCodes[$langID];
-        }
-        return $newLangCodes;
+        return array_intersect_key($strings, array_flip($indices));
     }
-
     /**
      * @param int[] $langArray
      */
-    protected function saveNgrams(string $filePath, array $langArray, bool $encode): bool
+    private function saveNgrams(string $filePath, array $langArray, bool $encode): bool
     {
         // in case $this->loadedSubset !== $newSubset, and was previously saved
         if (!file_exists($filePath) && !file_put_contents(
@@ -187,7 +188,7 @@ trait LanguageSubsetTools
                 . "'type' => '" . $this->dataType . "',\r\n"
                 . "'ngramLength' => " . $this->ngramLength .  ",\r\n"
                 . "'ngramStride' => " . $this->ngramStride .  ",\r\n"
-                . "'languages' => " . var_export($this->isoLanguages($langArray), true) . ",\r\n"
+                . "'languages' => " . var_export($this->indicesToStrings($langArray, $this->langCodes), true) . ",\r\n"
                 . "'isSubset' => true,\r\n"
                 . "'avgScore' => " . var_export($this->avgScore, true) . ",\r\n"
                 . "'ngrams' =>" . $this->ngramExport($this->ngrams, $encode) . "\r\n"
@@ -199,9 +200,9 @@ trait LanguageSubsetTools
     }
 
     /**
-     * Generates a compact string representation of the ngram database for storage, reducing file size
+     * Generates a compact string representation of the ngram data, for storage, reducing file size
      *
-     * @param int|array<int, int>|array<string, array<int, int>> $data
+     * @param float|array<int, float>|array<string, array<int, float>> $data
      */
     private function ngramExport($data, bool $encode = false): ?string
     {

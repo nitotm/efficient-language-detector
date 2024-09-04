@@ -14,35 +14,35 @@ namespace Nitotm\Eld;
 final class LanguageResult
 {
     public string $language;
-    private int $languageIndex;
+    private int $languageId;
+    /** @var array<int, float> $rawScores */
+    private array $rawScores;
+    /** @var array<string, ?int> $byteNgrams */
+    private array $byteNgrams;
     /** @var null|array<string, float> $prettyScores */
     private ?array $prettyScores;
-    /** @var null|array<int, float> $rawScores */
-    private $rawScores;
-    /** @var null|array<string, ?int> $byteNgrams */
-    private $byteNgrams;
-    /** @var null|array<int, string> $outputLanguages */
-    private $outputLanguages;
-    /** @var null|array<int, float> $avgScore */
-    private $avgScore;
+    /** @var array<int, string> $outputLanguages */
+    private array $outputLanguages;
+    /** @var array<int, float> $avgScore */
+    private array $avgScore;
 
 
     /**
-     * @param null|array<int, float> $rawScores
-     * @param null|array<string, ?int> $byteNgrams
-     * @param null|array<int, string> $outputLanguages
-     * @param null|array<string, float> $avgScore
+     * @param array<int, float> $rawScores
+     * @param array<string, ?int> $byteNgrams
+     * @param array<int, string> $outputLanguages
+     * @param array<int, float> $avgScore
      */
     public function __construct(
-        ?float $maxScore = null,
-        ?array $rawScores = null,
-        ?array $byteNgrams = null,
-        ?array $outputLanguages = null,
-        ?array $avgScore = null
+        ?int $languageId = null,
+        array $rawScores = [],
+        array $byteNgrams = [],
+        array $outputLanguages = [],
+        array $avgScore = []
     ) {
-        if ($maxScore !== null) {
-            $this->languageIndex = array_search($maxScore, $rawScores, true);
-            $this->language = $outputLanguages[$this->languageIndex];
+        if ($languageId !== null) {
+            $this->languageId = $languageId;
+            $this->language = $outputLanguages[$this->languageId];
             $this->rawScores = $rawScores;
             $this->byteNgrams = $byteNgrams;
             $this->outputLanguages = $outputLanguages;
@@ -88,11 +88,11 @@ final class LanguageResult
         if ($this->language === 'und' || count($this->byteNgrams) < 3) {
             return false;
         }
-
+        /** @var array<string, float> $scores */
         $scores = $this->scores();
 
-        // Reliable if score is >75% of average, and +5% higher than next score. Selected numbers after testing
-        if ($this->avgScore[$this->languageIndex] * 0.75 > $scores[$this->language]
+        // Is reliable if score is >75% of average, and +5% higher than next score. Selected numbers after testing
+        if ($this->avgScore[$this->languageId] * 0.75 > $scores[$this->language]
             || 0.05 > abs($scores[$this->language] - next($scores)) / $scores[$this->language]) {
             return false;
         }

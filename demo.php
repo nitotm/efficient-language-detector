@@ -8,12 +8,12 @@
 
 echo (PHP_SAPI === 'cli' ? '' : "<pre>") . PHP_EOL;
 
-require_once 'manual_autoload.php';
+require_once 'manual_loader.php';
 // require __DIR__ . '/vendor/autoload.php';
 
 use Nitotm\Eld\LanguageDetector;
-use Nitotm\Eld\EldDataFile; // Not mandatory
-use Nitotm\Eld\EldFormat; // Not mandatory
+use Nitotm\Eld\EldDataFile; // not mandatory
+use Nitotm\Eld\EldFormat; // not mandatory
 
 // LanguageDetector(databaseFile: ?string, outputFormat: ?string)
 $eld = new LanguageDetector(EldDataFile::SMALL, EldFormat::ISO639_1); // Default file and format
@@ -21,7 +21,10 @@ $eld = new LanguageDetector(EldDataFile::SMALL, EldFormat::ISO639_1); // Default
 // Language formats: 'ISO639_1', 'ISO639_2T', 'ISO639_1_BCP47', 'ISO639_2T_BCP47' and 'FULL_TEXT'
 // Argument constants are not mandatory, LanguageDetector('small', 'ISO639_1'); will also work
 
-// detect() expects a UTF-8 string, returns an object, with a value (ISO 639-1 code or 'und') named 'language'
+/*
+ detect() expects a UTF-8 string, returns an object with a 'language' property, with an ISO 639-1 code (or other
+ selected format), or 'und' for undetermined language.
+*/
 var_dump($result = $eld->detect('Hola, cómo te llamas?'));
 // object( language => string, scores() => array<string, float>, isReliable() => bool )
 // ( language => 'es', scores() => ['es' => 0.25, 'nl' => 0.05], isReliable() => true )
@@ -35,7 +38,7 @@ var_dump($result->language); // 'es'
  It always accepts ISO 639-1 codes, as well as the selected output format if different.
  langSubset(languages: [], save: true, encode: true)
 */
-//var_dump($eld->langSubset(['en', 'es', 'fr', 'it', 'nl', 'de'])); // returns subset file name if saved
+var_dump($eld->langSubset(['en', 'es', 'fr', 'it', 'nl', 'de'])); // returns subset file name if saved
 // Object ( success => bool, languages => ?array, error => ?string, file => ?string )
 // ( success => true, languages => ['en', 'es', ...], error => NULL, file => 'small_6_mfss5...' )
 
@@ -43,7 +46,7 @@ var_dump($result->language); // 'es'
 $eld->langSubset();
 
 /*
- To use a subset without additional overhead, the proper way is to initiate the detector with the file saved
+ To use a subset without additional overhead, the proper way is to instantiate the detector with the file saved
   and returned by langSubset(), it will be loaded as if it were a default database
 */
 $eld_subset = new Nitotm\Eld\LanguageDetector('small_6_mfss5z1t');

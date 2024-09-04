@@ -21,7 +21,7 @@ ELD is also available (outdated versions) in [Javascript](https://github.com/nit
 5. [Testing](#testing)
 6. [Languages](#languages)
 
-> Changes from ELD v2 to v3:
+> Changes from ELD v2 to v3-beta:
 > * detect()->language now returns string `'und'` for *undetermined* instead of `NULL`
 > * Databases are not compatible, and bigger, medium v2 ≈ small v3
 > * dynamicLangSubset() function is removed
@@ -34,12 +34,12 @@ $ composer require nitotm/efficient-language-detector
 ```
 Use `--prefer-dist` to omit tests/, misc/ & benchmark/  
 Alternatively, download / clone the files will work just fine.  
-(Only small DB install *under construction*)  
+(Only *small* DB install under construction)  
 
 
 #### Configuration
 
-It is recommended to use OPcache, specially for the larger databases to reduce load times on startup.   
+It is recommended to use OPcache, specially for the larger databases to reduce load times.   
 We need to set `opcache.interned_strings_buffer`, `opcache.memory_consumption` high enough for each database  
 Recommended value in parentheses. Check [Databases](#databases) for more info.
 
@@ -54,7 +54,7 @@ Recommended value in parentheses. Check [Databases](#databases) for more info.
 
 `detect()` expects a UTF-8 string and returns an object with a `language` property, containing an *ISO 639-1* code (or other selected format), or `'und'` for undetermined language.
 ```php
-// require_once 'manual_autoload.php'; To load ELD without autoloader. Update path.
+// require_once 'manual_loader.php'; To load ELD without autoloader. Update path.
 use Nitotm\Eld\{LanguageDetector, EldDataFile, EldFormat};
 
 // LanguageDetector(databaseFile: ?string, outputFormat: ?string)
@@ -158,27 +158,27 @@ Benchmarks:
 
 * **Lingua** participates with 54 languages, **Franc** with 58, **patrickschur** with 54.  
 * **fasttext** does not have a built-in subset option, so to show its accuracy and speed potential I made two benchmarks, fasttext-all not being limited by any subset at any test  
-* <sup style="color:#08e">*</sup> **CLD2** also lacks subset option, and it's difficult to make a subset even with its option `bestEffort = True`, as usually returns only one language, so it has a comparative disadvantage.
+* <sup style="color:#08e">*</sup> Google's **CLD2** also lacks subset option, and it's difficult to make a subset even with its option `bestEffort = True`, as usually returns only one language, so it has a comparative disadvantage.
 * Time is normalized: (total lines * time) / processed lines
 
 
 ## Databases
 
-|                           | Small          | Medium             | Large        | Extralarge    |
-|---------------------------|----------------|--------------------|--------------|---------------|
-| Pros                      | Lowest memory  | Equilibrated       | Fastest      | Most accurate |
-| Cons                      | Least accurate | Slowest (but fast) | High memory  | Higest memory |
-| File size                 | 3 MB           | 10 MB              | 32 MB        | 71 MB         |
-| Memory usage              | 76 MB          | 280 MB             | 977 MB       | 2083 MB       |
-| Memory usage Cached       | 0.4 MB + OP    | 0.4 MB + OP        | 0.4 MB + OP  | 0.4 MB + OP   |
-| OPcache used memory       | 21 MB          | 69 MB              | 244 MB       | 539 MB        |
-| OPcache used interned     | 4 MB           | 10 MB              | 45 MB        | 98 MB         |
-| Load time Uncached        | 0.14 sec       | 0.5 sec            | 1.5 sec      | 3.4 sec       |
-| Load time Cached          | 0.0002 sec     | 0.0002 sec         | 0.0002 sec   | 0.0002 sec    |
-| **Settings** (Recomended) |                |                    |              |               |
-| `memory_limit`            | >= 128         | >= 340             | >= 1060      | >= 2200       |
-| `opcache.interned...`*    | >= 8      (16) | >= 16        (32)  | >= 60   (70) | >= 116  (128) |
-| `opcache.memory`          | >= 64    (128) | >= 128      (230)  | >= 360 (450) | >= 750  (820) |
+|                            | Small          | Medium             | Large        | Extralarge     |
+|----------------------------|----------------|--------------------|--------------|----------------|
+| Pros                       | Lowest memory  | Equilibrated       | Fastest      | Most accurate  |
+| Cons                       | Least accurate | Slowest (but fast) | High memory  | Highest memory |
+| File size                  | 3 MB           | 10 MB              | 32 MB        | 71 MB          |
+| Memory usage               | 76 MB          | 280 MB             | 977 MB       | 2083 MB        |
+| Memory usage Cached        | 0.4 MB + OP    | 0.4 MB + OP        | 0.4 MB + OP  | 0.4 MB + OP    |
+| OPcache used memory        | 21 MB          | 69 MB              | 244 MB       | 539 MB         |
+| OPcache used interned      | 4 MB           | 10 MB              | 45 MB        | 98 MB          |
+| Load time Uncached         | 0.14 sec       | 0.5 sec            | 1.5 sec      | 3.4 sec        |
+| Load time Cached           | 0.0002 sec     | 0.0002 sec         | 0.0002 sec   | 0.0002 sec     |
+| **Settings** (Recommended) |                |                    |              |                |
+| `memory_limit`             | >= 128         | >= 340             | >= 1060      | >= 2200        |
+| `opcache.interned...`*     | >= 8      (16) | >= 16        (32)  | >= 60   (70) | >= 116  (128)  |
+| `opcache.memory`           | >= 64    (128) | >= 128      (230)  | >= 360 (450) | >= 750  (820)  |
 
 * \* I recommend using more than enough `interned_strings_buffer` as *buffers overflow* error might delay server response.  
 To use *all* databases `opcache.interned_strings_buffer` should be a minimum of 160MB (170MB).  

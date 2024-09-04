@@ -13,7 +13,7 @@ namespace Nitotm\Eld;
  */
 class LanguageDetector extends LanguageData
 {
-    protected bool $textCleanupEnabled = false;
+    private bool $textCleanupEnabled = false;
 
     public function __construct(?string $databaseFile = null, ?string $outputFormat = null)
     {
@@ -21,7 +21,7 @@ class LanguageDetector extends LanguageData
     }
 
     /**
-     * Returns the language detected for a given UTF-8 string, as ISO 639-1 code by default, or 'und' for undetermined
+     * Returns the language detected for a given UTF-8 string, as ISO 639-1 code (default), or 'und' if undetermined
      *  LanguageResult object( language => string, scores() => array<string, float>, isReliable() => bool )
      *  ( language => 'es', scores() => ['es' => 0.5, 'et' => 0.2], isReliable() => true )
      *  ( language => 'und', scores() => [], isReliable() => false )
@@ -36,9 +36,10 @@ class LanguageDetector extends LanguageData
         $byteNgrams = $this->getByteNgrams($words);
         $scores = $this->calculateScores($byteNgrams);
         $maxScore = max($scores);
+        // scores start at 1
         if ($maxScore > 1) {
             return new LanguageResult(
-                $maxScore,
+                array_search($maxScore, $scores, true), // max score language key
                 $scores,
                 $byteNgrams,
                 $this->outputLanguages,
@@ -50,7 +51,7 @@ class LanguageDetector extends LanguageData
     }
 
     /**
-     * Removes parts of a string, that may be considered as "noise" for language detection
+     * Removes parts of a string, that may be considered "noise" for language detection
      */
     public function cleanText(string $str): string
     {
@@ -93,25 +94,24 @@ class LanguageDetector extends LanguageData
     {
         /** @var array<string, ?int> $byteNgrams */
         $byteNgrams = [];
-        // $countNgrams = 0;
         $ngramLength = $this->ngramLength; // Local access is faster
         $ngramStride = $this->ngramStride;
+        // $countNgrams = 0;
+
         foreach ($words as $word) {
             $len = strlen($word);
-
             // Processing whole-word n-grams separately improves speed measurably
             if ($len <= $ngramLength) {
                 // fastest way to set an index key without checking if exist
-                $tmp = &$byteNgrams[' ' . $word . ' '];
-                // $countNgrams++; $tmp++;
+                $tmp = &$byteNgrams[' ' . $word . ' ']; // $countNgrams++; $tmp++;
             } else {
                 $tmp = &$byteNgrams[' ' . substr($word, 0, $ngramLength)]; // $tmp++;
-                for ($j = $ngramStride; ($j + $ngramLength) < $len; $j += $ngramStride) { // , ++$countNgrams, ++$tmp
+                
+                for ($j = $ngramStride; ($j + $ngramLength) < $len; $j += $ngramStride) { // ++$countNgrams, ++$tmp
                     $tmp = &$byteNgrams[substr($word, $j, $ngramLength)];
                 }
                 $tmp = &$byteNgrams[substr($word, $len - $ngramLength) . ' '];
-                // We would count at least 2 ngrams, start and ending ngram.
-                // $countNgrams+=2; $tmp++;
+                // $countNgrams+=2; $tmp++; We would count at least 2 ngrams, start and ending ngram.
             }
             // $tmp++; Unnecessary as long as we do not use $frequency at calculateScores()
             // if ( $countNgrams > 100) { break; } Unnecessary as long as we cut $text at <=1000 bytes
@@ -121,14 +121,14 @@ class LanguageDetector extends LanguageData
     }
 
     /**
-     * Calculate scores for each language from the given Ngrams
+     * Calculate scores from the given Ngrams for each language
      *
      * @param array<string, ?int> $byteNgrams
-     * @return array<int, float>
+     * @return non-empty-array<int, float>
      */
     protected function calculateScores(array $byteNgrams): array
     {
-        /** @var array<int, float> $langScore */
+        /** @psalm-var non-empty-array<int, float> $langScore */
         $langScore = $this->langScore;
 
         foreach ($byteNgrams as $bytes => $frequency) {

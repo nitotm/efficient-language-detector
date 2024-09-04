@@ -13,18 +13,15 @@
 */
 declare(strict_types=1);
 
+require_once __DIR__ . '/../manual_loader.php';
 require_once __DIR__ . '/TestRunner.php';
 
 $tests = new Nitotm\Eld\Tests\TestRunner();
 
 // Mostly functional testing, when functions are more mature I will add some more unit tests
 
-if (!isset($GLOBALS['autoload_'])) {
-    require_once __DIR__ . '/../manual_autoload.php';
-}
-
 $tests->addTest('Load ELD and create instance', function () {
-    new Nitotm\Eld\LanguageDetector('small');
+    new Nitotm\Eld\LanguageDetector(Nitotm\Eld\EldDataFile::SMALL);
 }, true);
 
 $tests->addTest('Simple language detection', function () {
@@ -33,7 +30,16 @@ $tests->addTest('Simple language detection', function () {
     $result = $eld->detect('Hola, cómo te llamas?');
 
     if ($result->language !== 'es') {
-        throw new RuntimeException("Expected: 'es', but got: " . ($result->language ?? ''));
+        throw new RuntimeException("Expected: 'es', but got: " . var_export($result->language, true));
+    }
+});
+
+$tests->addTest('Test detect() with ISO 639-2T return format', function () {
+    $eld = new Nitotm\Eld\LanguageDetector('small', Nitotm\Eld\EldFormat::ISO639_2T);
+    $result = $eld->detect('How are you today my friend');
+
+    if ($result->language !== 'eng') {
+        throw new RuntimeException("Expected 'eng', but got: ". var_export($result->language, true));
     }
 });
 
@@ -43,9 +49,7 @@ $tests->addTest('Empty text', function () {
     $result = $eld->detect('');
 
     if ($result->language !== 'und') {
-        throw new RuntimeException(
-            "Expected: 'und', but got: " . gettype($result->language) . '( ' . ($result->language ?? '') . ' )'
-        );
+        throw new RuntimeException("Expected: 'und', but got: " . var_export($result->language, true));
     }
 });
 
@@ -65,8 +69,8 @@ $tests->addTest('Language detection, 2 bytes length', function () {
     $eld = new Nitotm\Eld\LanguageDetector('small');
     $result = $eld->detect('To');
 
-    if (!isset($result->language) || $result->language !== 'en') {
-        throw new RuntimeException("Expected: 'en', but got: " . ($result->language ?? ''));
+    if ($result->language !== 'en') {
+        throw new RuntimeException("Expected: 'en', but got: " . var_export($result->language, true));
     }
     if ($result->isReliable() !== false) {
         throw new RuntimeException(
@@ -75,7 +79,7 @@ $tests->addTest('Language detection, 2 bytes length', function () {
     }
 });
 
-$tests->addTest('cleanText function', function () {
+$tests->addTest('cleanText() method', function () {
     $eld = new Nitotm\Eld\LanguageDetector('small');
 
     $text = "https://www.google.com/\n" .
@@ -90,7 +94,7 @@ $tests->addTest('cleanText function', function () {
     }
 });
 
-$tests->addTest('Clean text option', function () {
+$tests->addTest('enableTextCleanup() option', function () {
     $eld = new Nitotm\Eld\LanguageDetector('small');
     $eld->enableTextCleanup(true);
 
@@ -106,10 +110,10 @@ $tests->addTest('Clean text option', function () {
     }
 });
 
-$tests->addTest('Check minimum confidence', function () {
+$tests->addTest('Check isReliable() threshold', function () {
     $eld = new Nitotm\Eld\LanguageDetector('small');
 
-    $result = $eld->detect('zxb zxh zsf tudo');
+    $result = $eld->detect('zxb zxh zsf pelo');
 
     if ($result->isReliable() !== false) {
         throw new RuntimeException(
@@ -129,6 +133,19 @@ $tests->addTest('Create langSubset(), and detect', function () {
     if (count($result->scores()) !== 1) {
         throw new RuntimeException(
             "Expected: 1 score, but got: " . count($result->scores())
+        );
+    }
+});
+
+$tests->addTest('Create langSubset() with ISO 639-2T format', function () {
+    $eld = new Nitotm\Eld\LanguageDetector('small', 'ISO639_2T');
+
+    $langSubset = ['eng'];
+    $subsetResult = $eld->langSubset($langSubset);
+
+    if (!isset($subsetResult->languages) || $subsetResult->languages !== [11 => 'eng']) {
+        throw new RuntimeException(
+            "Expected: [11 => 'eng'], but got: " . var_export($subsetResult->languages, true)
         );
     }
 });
@@ -165,13 +182,13 @@ $tests->addTest('Check if langSubset() is able to save subset file', function ()
     }
 });
 
-$tests->addTest('Create instance with diferent ngrams database, and detect', function () {
+$tests->addTest('Create instance with different ngrams database, and detect', function () {
     $eld = new Nitotm\Eld\LanguageDetector('small_6_mfss5z1t');
 
     $result = $eld->detect('Hola, cómo te llamas?');
 
-    if (!isset($result->language) || $result->language !== 'es') {
-        throw new RuntimeException("Expected: 'es', but got: " . ($result->language ?? ''));
+    if ($result->language !== 'es') {
+        throw new RuntimeException("Expected: 'es', but got: " . var_export($result->language, true));
     }
 });
 
@@ -183,13 +200,12 @@ $tests->addTest("Testing accuracy: 'small' database, for eld-test.txt", function
     if ($handle) {
         while (($line = fgets($handle)) !== false) {
             $values = explode("\t", trim($line));
-            if (!isset($values[1])) {
-                echo '----> ' . $total . '  ';
+            if (isset($values[1])) {
+                if ($eld->detect($values[1])->language === $values[0]) {
+                    $correct++;
+                }
+                $total++;
             }
-            if ($eld->detect($values[1])->language === $values[0]) {
-                $correct++;
-            }
-            $total++;
         }
         fclose($handle);
     }

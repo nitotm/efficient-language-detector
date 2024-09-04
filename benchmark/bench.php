@@ -1,25 +1,26 @@
 <?php
 
-set_time_limit(80);
+set_time_limit(90);
 
-require_once __DIR__ . '/../manual_autoload.php';
-
+require_once __DIR__ . '/../manual_loader.php';
 use Nitotm\Eld\LanguageDetector;
 
 // opcache_reset(); // Avoid "interned string buffers overflow" testing multiple DB
 // clearstatcache();
 
 $database = 'small';
-$files = ['tatoeba-50.txt', 'eld-test.txt', 'sentences_v3.txt', 'word-pairs_v3.txt', 'single-words_v3.txt'];
-// $tatoeba50 = ['ar', 'az', 'be', 'bg', 'bn', 'ca', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'eu', 'fa', 'fi', 'fr',
-// 'gu', 'he', 'hi', 'hr', 'hu', 'hy', 'is', 'it', 'ja', 'ka', 'ko', 'lt', 'lv', 'ms', 'nl', 'no', 'pl', 'pt', 'ro',
-// 'ru', 'sk', 'sl', 'sq', 'sv', 'ta', 'th', 'tl', 'tr', 'uk', 'ur', 'vi', 'yo', 'zh'];
+/*
+$tatoeba50 = ['ar', 'az', 'be', 'bg', 'bn', 'ca', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'eu', 'fa', 'fi', 'fr',
+ 'gu', 'he', 'hi', 'hr', 'hu', 'hy', 'is', 'it', 'ja', 'ka', 'ko', 'lt', 'lv', 'ms', 'nl', 'no', 'pl', 'pt', 'ro',
+ 'ru', 'sk', 'sl', 'sq', 'sv', 'ta', 'th', 'tl', 'tr', 'uk', 'ur', 'vi', 'yo', 'zh'];
+*/
 
 $loadStart = microtime(true);
 $eld = new LanguageDetector($database);
-// $eld->langSubset($tatoeba50); //without saving ->($tatoeba50,false) but benchmarks below are done with DB file cached
+// $eld->langSubset($tatoeba50); //without saving: ($tatoeba50,false) but benchmarks below are done with DB file cached
 $loadTime = microtime(true) - $loadStart;
 
+$files = ['tatoeba-50.txt', 'eld-test.txt', 'sentences_v3.txt', 'word-pairs_v3.txt', 'single-words_v3.txt'];
 $folder = __DIR__ . '/';
 $times = [];
 $average = [];
@@ -34,6 +35,7 @@ foreach ($files as $key => $file) {
     $duration = 0;
     $total = 0;
     $file_stream = fopen($folder . $file, 'rb');
+
     while (($line = fgets($file_stream, 65535)) !== false) {
         $values = explode("\t", $line);
         $start = microtime(true);
@@ -50,7 +52,7 @@ foreach ($files as $key => $file) {
     $accuracy = ($correct / $total) * 100;
     $average[] = $accuracy;
     echo str_pad($file, 17) . ' - Correct ratio: ' . round($accuracy, 2) . '%   Duration: ' . $duration . PHP_EOL;
-} //                                                                                                print_r($failed);
+}
 
 $opcacheStatus = (function_exists('opcache_get_status') ? opcache_get_status() : false);
 $memoryUsage = memory_get_peak_usage();
