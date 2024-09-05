@@ -32,8 +32,9 @@ ELD is also available (outdated versions) in [Javascript](https://github.com/nit
 ```bash
 $ composer require nitotm/efficient-language-detector
 ```
-Use `--prefer-dist` to omit tests/, misc/ & benchmark/  
-Alternatively, download / clone the files will work just fine.  
+- `--prefer-dist` will omit *tests/*, *misc/* & *benchmark/*, or use `--prefer-source` to include everything  
+- Install `nitotm/efficient-language-detector:dev-main` to try the last unstable changes  
+- Alternatively, download / clone the files can work just fine.  
 (Only *small* DB install under construction)  
 
 
@@ -188,17 +189,16 @@ To use *all* databases `opcache.interned_strings_buffer` should be a minimum of 
 To cache all default databases comfortably you would want to set it at 1200MB.
 
 ## Testing
-
-- To make sure everything works on your setup, you can execute the following file:
-```bash
-$ php efficient-language-detector/tests/tests.php # Update path
-```
-- Also, for composer "autoload-dev", the following line will also execute the tests
-
+Default composer install might not include these files. Use `--prefer-source` to include them.
+- For *dev* environment with composer *"autoload-dev"* (root only), the following will execute the tests
 ```php
 new Nitotm\Eld\Tests\TestsAutoload();
 ```
-- To run the accuracy benchmarks run the `benchmark/bench.php` file. Some composer installs might not include these files.
+- Or, you can also run the tests executing the following file:
+```bash
+$ php efficient-language-detector/tests/tests.php # Update path
+```
+- To run the accuracy benchmarks run the `benchmark/bench.php` file.
 
 ## Languages
 
