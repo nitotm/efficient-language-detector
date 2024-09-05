@@ -35,7 +35,6 @@
     "ext-mbstring": "*"
   },
   "require-dev": {
-	 "ext-json": "*"
   },
   "scripts": {
  }
