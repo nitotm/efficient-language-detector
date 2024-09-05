@@ -9,8 +9,8 @@
     "language detector",
     "language detection",
     "language identification",
-	 "language recognition",
-	 "language classification"
+    "language recognition",
+    "language classification"
   ],
   "homepage": "https://github.com/nitotm/efficient-language-detector",
   "license": "Apache-2.0",
@@ -37,5 +37,5 @@
   "require-dev": {
   },
   "scripts": {
- }
+  }
 }
