@@ -49,6 +49,7 @@ final class LanguageResult
         if (!$this->language || $this->numNgrams < 3 || !$this->scores) {
             return false;
         }
+        reset($this->scores);
         // A minimum of a 24% from the average score
         if ($this->avgScore[$this->language] * 0.24 > ($this->scores[$this->language] / $this->numNgrams)
             || 0.01 > abs($this->scores[$this->language] - next($this->scores))) {
