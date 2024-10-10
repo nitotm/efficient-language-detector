@@ -5,7 +5,7 @@
 ![supported PHP versions](https://img.shields.io/badge/PHP-%3E%3D%207.4-blue)
 [![license](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![supported languages](https://img.shields.io/badge/supported%20languages-60-brightgreen.svg)](#languages)
-![version](https://img.shields.io/badge/ver.-3.0--beta-blue)
+![version](https://img.shields.io/badge/ver.-3.0-blue)
 	
 </div>
 
@@ -21,7 +21,7 @@ ELD is also available (outdated versions) in [Javascript](https://github.com/nit
 5. [Testing](#testing)
 6. [Languages](#languages)
 
-> Changes from ELD v2 to v3-beta:
+> Changes from ELD v2 to v3:
 > * detect()->language now returns string `'und'` for *undetermined* instead of `NULL`
 > * Databases are not compatible, and bigger, medium v2 ≈ small v3
 > * dynamicLangSubset() function is removed
@@ -107,7 +107,7 @@ I compared *ELD* with a different variety of detectors, as there are not many in
 
 | URL                                                      | Version      | Language     |
 |:---------------------------------------------------------|:-------------|:-------------|
-| https://github.com/nitotm/efficient-language-detector/   | 3.0.0-BETA   | PHP          |
+| https://github.com/nitotm/efficient-language-detector/   | 3.0.0        | PHP          |
 | https://github.com/pemistahl/lingua-py                   | 2.0.2        | Python       |
 | https://github.com/facebookresearch/fastText             | 0.9.2        | C++          |
 | https://github.com/CLD2Owners/cld2                       | Aug 21, 2015 | C++          |

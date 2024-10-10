@@ -13,7 +13,7 @@ namespace Nitotm\Eld;
  */
 final class LanguageResult
 {
-    public string $language;
+    public string $language; // TODO make it readonly when we upgrade to PHP +8.1
     private int $languageId;
     /** @var array<int, float> $rawScores */
     private array $rawScores;
@@ -90,12 +90,14 @@ final class LanguageResult
         }
         /** @var array<string, float> $scores */
         $scores = $this->scores();
+        reset($scores); // Make sure the pointer is at the beginning
 
         // Is reliable if score is >75% of average, and +5% higher than next score. Selected numbers after testing
         if ($this->avgScore[$this->languageId] * 0.75 > $scores[$this->language]
             || 0.05 > abs($scores[$this->language] - next($scores)) / $scores[$this->language]) {
             return false;
         }
+
         return true;
     }
 }
