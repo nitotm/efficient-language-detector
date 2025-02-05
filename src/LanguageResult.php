@@ -82,7 +82,10 @@ final class LanguageResult
         return $this->prettyScores = $scores;
     }
 
-    public function isReliable(): bool
+    /**
+     * @param float $forAverageScoreRatio Is reliable if score * $forAverageScoreRatio > average score for the language
+     */
+    public function isReliable(float $forAverageScoreRatio = 0.75): bool
     {
         // if undetermined language, or less than 3 ngrams
         if ($this->language === 'und' || count($this->byteNgrams) < 3) {
@@ -92,8 +95,8 @@ final class LanguageResult
         $scores = $this->scores();
         reset($scores); // Make sure the pointer is at the beginning
 
-        // Is reliable if score is >75% of average, and +5% higher than next score. Selected numbers after testing
-        if ($this->avgScore[$this->languageId] * 0.75 > $scores[$this->language]
+        // Is reliable if score is greater than a fraction of the average, and +5% higher than next score. Selected numbers after testing
+        if ($this->avgScore[$this->languageId] * $forAverageScoreRatio > $scores[$this->language]
             || 0.05 > abs($scores[$this->language] - next($scores)) / $scores[$this->language]) {
             return false;
         }
