@@ -26,7 +26,6 @@ class LanguageData
     protected array $ngrams;
     /** @var array<int, float> $avgScore */
     protected array $avgScore;
-
     /** @var non-empty-array<int, float> $langScore */
     protected array $langScore;
     /** @var array<int, string> $langCodes */
@@ -85,10 +84,10 @@ class LanguageData
             $folder .= 'subset/';
             if (!file_exists($folder . $fileBaseName . '.php')) {
                 if ($this->databaseMode !== EldMode::MODE_ARRAY && in_array(
-                    $fileBaseName,
-                    [EldDataFile::MEDIUM, EldDataFile::LARGE],
-                    true
-                )) {
+                        $fileBaseName,
+                        [EldDataFile::MEDIUM, EldDataFile::LARGE],
+                        true
+                    )) {
                     throw new InvalidArgumentException(
                         "Database modes 'string', 'bytes', 'disk' do not ship with size "
                         . $fileBaseName . ", build with BlobDataBuilder()."
@@ -102,7 +101,6 @@ class LanguageData
         if ($this->databaseMode === EldMode::MODE_ARRAY) {
             // Send warning if OPcache is active and interned_strings_buffer is too low
             InternedWarning::checkAndSend($databaseInput);
-
             $memory_limit = $this->getMemoryLimit();
             // Basic memory limit check, so we don't assume necessary free memory, database could be cached
             if (($fileBaseName === EldDataFile::MEDIUM && $memory_limit < 256) // Approximate memory requirements
@@ -116,6 +114,7 @@ class LanguageData
         }
 
         $ngramsData = $this->loadFileContents($folder . $fileBaseName . '.php', $static);
+
         if (empty($ngramsData['languages']) || ($this->databaseMode === 'array' && empty($ngramsData['ngrams']))) {
             throw new RuntimeException(sprintf('File "%s" data is invalid', $fileBaseName));
         }
@@ -143,10 +142,12 @@ class LanguageData
                     fclose($this->dataStream);
                 }
                 $this->indexStream = fopen($folder . $fileBaseName . '.index.php', 'rb');
+
                 if ($this->indexStream === false) {
                     throw new RuntimeException("Failed to open file: " . $folder . $fileBaseName . '.index.php');
                 }
                 $this->dataStream = fopen($folder . $fileBaseName . '.data.php', 'rb');
+
                 if ($this->dataStream === false) {
                     throw new RuntimeException("Failed to open file: " . $folder . $fileBaseName . '.data.php');
                 }
@@ -192,9 +193,7 @@ class LanguageData
                 throw new RuntimeException("Invalid data at file: " . $folder . $fileBaseName . '.data.php');
             }
         }
-
         $this->loadOutputScheme($schemeInput);
-
         $this->isInitialized = true;
     }
 
@@ -210,17 +209,16 @@ class LanguageData
         if (in_array($databaseMode, EldMode::values(), true)) {
             return $databaseMode;
         }
-
         throw new InvalidArgumentException("Invalid database mode: " . $databaseMode);
     }
 
     private function getMemoryLimit()
     {
         $v = trim(ini_get('memory_limit') ?: '-1');
+
         if ($v === '-1') {
             return 9999; // We could check system memory
         }
-
         $unit = strtolower(substr($v, -1));
         $num = (int)$v;
         return $num * ($unit === 'g' ? 1000 : 1); // we handle M and G
@@ -243,6 +241,7 @@ class LanguageData
     private function loadBlobContents(string $file, int $offset = 0, bool $static = true)
     {
         $contents = self::$blobContents[$file] ?? file_get_contents($file, false, null, $offset);
+
         if ($contents === false) {
             throw new RuntimeException("Failed to open file: " . $file);
         }
@@ -258,6 +257,7 @@ class LanguageData
     {
         // Normalize Scheme to avoid case sensitivity issues
         $normalizedScheme = str_replace('-', '_', strtoupper($schemeInput ?? EldFormat::ISO639_1));
+
         if ($normalizedScheme === $this->outputScheme) {
             return true;
         }
@@ -268,10 +268,10 @@ class LanguageData
             $this->outputScheme = $normalizedScheme;
             return true;
         }
-
         if ($isCritical) {
             throw new InvalidArgumentException("Invalid scheme: $schemeInput");
         }
+
         return false;
     }
 }

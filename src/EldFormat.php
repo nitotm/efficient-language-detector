@@ -8,12 +8,12 @@
 
 namespace Nitotm\Eld;
 
-// TODO v4, delete file for v4
+// TODO error for v3.X, delete file for v4
+/*
 @trigger_error(
-    'Class Nitotm\Eld\EldFormat is deprecated and will be removed in a future release. Use Nitotm\Eld\EldScheme instead.',
+    'Class Nitotm\Eld\EldFormat is deprecated and will be removed for v4. Use Nitotm\Eld\EldScheme instead.',
     E_USER_DEPRECATED
 );
-
+*/
 // Create an alias: EldFormat -> EldScheme
-\class_alias(\Nitotm\Eld\EldScheme::class, \Nitotm\Eld\EldFormat::class);
-
+\class_alias(EldScheme::class, EldFormat::class);
