@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2024 Nito T.M.
+ * @copyright 2025 Nito T.M.
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Nito T.M. (https://github.com/nitotm)
  * @package nitotm/efficient-language-detector
@@ -8,22 +8,25 @@
 
 echo (PHP_SAPI === 'cli' ? '' : "<pre>") . PHP_EOL;
 
-require_once 'manual_loader.php';
+require_once __DIR__ . '/manual_loader.php';
 // require __DIR__ . '/vendor/autoload.php';
 
 use Nitotm\Eld\LanguageDetector;
 use Nitotm\Eld\EldDataFile; // not mandatory
-use Nitotm\Eld\EldFormat; // not mandatory
+use Nitotm\Eld\EldScheme; // not mandatory
+use Nitotm\Eld\EldMode; // not mandatory
 
-// LanguageDetector(databaseFile: ?string, outputFormat: ?string)
-$eld = new LanguageDetector(EldDataFile::SMALL, EldFormat::ISO639_1); // Default file and format
+// LanguageDetector(databaseFile: ?string, outputFormat: ?string, mode: string)
+$eld = new LanguageDetector(EldDataFile::SMALL, EldScheme::ISO639_1, EldMode::MODE_ARRAY); // Default file and format
 // Database files: 'small', 'medium', 'large', 'extralarge'. Check memory requirements at README
-// Language formats: 'ISO639_1', 'ISO639_2T', 'ISO639_1_BCP47', 'ISO639_2T_BCP47' and 'FULL_TEXT'
-// Argument constants are not mandatory, LanguageDetector('small', 'ISO639_1'); will also work
+// Language schemess: 'ISO639_1', 'ISO639_2T', 'ISO639_1_BCP47', 'ISO639_2T_BCP47' and 'FULL_TEXT'
+// Database modes: 'array', 'string', 'bytes', 'disk'.
+// Argument constants are not mandatory, LanguageDetector('small', 'ISO639_1', 'array'); will also work
+// outputFormat: parameter to be named outputScheme: on v4
 
 /*
  detect() expects a UTF-8 string, returns an object with a 'language' property, with an ISO 639-1 code (or other
- selected format), or 'und' for undetermined language.
+ selected scheme), or 'und' for undetermined language.
 */
 var_dump($result = $eld->detect('Hola, cómo te llamas?'));
 // object( language => string, scores() => array<string, float>, isReliable() => bool )
@@ -33,9 +36,11 @@ var_dump($result = $eld->detect('Hola, cómo te llamas?'));
 var_dump($result->language); // 'es'
 
 /*
- We can use a subset of languages, calling langSubset() once, will set it. The first time is expensive as it creates
- a new database, if saving the database file (default), it will be loaded next time we make the same subset.
- It always accepts ISO 639-1 codes, as well as the selected output format if different.
+ In array mode the first call takes longer as it creates a new database, if save enabled (default), it will be loaded
+  next time we make the same subset.
+ In modes string, bytes & disk, a "virtual" subset is created instantly, detect() will just remove unwanted languages
+  before returning results.
+ It accepts any ISO codes.
  langSubset(languages: [], save: true, encode: true)
 */
 var_dump($eld->langSubset(['en', 'es', 'fr', 'it', 'nl', 'de'])); // returns subset file name if saved
@@ -46,8 +51,10 @@ var_dump($eld->langSubset(['en', 'es', 'fr', 'it', 'nl', 'de'])); // returns sub
 $eld->langSubset();
 
 /*
- To use a subset without additional overhead, the proper way is to instantiate the detector with the file saved
-  and returned by langSubset(), it will be loaded as if it were a default database
+ To load a subset with 0 overhead, we can feed the returned file by langSubset() in array mode, when creating the
+  instance LanguageDetector(file)
+ To make use of pre-built subsets in modes string, bytes & disk, getting lower memory usage and increased speed, it is
+  possible by manually converting an array database, using BlobDataBuilder()
 */
 $eld_subset = new Nitotm\Eld\LanguageDetector('small_6_mfss5z1t');
 
@@ -62,6 +69,9 @@ $eld_subset = new Nitotm\Eld\LanguageDetector('small_6_mfss5z1t');
 // enableTextCleanup(true) Removes Urls, .com domains, emails, alphanumerical & numbers. Default is 'false'
 // Not recommended as urls, domains, etc. may be related to a language, and ELD is trained without "cleaning"
 $eld->enableTextCleanup(true); // Only needs to be set once to apply to all subsequent detect()
+
+// We can also change the output scheme, returns true on success
+$eld->setOutputScheme('FULL_TEXT');
 
 // If needed, we can get some info of the ELD instance: languages, database type, etc.
 var_dump($eld_subset->info());

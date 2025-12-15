@@ -15,4 +15,15 @@ final class EldDataFile
     public const MEDIUM = 'medium';
     public const LARGE = 'large';
     public const EXTRALARGE = 'extralarge';
+
+    public static function values(): array
+	{
+	    return [
+	        self::SMALL,
+	        self::MEDIUM,
+	        self::LARGE,
+	        self::EXTRALARGE
+	    ];
+	}
+
 }

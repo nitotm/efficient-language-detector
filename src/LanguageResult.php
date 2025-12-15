@@ -95,7 +95,7 @@ final class LanguageResult
         $scores = $this->scores();
         reset($scores); // Make sure the pointer is at the beginning
 
-        // Is reliable if score is greater than a fraction of the average, and +5% higher than next score. Selected numbers after testing
+        // Is reliable if score is greater than a fraction of the average, and +5% higher than next score.
         if ($this->avgScore[$this->languageId] * $forAverageScoreRatio > $scores[$this->language]
             || 0.05 > abs($scores[$this->language] - next($scores)) / $scores[$this->language]) {
             return false;

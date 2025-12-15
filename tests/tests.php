@@ -20,7 +20,7 @@ $tests = new Nitotm\Eld\Tests\TestRunner();
 
 // Mostly functional testing, when functions are more mature I will add some more unit tests
 
-$tests->addTest('Load ELD and create instance', function () {
+$tests->addTest('Create ELD instance', function () {
     new Nitotm\Eld\LanguageDetector(Nitotm\Eld\EldDataFile::SMALL);
 }, true);
 
@@ -176,6 +176,7 @@ $tests->addTest('Check if langSubset() is able to save subset file', function ()
 
     $langSubset = ['en'];
     $eld->langSubset($langSubset);
+    $eld->detect(''); // In case we are doing 100% lazy load
 
     if (!file_exists($file)) {
         throw new RuntimeException("File resources/ngrams/subset/small_1_1ni.php not found");
@@ -183,12 +184,12 @@ $tests->addTest('Check if langSubset() is able to save subset file', function ()
 });
 
 $tests->addTest('Create instance with different ngrams database, and detect', function () {
-    $eld = new Nitotm\Eld\LanguageDetector('small_6_mfss5z1t');
+    $eld = new Nitotm\Eld\LanguageDetector('small_1_1ni');
 
-    $result = $eld->detect('Hola, cómo te llamas?');
+    $result = $eld->detect('How are you? Bien, gracias');
 
-    if ($result->language !== 'es') {
-        throw new RuntimeException("Expected: 'es', but got: " . var_export($result->language, true));
+    if ($result->language !== 'en') {
+        throw new RuntimeException("Expected: 'en', but got: " . var_export($result->language, true));
     }
 });
 

@@ -12,6 +12,7 @@
 Efficient language detector (*Nito-ELD* or *ELD*) is a fast and accurate natural language detection software, written 100% in PHP, with a speed comparable to fast C++ compiled detectors, and accuracy rivaling the best detectors to date.
 
 It has no dependencies, easy installation, all it's needed is PHP with the **mb** extension.  
+ELD scales perfectly with database size.  
 ELD is also available (outdated versions) in [Javascript](https://github.com/nitotm/efficient-language-detector-js) and [Python](https://github.com/nitotm/efficient-language-detector-py).
 
 1. [Installation](#installation)
@@ -38,31 +39,42 @@ $ composer require nitotm/efficient-language-detector
 (Only *small* DB install under construction)  
 
 
-#### Configuration
+### Configuration
 
-It is recommended to use OPcache, specially for the larger databases to reduce load times.   
+- ELD has database execution Modes: `array`, `string`, `bytes`, `disk`  
+- ELD database Sizes: `small`, `medium`, `large`, `extralarge`  
+- Modes `string`, `bytes`, `disk` only ship with database sizes: `small` & `extralarge`, but others can be built with `BlobDataBuilder()`  
+
+**Low memory Modes**  
+For Modes `string`, `bytes` and `disk`, all size databases can run under *128MB*  
+`disk` mode with `extralarge` size, can run with 8MB setting `memory_limit=8M`, as it only uses 0.5MB  
+
+**Fastest Mode: Array**  
+For `array` Mode it is recommended to use OPcache, specially for the larger databases to reduce load times  
 We need to set `opcache.interned_strings_buffer`, `opcache.memory_consumption` high enough for each database  
 Recommended value in parentheses. Check [Databases](#databases) for more info.
 
-| php.ini setting       | Small           | Medium             | Large         | Extralarge     |
-|-----------------------|-----------------|--------------------|---------------|----------------|
-| `memory_limit`        | \>= 128         | \>= 340            | \>= 1060      | \>= 2200       |
-| `opcache.interned...` | \>= 8      (16) | \>= 16        (32) | \>= 60   (70) | \>= 116  (128) |
-| `opcache.memory`      | \>= 64    (128) | \>= 128      (230) | \>= 360 (450) | \>= 750  (820) |
+| Setting for `'array'` mode | Small           | Medium             | Large         | Extralarge     |
+|----------------------------|-----------------|--------------------|---------------|----------------|
+| `memory_limit`             | \>= 128         | \>= 340            | \>= 1060      | \>= 2200       |
+| `opcache.interned...`      | \>= 8      (16) | \>= 16        (32) | \>= 60   (70) | \>= 116  (128) |
+| `opcache.memory`           | \>= 64    (128) | \>= 128      (230) | \>= 360 (450) | \>= 750  (820) |
 
 
 ## How to use?
 
-`detect()` expects a UTF-8 string and returns an object with a `language` property, containing an *ISO 639-1* code (or other selected format), or `'und'` for undetermined language.
+`detect()` expects a UTF-8 string and returns an object with a `language` property, containing an *ISO 639-1* code (or other selected scheme), or `'und'` for undetermined language.
 ```php
 // require_once 'manual_loader.php'; To load ELD without autoloader. Update path.
-use Nitotm\Eld\{LanguageDetector, EldDataFile, EldFormat};
+use Nitotm\Eld\{LanguageDetector, EldDataFile, EldScheme, EldMode};
 
-// LanguageDetector(databaseFile: ?string, outputFormat: ?string)
-$eld = new LanguageDetector(EldDataFile::SMALL, EldFormat::ISO639_1);
+// LanguageDetector(databaseFile: ?string, outputFormat: ?string, mode: string)
+$eld = new LanguageDetector(EldDataFile::SMALL, EldScheme::ISO639_1, EldMode::MODE_ARRAY);
 // Database files: 'small', 'medium', 'large', 'extralarge'. Check memory requirements
-// Formats: 'ISO639_1', 'ISO639_2T', 'ISO639_1_BCP47', 'ISO639_2T_BCP47' and 'FULL_TEXT'
-// Constants are not mandatory, LanguageDetector('small', 'ISO639_1'); will also work
+// Database modes: 'array', 'string', 'bytes', 'disk'.
+// Schemes: 'ISO639_1', 'ISO639_2T', 'ISO639_1_BCP47', 'ISO639_2T_BCP47' and 'FULL_TEXT'
+// Modes 'string', 'bytes' & 'disk' only ship with DB sizes 'small' & 'extralarge'
+// Constants are not mandatory, LanguageDetector('small'); will also work
 
 $eld->detect('Hola, cómo te llamas?');
 // object( language => string, scores() => array<string, float>, isReliable() => bool )
@@ -74,10 +86,14 @@ $eld->detect('Hola, cómo te llamas?')->language;
 
 #### Languages subsets
 
-Calling `langSubset()` once, will set the subset. The first call takes longer as it creates a new database, if saving the database file (default), it will be loaded next time we make the same subset.  
-To use a subset without additional overhead, the proper way is to instantiate the detector with the file saved and returned by `langSubset()`. Check available [Languages](#languages) below.
+Calling `langSubset()` once, will set the subset.  
+- In `array` mode the first call takes longer as it creates a new database, if save enabled (default), it will be loaded next time we make the same subset.  
+- In modes `string`, `bytes` & `disk`, a "virtual" subset is created instantly, `detect()` will just remove unwanted languages before returning results.  
+- To load a subset with 0 overhead, we can feed the returned file by `langSubset()` in `array` mode, when creating the instance `LanguageDetector(file)`  
+  - To make use of pre-built subsets in modes `string`, `bytes` & `disk`, getting lower memory usage and increased speed, it is possible by manually converting an `array` database, using `BlobDataBuilder()` 
+- Check available [Languages](#languages) below.
 ```php
-// It always accepts ISO 639-1 codes, as well as the selected output format if different.
+// It accepts any ISO codes.
 // langSubset(languages: [], save: true, encode: true); Will return subset file name if saved
 $eld->langSubset(['en', 'es', 'fr', 'it', 'nl', 'de']);
 // Object ( success => bool, languages => ?array, error => ?string, file => ?string )
@@ -86,8 +102,14 @@ $eld->langSubset(['en', 'es', 'fr', 'it', 'nl', 'de']);
 // to remove the subset
 $eld->langSubset();
 
-// The best and fastest way to use a subset, is to load it just like a default database
+// Load pre-saved subset directly, just like a default database
 $eld_subset = new Nitotm\Eld\LanguageDetector('small_6_mfss5z1t');
+
+// Build a binary database for modes 'string', 'bytes' & 'disk', from any 'array' database
+// Memory requirements for 'array' database input apply 
+$eldBuilder = new BlobDataBuilder('large'); // or subset 'small_6_mfss5z1t'
+// Create subset directly: new BlobDataBuilder('extralarge', ['en', 'es', 'de', 'it']);
+$eldBuilder->buildDatabase();
 ```
 
 #### Other Functions
@@ -99,7 +121,14 @@ $eld->enableTextCleanup(true); // Default is false
 
 // If needed, we can get info of the ELD instance: languages, database type, etc.
 $eld->info();
+
+// Change output scheme on demand
+// 'ISO639_1', 'ISO639_2T', 'ISO639_1_BCP47', 'ISO639_2T_BCP47', 'FULL_TEXT'
+$eld->setOutputScheme('ISO639_2T'); // returns bool true on success
 ```
+There is a CLI wrapper (BETA version)  
+`>./bin/eld --help` on Linux.  
+`>php bin/eld --help` on Windows.
 
 ## Benchmarks
 
@@ -107,7 +136,7 @@ I compared *ELD* with a different variety of detectors, as there are not many in
 
 | URL                                                      | Version      | Language     |
 |:---------------------------------------------------------|:-------------|:-------------|
-| https://github.com/nitotm/efficient-language-detector/   | 3.0.0        | PHP          |
+| https://github.com/nitotm/efficient-language-detector/   | 3.1.0        | PHP          |
 | https://github.com/pemistahl/lingua-py                   | 2.0.2        | Python       |
 | https://github.com/facebookresearch/fastText             | 0.9.2        | C++          |
 | https://github.com/CLD2Owners/cld2                       | Aug 21, 2015 | C++          |
@@ -124,19 +153,22 @@ Benchmarks:
 * **Word pairs** *1.5MB*, and **Single words** *870KB*, also from Lingua, same 53 languages.
 
 <!--- Time table
-|                     | Tatoeba-50   | ELD test     | Sentences    | Word pairs   | Single words |
-|:--------------------|:------------:|:------------:|:------------:|:------------:|:------------:|
-| **Nito-ELD-S**      |     4.7"     |      1.7"    |      1.4"    |     0.45"    |     0.34"    |
-| **Nito-ELD-M**      |     5.2"     |      1.8"    |      1.5"    |     0.47"    |     0.36"    |
-| **Nito-ELD-L**      |     4.3"     |      1.5"    |      1.2"    |     0.40"    |     0.32"    |
-| **Nito-ELD-XL**     |     4.6"     |      1.6"    |      1.3"    |     0.42"    |     0.33"    |
-| **Lingua**          |    98"       |     27"      |     24"      |     8.2"     |     5.9"     |
-| **fasttext-subset** |    12"       |      2.7"    |      2.3"    |     1.2"     |     1.1"     |
-| **fasttext-all**    |     --       |      2.4"    |      2.0"    |     0.91"    |     0.73"    |
-| **CLD2**            |     3.5"     |      0.71"   |      0.59"   |     0.35"    |     0.32"    |
-| **Lingua-low**      |    37"       |     13"      |     11"      |     3.0"     |     2.3"     |
-| **patrickschur**    |   227"       |     74"      |     63"      |    18"       |    11"       |
-| **franc**           |    43"       |     10"      |      9"      |     4.1"     |     3.2"     |
+|                       | Tatoeba-50   | ELD test     | Sentences    | Word pairs   | Single words |
+|:----------------------|:------------:|:------------:|:------------:|:------------:|:------------:|
+| **Nito-ELD-S-array**  |     4.7"     |      1.6"    |      1.4"    |     0.45"    |     0.34"    |
+| **Nito-ELD-M-array**  |     5.3"     |      1.8"    |      1.5"    |     0.48"    |     0.37"    |
+| **Nito-ELD-L-array**  |     4.4"     |      1.5"    |      1.2"    |     0.41"    |     0.33"    |
+| **Nito-ELD-XL-array** |     4.7"     |      1.6"    |      1.3"    |     0.43"    |     0.34"    |
+| **Nito-ELD-XL-string**|    11"       |      3.9"    |      3.2"    |     0.76"    |     0.52"    |
+| **Nito-ELD-XL-bytes** |    11"       |      3.9"    |      3.2"    |     0.76"    |     0.52"    |
+| **Nito-ELD-XL-disk**  |    63"       |     27"      |     22"      |     4.3"     |     2.5"     |
+| **Lingua**            |    98"       |     27"      |     24"      |     8.2"     |     5.9"     |
+| **fasttext-subset**   |    12"       |      2.7"    |      2.3"    |     1.2"     |     1.1"     |
+| **fasttext-all**      |     --       |      2.4"    |      2.0"    |     0.91"    |     0.73"    |
+| **CLD2**              |     3.5"     |      0.71"   |      0.59"   |     0.35"    |     0.32"    |
+| **Lingua-low**        |    37"       |     13"      |     11"      |     3.0"     |     2.3"     |
+| **patrickschur**      |   227"       |     74"      |     63"      |    18"       |    11"       |
+| **franc**             |    43"       |     10"      |      9"      |     4.1"     |     3.2"     |
 -->
 <img alt="time table" width="800" src="https://raw.githubusercontent.com/nitotm/efficient-language-detector/main/misc/table_time_v3.svg">
 
@@ -165,21 +197,49 @@ Benchmarks:
 
 ## Databases
 
-|                            | Small          | Medium             | Large        | Extralarge     |
-|----------------------------|----------------|--------------------|--------------|----------------|
-| Pros                       | Lowest memory  | Equilibrated       | Fastest      | Most accurate  |
-| Cons                       | Least accurate | Slowest (but fast) | High memory  | Highest memory |
-| File size                  | 3 MB           | 10 MB              | 32 MB        | 71 MB          |
-| Memory usage               | 76 MB          | 280 MB             | 977 MB       | 2083 MB        |
-| Memory usage Cached        | 0.4 MB + OP    | 0.4 MB + OP        | 0.4 MB + OP  | 0.4 MB + OP    |
-| OPcache used memory        | 21 MB          | 69 MB              | 244 MB       | 539 MB         |
-| OPcache used interned      | 4 MB           | 10 MB              | 45 MB        | 98 MB          |
-| Load time Uncached         | 0.14 sec       | 0.5 sec            | 1.5 sec      | 3.4 sec        |
-| Load time Cached           | 0.0002 sec     | 0.0002 sec         | 0.0002 sec   | 0.0002 sec     |
-| **Settings** (Recommended) |                |                    |              |                |
-| `memory_limit`             | >= 128         | >= 340             | >= 1060      | >= 2200        |
-| `opcache.interned...`*     | >= 8      (16) | >= 16        (32)  | >= 60   (70) | >= 116  (128)  |
-| `opcache.memory`           | >= 64    (128) | >= 128      (230)  | >= 360 (450) | >= 750  (820)  |
+### Low memory database modes 
+Special mention to `'disk'` mode, while slower, is the fastest uncached load & detect for up to a 100 detections.  
+Modes `'bytes'` and `'string'` are very similar, they differ on how they are load, and are just 2x slower than **Array**  
+Modes `'string'`, `'bytes'` & `'disk'` only ship with DB sizes `'small'` & `'extralarge'`  
+
+| Mode                     | Disk          | Bytes        | String      | String        |
+|--------------------------|---------------|--------------|-------------|---------------|
+| Database Size option     | Extralarge    | Extralarge   | Extralarge  | Small         |
+| Pros                     | Lowest memory | Equilibrated | Cacheable   | Cacheable     |
+| Cons                     | Slowest       | Un-cacheable | Memory peak | Less accurate |
+| File size                | 50 MB         | 50 MB        | 50 MB       | 3 MB          |
+| Memory usage             | 0.4 MB        | 52 MB        | 52 MB       | 5 MB          |
+| Memory usage Cached      | 0.4 MB        | 52 MB        | 0.4 MB + OP | 0.4 MB + OP   |
+| Memory peak              | 0.6 MB        | 52 MB        | 80 MB       | 8 MB          |
+| Memory peak Cached       | 0.5 MB        | 52 MB        | 0.4 MB + OP | 0.4 MB + OP   |
+| OPcache used memory      | -             | -            | 50 MB       | 0 MB          |
+| OPcache used interned    | -             | -            | 0.4 MB      | 3 MB          |
+| Load & detect() Uncached | 0.0012 sec    | 0.04 sec     | 0.25 sec    | 0.016 sec     |
+| Load & detect() Cached   | 0.0011 sec    | 0.04 sec     | 0.0003 sec  | 0.0003 sec    |
+| **Settings**             |               |              |             |               |
+| `memory_limit` Minimum   | \>= 4         | \>= 128      | \>= 128     | \>= 16        |
+| `opcache.memory`         | -             | -            | \>= 128     | \>= 16        |
+
+
+### Fastest mode *Array*, but memory hungry
+
+| Array Mode, Size:          | Small           | Medium             | Large         | Extralarge     |
+|----------------------------|-----------------|--------------------|---------------|----------------|
+| Pros                       | Lowest memory   | Equilibrated       | Fastest       | Most accurate  |
+| Cons                       | Least accurate  | Slowest (but fast) | High memory   | Highest memory |
+| File size                  | 3 MB            | 10 MB              | 32 MB         | 71 MB          |
+| Memory usage               | 45 MB           | 135 MB             | 554 MB        | 1189 MB        |
+| Memory usage Cached        | 0.4 MB + OP     | 0.4 MB + OP        | 0.4 MB + OP   | 0.4 MB + OP    |
+| Memory peak                | 77 MB           | 282 MB             | 977 MB        | 2083 MB        |
+| Memory peak Cached         | 0.4 MB + OP     | 0.4 MB + OP        | 0.4 MB + OP   | 0.4 MB + OP    |
+| OPcache used memory        | 21 MB           | 69 MB              | 244 MB        | 539 MB         |
+| OPcache used interned      | 4 MB            | 10 MB              | 45 MB         | 98 MB          |
+| Load & detect() Uncached   | 0.14 sec        | 0.5 sec            | 1.5 sec       | 3.4 sec        |
+| Load & detect() Cached     | 0.0003 sec      | 0.0003 sec         | 0.0003 sec    | 0.0003 sec     |
+| **Settings** (Recommended) |                 |                    |               |                |
+| `memory_limit`             | \>= 128         | \>= 340            | \>= 1060      | \>= 2200       |
+| `opcache.interned...`\*    | \>= 8      (16) | \>= 16        (32) | \>= 60   (70) | \>= 116  (128) |
+| `opcache.memory`           | \>= 64    (128) | \>= 128      (230) | \>= 360 (450) | \>= 750  (820) |
 
 * \* I recommend using more than enough `interned_strings_buffer` as *buffers overflow* error might delay server response.  
 To use *all* databases `opcache.interned_strings_buffer` should be a minimum of 160MB (170MB).  
@@ -203,19 +263,19 @@ $ php efficient-language-detector/tests/tests.php # Update path
 ## Languages
 
 * These are the *ISO 639-1 codes* that include the 60 languages. Plus `'und'` for undetermined  
-It is the default ELD language format. `outputFormat: 'ISO639_1'`
+It is the default ELD language scheme. `outputScheme: 'ISO639_1'`
 
 > am, ar, az, be, bg, bn, ca, cs, da, de, el, en, es, et, eu, fa, fi, fr, gu, he, hi, hr, hu, hy, is, it, ja, ka, kn, ko, ku, lo, lt, lv, ml, mr, ms, nl, no, or, pa, pl, pt, ro, ru, sk, sl, sq, sr, sv, ta, te, th, tl, tr, uk, ur, vi, yo, zh
 
-* These are the 60 supported languages for *Nito-ELD*. `outputFormat: 'FULL_TEXT'`
+* These are the 60 supported languages for *Nito-ELD*. `outputScheme: 'FULL_TEXT'`
 
 > Amharic, Arabic, Azerbaijani (Latin), Belarusian, Bulgarian, Bengali, Catalan, Czech, Danish, German, Greek, English, Spanish, Estonian, Basque, Persian, Finnish, French, Gujarati, Hebrew, Hindi, Croatian, Hungarian, Armenian, Icelandic, Italian, Japanese, Georgian, Kannada, Korean, Kurdish (Arabic), Lao, Lithuanian, Latvian, Malayalam, Marathi, Malay (Latin), Dutch, Norwegian, Oriya, Punjabi, Polish, Portuguese, Romanian, Russian, Slovak, Slovene, Albanian, Serbian (Cyrillic), Swedish, Tamil, Telugu, Thai, Tagalog, Turkish, Ukrainian, Urdu, Vietnamese, Yoruba, Chinese
 
-* *ISO 639-1 codes* with IETF BCP 47 script name tag. `outputFormat: 'ISO639_1_BCP47'`
+* *ISO 639-1 codes* with IETF BCP 47 script name tag. `outputScheme: 'ISO639_1_BCP47'`
 
 > am, ar, az-Latn, be, bg, bn, ca, cs, da, de, el, en, es, et, eu, fa, fi, fr, gu, he, hi, hr, hu, hy, is, it, ja, ka, kn, ko, ku-Arab, lo, lt, lv, ml, mr, ms-Latn, nl, no, or, pa, pl, pt, ro, ru, sk, sl, sq, sr-Cyrl, sv, ta, te, th, tl, tr, uk, ur, vi, yo, zh
 
-* *ISO 639-2/T* codes (which are also valid *639-3*) `outputFormat: 'ISO639_2T'`. Also available with BCP 47 `ISO639_2T_BCP47`
+* *ISO 639-2/T* codes (which are also valid *639-3*) `outputScheme: 'ISO639_2T'`. Also available with BCP 47 `ISO639_2T_BCP47`
 
 > amh, ara, aze, bel, bul, ben, cat, ces, dan, deu, ell, eng, spa, est, eus, fas, fin, fra, guj, heb, hin, hrv, hun, hye, isl, ita, jpn, kat, kan, kor, kur, lao, lit, lav, mal, mar, msa, nld, nor, ori, pan, pol, por, ron, rus, slk, slv, sqi, srp, swe, tam, tel, tha, tgl, tur, ukr, urd, vie, yor, zho
   

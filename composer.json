@@ -25,6 +25,10 @@
       "Nitotm\\Eld\\": "src"
     }
   },
+  "bin": [
+    "bin/eld",
+    "bin/eld-php"
+  ],
   "autoload-dev": {
     "psr-4": {
       "Nitotm\\Eld\\Tests\\": "tests"
