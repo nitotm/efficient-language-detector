@@ -84,7 +84,7 @@ class LanguageDetector extends LanguageData
         $str = preg_replace('/([A-Za-z0-9-]+\.)+com(\/\S*|[^\pL])/u', ' ', $str ?? '');
 
         // Remove alphanumerical/number codes
-        return preg_replace('/[a-zA-Z]*\d+[a-zA-Z0-9]*+/', ' ', $str ?? '');
+        return (preg_replace('/[a-zA-Z]*\d+[a-zA-Z0-9]*+/', ' ', $str ?? '') ?? '');
     }
 
     protected function getWords(string $text): array
@@ -178,7 +178,7 @@ class LanguageDetector extends LanguageData
         $langScore = $this->langScore;
         $IndexM = $this->IndexM; // faster local access
         $isDisk = ($this->databaseMode === EldMode::MODE_DISK);
-        $indexSlotLen = 8;
+        $indexSlotLen = 7;
         $dataSlotLen = 3;
 
         foreach ($byteNgrams as $bytes => $_) { // $frequency) {
@@ -186,8 +186,6 @@ class LanguageDetector extends LanguageData
             $startSlot = $slot;
 
             for (;;) {
-                // 4 bytes Ngram identifier + 3 bytes data offset + 1 byte data points length
-                // Performance critical, we repeat a bit of code to make it faster
                 if ($isDisk) {
                     $index = stream_get_contents(
                         $this->indexStream,
@@ -198,35 +196,34 @@ class LanguageDetector extends LanguageData
                     $index = substr($this->indexBlob, $slot * $indexSlotLen, $indexSlotLen);
                 }
 
-                if ($index === "\0\0\0\0\0\0\0\0") {
+                if ($index === "\0\0\0\0\0\0\0") {
                     break; // not found
                 }
                 if ($index === false) {
                     throw new RuntimeException('Incorrect Blob data');
                 }
-                // 4 byte ngram index "fingerprint", safe enough, faster than int hash
-                if ($index[2] === $bytes[2] &&
-                    $index[1] === $bytes[1] &&
-                    $index[0] === $bytes[0] &&
-                    $index[3] === ($bytes[3] ?? "\0") // min ngram size across all databases is 3 bytes
-                ) {
-                    // unpack('C', $index[7])[1];
-                    $scoresLen = ord($index[7]);
 
-                    // $index 4-6 is data offset, 3 bytes each, unpack('N', "\0".$index[4].$index[5].$index[6])[1] * 3
+                // 4 bytes Ngram identifier (safe enough) + 3 bytes data offset + 1 byte data points length
+                if ($index[0] === $bytes[1] &&
+                    $index[1] === $bytes[2] &&
+                    $index[2] === ($bytes[3] ?? "\0") // min ngram size across all databases is 3 bytes
+                ) {
+                    // unpack('C', $index[6])[1];
+                    $scoresLen = ord($index[6]);
+                    // $index 3-5 is data offset, 3 bytes each, unpack('N', "\0".$index[3].$index[4].$index[5])[1] * 3
                     // $data: 1 byte language id + 1 byte score, repeated sequence
                     // Performance critical, we repeat a bit of code to make it faster
                     if ($isDisk) {
                         $data = stream_get_contents(
                             $this->dataStream,
                             $scoresLen * $dataSlotLen,
-                            ((ord($index[4]) << 16) | (ord($index[5]) << 8) | ord($index[6]))
+                            ((ord($index[3]) << 16) | (ord($index[4]) << 8) | ord($index[5]))
                                     * $dataSlotLen + self::BLOB_HEAD_LEN
                         );
                     } else {
                         $data = substr(
                             $this->dataBlob,
-                            ((ord($index[4]) << 16) | (ord($index[5]) << 8) | ord($index[6])) * $dataSlotLen,
+                            ((ord($index[3]) << 16) | (ord($index[4]) << 8) | ord($index[5])) * $dataSlotLen,
                             $scoresLen * $dataSlotLen
                         );
                     }
@@ -235,16 +232,16 @@ class LanguageDetector extends LanguageData
                     for ($i = 0, $dataPos = 0; $i < $scoresLen; $i++, $dataPos += 3) {
                         // unpack('C') Language id 8-bit int, unpack('n') score 16-bit int
                         $langScore[ord($data[$dataPos])] *=
-                            // unpack('n',  $data[$dataPos+1]. $data[$dataPos+2] )[1] / 2100
-                            ((ord($data[$dataPos + 1]) << 8) | ord($data[$dataPos + 2])) * 0.00047619047619048;
-                        // Scores are multiplied by 2100 at Blob DB, multiply here is much faster
+                            // unpack('n',  $data[$dataPos+1]. $data[$dataPos+2] )[1] / 2000
+                            ((ord($data[$dataPos + 1]) << 8) | ord($data[$dataPos + 2])) * 0.0005; // 1/2000 = 0.0005
+                        // Scores are multiplied by 2000 at Blob DB, multiply here is much faster
                     }
                     break;
                 }
 
                 $slot = ($slot + 1) % $IndexM;
                 if ($slot === $startSlot) {
-                    throw new RuntimeException('Incorrect Blob data, stopping semi-infinite loop');
+                    throw new RuntimeException('Incorrect Blob data, stopping long-running loop');
                 }
             }
         }
@@ -265,7 +262,6 @@ class LanguageDetector extends LanguageData
     {
         return $this->loadOutputScheme($scheme, false);
     }
-
 
     public function info(): array
     {

@@ -1,186 +1,131 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" font-family="Arial, Helvetica, sans-serif" font-size="17" viewBox="0 0 600 511">
-  <path d="M0 0h600v511H0z" fill="#fff"/>
+<svg xmlns="http://www.w3.org/2000/svg" font-family="Arial, Helvetica, sans-serif" font-size="17" viewBox="0 0 600 361">
+  <path d="M0 0h600v361H0z" fill="#fff"/>
   <text fill="#555" transform="translate(30 16)">
 
       <tspan x="0" y="0">Seconds</tspan>
   </text>
-  <text transform="translate(4 52)">ELD-S-array</text>
+  <text transform="translate(4 52)">ELD-L-array</text>
     <path d="M126 30h93v30H126z" fill="#dfd"/>
-    <text transform="translate(132 52)">4.7"</text>
+    <text transform="translate(132 52)">4.4"</text>
     <path d="M219 30h93v30H219z" fill="#dfd"/>
-    <text transform="translate(225 52)">1.6"</text>
+    <text transform="translate(225 52)">1.5"</text>
     <path d="M312 30h93v30H312z" fill="#dfd"/>
-    <text transform="translate(318 52)">1.4"</text>
+    <text transform="translate(318 52)">1.2"</text>
     <path d="M405 30h93v30H405z" fill="#dfd"/>
-    <text transform="translate(411 52)">0.45"</text>
+    <text transform="translate(411 52)">0.41"</text>
     <path d="M498 30h102v30H498z" fill="#dfd"/>
-    <text transform="translate(504 52)">0.34"</text>
-  <text transform="translate(4 82)">ELD-M-array</text>
+    <text transform="translate(504 52)">0.33"</text>
+  <text transform="translate(4 82)">ELD-L-string</text>
     <path d="M126 60h93v30H126z" fill="#dfd"/>
-    <text transform="translate(132 82)">5.3"</text>
+    <text transform="translate(132 82)">9.5"</text>
     <path d="M219 60h93v30H219z" fill="#dfd"/>
-    <text transform="translate(225 82)">1.8"</text>
+    <text transform="translate(225 82)">3.5"</text>
     <path d="M312 60h93v30H312z" fill="#dfd"/>
-    <text transform="translate(318 82)">1.5"</text>
+    <text transform="translate(318 82)">2.9"</text>
     <path d="M405 60h93v30H405z" fill="#dfd"/>
-    <text transform="translate(411 82)">0.48"</text>
+    <text transform="translate(411 82)">0.68"</text>
     <path d="M498 60h102v30H498z" fill="#dfd"/>
-    <text transform="translate(504 82)">0.37"</text>
-  <text transform="translate(4 112)">ELD-L-array</text>
+    <text transform="translate(504 82)">0.48"</text>
+  <text transform="translate(4 112)">ELD-L-bytes</text>
     <path d="M126 90h93v30H126z" fill="#dfd"/>
-    <text transform="translate(132 112)">4.4"</text>
+    <text transform="translate(132 112)">9.5"</text>
     <path d="M219 90h93v30H219z" fill="#dfd"/>
-    <text transform="translate(225 112)">1.5"</text>
+    <text transform="translate(225 112)">3.5"</text>
     <path d="M312 90h93v30H312z" fill="#dfd"/>
-    <text transform="translate(318 112)">1.2"</text>
+    <text transform="translate(318 112)">2.9"</text>
     <path d="M405 90h93v30H405z" fill="#dfd"/>
-    <text transform="translate(411 112)">0.41"</text>
+    <text transform="translate(411 112)">0.68"</text>
     <path d="M498 90h102v30H498z" fill="#dfd"/>
-    <text transform="translate(504 112)">0.33"</text>
-  <text transform="translate(4 142)">ELD-XL-array</text>
-    <path d="M126 120h93v30H126z" fill="#dfd"/>
-    <text transform="translate(132 142)">4.7"</text>
-    <path d="M219 120h93v30H219z" fill="#dfd"/>
-    <text transform="translate(225 142)">1.6"</text>
-    <path d="M312 120h93v30H312z" fill="#dfd"/>
-    <text transform="translate(318 142)">1.3"</text>
-    <path d="M405 120h93v30H405z" fill="#dfd"/>
-    <text transform="translate(411 142)">0.43"</text>
-    <path d="M498 120h102v30H498z" fill="#dfd"/>
-    <text transform="translate(504 142)">0.34"</text>
-  <text transform="translate(4 172)">ELD-XL-string</text>
-    <path d="M126 150h93v30H126z" fill="#dfd"/>
-    <text transform="translate(132 172)">11"</text>
-    <path d="M219 150h93v30H219z" fill="#dfd"/>
-    <text transform="translate(225 172)">3.9"</text>
-    <path d="M312 150h93v30H312z" fill="#dfd"/>
-    <text transform="translate(318 172)">3.2"</text>
-    <path d="M405 150h93v30H405z" fill="#dfd"/>
-    <text transform="translate(411 172)">0.76"</text>
-    <path d="M498 150h102v30H498z" fill="#dfd"/>
-    <text transform="translate(504 172)">0.52"</text>
-  <text transform="translate(4 202)">ELD-XL-bytes</text>
+    <text transform="translate(504 112)">0.48"</text>
+  <text transform="translate(4 142)">ELD-L-disk</text>
+    <path d="M126 120h93v30H126z" fill="#fec"/>
+    <text transform="translate(132 142)">58"</text>
+    <path d="M219 120h93v30H219z" fill="#fec"/>
+    <text transform="translate(225 142)">25"</text>
+    <path d="M312 120h93v30H312z" fill="#fec"/>
+    <text transform="translate(318 142)">20"</text>
+    <path d="M405 120h93v30H405z" fill="#ffc"/>
+    <text transform="translate(411 142)">3.9"</text>
+    <path d="M498 120h102v30H498z" fill="#ffc"/>
+    <text transform="translate(504 142)">2.3"</text>
+  <text transform="translate(4 172)">Lingua</text>
+    <path d="M126 150h93v30H126z" fill="#fec"/>
+    <text transform="translate(132 172)">98"</text>
+    <path d="M219 150h93v30H219z" fill="#fec"/>
+    <text transform="translate(225 172)">27"</text>
+    <path d="M312 150h93v30H312z" fill="#fec"/>
+    <text transform="translate(318 172)">24"</text>
+    <path d="M405 150h93v30H405z" fill="#fec"/>
+    <text transform="translate(411 172)">8.2"</text>
+    <path d="M498 150h102v30H498z" fill="#fec"/>
+    <text transform="translate(504 172)">5.9"</text>
+  <text transform="translate(4 202)">fasttext-subset</text>
     <path d="M126 180h93v30H126z" fill="#dfd"/>
-    <text transform="translate(132 202)">11"</text>
+    <text transform="translate(132 202)">12"</text>
     <path d="M219 180h93v30H219z" fill="#dfd"/>
-    <text transform="translate(225 202)">3.9"</text>
+    <text transform="translate(225 202)">2.7"</text>
     <path d="M312 180h93v30H312z" fill="#dfd"/>
-    <text transform="translate(318 202)">3.2"</text>
+    <text transform="translate(318 202)">2.3"</text>
     <path d="M405 180h93v30H405z" fill="#dfd"/>
-    <text transform="translate(411 202)">0.76"</text>
+    <text transform="translate(411 202)">1.2"</text>
     <path d="M498 180h102v30H498z" fill="#dfd"/>
-    <text transform="translate(504 202)">0.52"</text>
-  <text transform="translate(4 232)">ELD-XL-disk</text>
-    <path d="M126 210h93v30H126z" fill="#fec"/>
-    <text transform="translate(132 232)">63"</text>
-    <path d="M219 210h93v30H219z" fill="#fec"/>
-    <text transform="translate(225 232)">27"</text>
-    <path d="M312 210h93v30H312z" fill="#fec"/>
-    <text transform="translate(318 232)">22"</text>
-    <path d="M405 210h93v30H405z" fill="#ffc"/>
-    <text transform="translate(411 232)">4.3"</text>
-    <path d="M498 210h102v30H498z" fill="#ffc"/>
-    <text transform="translate(504 232)">2.5"</text>
-  <text transform="translate(4 262)">Lingua</text>
-    <path d="M126 240h93v30H126z" fill="#fec"/>
-    <text transform="translate(132 262)">98"</text>
-    <path d="M219 240h93v30H219z" fill="#fec"/>
-    <text transform="translate(225 262)">27"</text>
-    <path d="M312 240h93v30H312z" fill="#fec"/>
-    <text transform="translate(318 262)">24"</text>
-    <path d="M405 240h93v30H405z" fill="#fec"/>
-    <text transform="translate(411 262)">8.2"</text>
-    <path d="M498 240h102v30H498z" fill="#fec"/>
-    <text transform="translate(504 262)">5.9"</text>
-  <text transform="translate(4 292)">fasttext-subset</text>
-    <path d="M126 270h93v30H126z" fill="#dfd"/>
-    <text transform="translate(132 292)">12"</text>
-    <path d="M219 270h93v30H219z" fill="#dfd"/>
-    <text transform="translate(225 292)">2.7"</text>
-    <path d="M312 270h93v30H312z" fill="#dfd"/>
-    <text transform="translate(318 292)">2.3"</text>
-    <path d="M405 270h93v30H405z" fill="#dfd"/>
-    <text transform="translate(411 292)">1.2"</text>
-    <path d="M498 270h102v30H498z" fill="#dfd"/>
-    <text transform="translate(504 292)">1.1"</text>
-  <text transform="translate(4 322)">fasttext-all</text>
-    <path d="M126 300h93v30H126z" fill="#fff"/>
-    <text transform="translate(132 322)">--</text>
-    <path d="M219 300h93v30H219z" fill="#dfd"/>
-    <text transform="translate(225 322)">2.4"</text>
-    <path d="M312 300h93v30H312z" fill="#dfd"/>
-    <text transform="translate(318 322)">2.0"</text>
-    <path d="M405 300h93v30H405z" fill="#dfd"/>
-    <text transform="translate(411 322)">0.91"</text>
-    <path d="M498 300h102v30H498z" fill="#dfd"/>
-    <text transform="translate(504 322)">0.73"</text>
-  <text transform="translate(4 352)">CLD2</text>
-    <path d="M126 330h93v30H126z" fill="#dfd"/>
-    <text transform="translate(132 352)">3.5"</text>
-    <path d="M219 330h93v30H219z" fill="#dfd"/>
-    <text transform="translate(225 352)">0.71"</text>
-    <path d="M312 330h93v30H312z" fill="#dfd"/>
-    <text transform="translate(318 352)">0.59"</text>
-    <path d="M405 330h93v30H405z" fill="#dfd"/>
-    <text transform="translate(411 352)">0.35"</text>
-    <path d="M498 330h102v30H498z" fill="#dfd"/>
-    <text transform="translate(504 352)">0.32"</text>
-  <text transform="translate(4 382)">Lingua-low</text>
-    <path d="M126 360h93v30H126z" fill="#ffc"/>
-    <text transform="translate(132 382)">37"</text>
-    <path d="M219 360h93v30H219z" fill="#ffc"/>
-    <text transform="translate(225 382)">13"</text>
-    <path d="M312 360h93v30H312z" fill="#ffc"/>
-    <text transform="translate(318 382)">11"</text>
-    <path d="M405 360h93v30H405z" fill="#ffc"/>
-    <text transform="translate(411 382)">3.0"</text>
-    <path d="M498 360h102v30H498z" fill="#ffc"/>
-    <text transform="translate(504 382)">2.3"</text>
-  <text transform="translate(4 412)">patrickschur</text>
-    <path d="M126 390h93v30H126z" fill="#fee"/>
-    <text transform="translate(132 412)">227"</text>
-    <path d="M219 390h93v30H219z" fill="#fee"/>
-    <text transform="translate(225 412)">74"</text>
-    <path d="M312 390h93v30H312z" fill="#fee"/>
-    <text transform="translate(318 412)">63"</text>
-    <path d="M405 390h93v30H405z" fill="#fee"/>
-    <text transform="translate(411 412)">18"</text>
-    <path d="M498 390h102v30H498z" fill="#fee"/>
-    <text transform="translate(504 412)">11"</text>
-  <text transform="translate(4 442)">franc</text>
-    <path d="M126 420h93v30H126z" fill="#ffc"/>
-    <text transform="translate(132 442)">43"</text>
-    <path d="M219 420h93v30H219z" fill="#ffc"/>
-    <text transform="translate(225 442)">10"</text>
-    <path d="M312 420h93v30H312z" fill="#ffc"/>
-    <text transform="translate(318 442)">9"</text>
-    <path d="M405 420h93v30H405z" fill="#ffc"/>
-    <text transform="translate(411 442)">4.1"</text>
-    <path d="M498 420h102v30H498z" fill="#ffc"/>
-    <text transform="translate(504 442)">3.2"</text>
-  <text transform="translate(4 472)">ELD-S_JS</text>
-    <path d="M126 450h93v30H126z" fill="#dfd"/>
-    <text transform="translate(132 472)">-</text>
-    <path d="M219 450h93v30H219z" fill="#dfd"/>
-    <text transform="translate(225 472)">-</text>
-    <path d="M312 450h93v30H312z" fill="#dfd"/>
-    <text transform="translate(318 472)">-</text>
-    <path d="M405 450h93v30H405z" fill="#dfd"/>
-    <text transform="translate(411 472)">-</text>
-    <path d="M498 450h102v30H498z" fill="#dfd"/>
-    <text transform="translate(504 472)">-</text>
-  <text transform="translate(4 502)">ELD-S_PY</text>
-    <path d="M126 480h93v30H126z" fill="#ffc"/>
-    <text transform="translate(132 502)">-</text>
-    <path d="M219 480h93v30H219z" fill="#ffc"/>
-    <text transform="translate(225 502)">-</text>
-    <path d="M312 480h93v30H312z" fill="#ffc"/>
-    <text transform="translate(318 502)">-</text>
-    <path d="M405 480h93v30H405z" fill="#ffc"/>
-    <text transform="translate(411 502)">-</text>
-    <path d="M498 480h102v30H498z" fill="#ffc"/>
-    <text transform="translate(504 502)">-</text>
+    <text transform="translate(504 202)">1.1"</text>
+  <text transform="translate(4 232)">fasttext-all</text>
+    <path d="M126 210h93v30H126z" fill="#fff"/>
+    <text transform="translate(132 232)">--</text>
+    <path d="M219 210h93v30H219z" fill="#dfd"/>
+    <text transform="translate(225 232)">2.4"</text>
+    <path d="M312 210h93v30H312z" fill="#dfd"/>
+    <text transform="translate(318 232)">2.0"</text>
+    <path d="M405 210h93v30H405z" fill="#dfd"/>
+    <text transform="translate(411 232)">0.91"</text>
+    <path d="M498 210h102v30H498z" fill="#dfd"/>
+    <text transform="translate(504 232)">0.73"</text>
+  <text transform="translate(4 262)">CLD2</text>
+    <path d="M126 240h93v30H126z" fill="#dfd"/>
+    <text transform="translate(132 262)">3.5"</text>
+    <path d="M219 240h93v30H219z" fill="#dfd"/>
+    <text transform="translate(225 262)">0.71"</text>
+    <path d="M312 240h93v30H312z" fill="#dfd"/>
+    <text transform="translate(318 262)">0.59"</text>
+    <path d="M405 240h93v30H405z" fill="#dfd"/>
+    <text transform="translate(411 262)">0.35"</text>
+    <path d="M498 240h102v30H498z" fill="#dfd"/>
+    <text transform="translate(504 262)">0.32"</text>
+  <text transform="translate(4 292)">Lingua-low</text>
+    <path d="M126 270h93v30H126z" fill="#ffc"/>
+    <text transform="translate(132 292)">37"</text>
+    <path d="M219 270h93v30H219z" fill="#ffc"/>
+    <text transform="translate(225 292)">13"</text>
+    <path d="M312 270h93v30H312z" fill="#ffc"/>
+    <text transform="translate(318 292)">11"</text>
+    <path d="M405 270h93v30H405z" fill="#ffc"/>
+    <text transform="translate(411 292)">3.0"</text>
+    <path d="M498 270h102v30H498z" fill="#ffc"/>
+    <text transform="translate(504 292)">2.3"</text>
+  <text transform="translate(4 322)">patrickschur</text>
+    <path d="M126 300h93v30H126z" fill="#fee"/>
+    <text transform="translate(132 322)">227"</text>
+    <path d="M219 300h93v30H219z" fill="#fee"/>
+    <text transform="translate(225 322)">74"</text>
+    <path d="M312 300h93v30H312z" fill="#fee"/>
+    <text transform="translate(318 322)">63"</text>
+    <path d="M405 300h93v30H405z" fill="#fee"/>
+    <text transform="translate(411 322)">18"</text>
+    <path d="M498 300h102v30H498z" fill="#fee"/>
+    <text transform="translate(504 322)">11"</text>
+  <text transform="translate(4 352)">franc</text>
+    <path d="M126 330h93v30H126z" fill="#ffc"/>
+    <text transform="translate(132 352)">43"</text>
+    <path d="M219 330h93v30H219z" fill="#ffc"/>
+    <text transform="translate(225 352)">10"</text>
+    <path d="M312 330h93v30H312z" fill="#ffc"/>
+    <text transform="translate(318 352)">9"</text>
+    <path d="M405 330h93v30H405z" fill="#ffc"/>
+    <text transform="translate(411 352)">4.1"</text>
+    <path d="M498 330h102v30H498z" fill="#ffc"/>
+    <text transform="translate(504 352)">3.2"</text>
   <g fill="#ddd">
     <path d="M0 0h600v1H0z"/>
     <path d="M0 30h600v1H0z"/>
@@ -195,14 +140,9 @@
     <path d="M0 300h600v1H0z"/>
     <path d="M0 330h600v1H0z"/>
     <path d="M0 360h600v1H0z"/>
-    <path d="M0 390h600v1H0z"/>
-    <path d="M0 420h600v1H0z"/>
-    <path d="M0 450h600v1H0z"/>
-    <path d="M0 480h600v1H0z"/>
-    <path d="M0 510h600v1H0z"/>
-    <path d="M0 510h600v1H0z"/>
+    <path d="M0 360h600v1H0z"/>
   </g>
-  <path d="M0 0h1v511H0zm126 0h1v511h-1zm93 0h1v511h-1zm93 0h1v511h-1zm93 0h1v511h-1zm93 0h1v511h-1zm101 0h1v511h-1z" fill="#ddd"/>
+  <path d="M0 0h1v361H0zm126 0h1v361h-1zm93 0h1v361h-1zm93 0h1v361h-1zm93 0h1v361h-1zm93 0h1v361h-1zm101 0h1v361h-1z" fill="#ddd"/>
   <g font-size="16" font-weight="700">
     <text transform="translate(130 21)"><tspan>Tatoeba-50</tspan></text>
     <text transform="translate(223 21)"><tspan>ELD test</tspan></text>
@@ -210,5 +150,5 @@
     <text transform="translate(409 21)"><tspan>Word pairs</tspan></text>
     <text font-size="15.4" transform="translate(502 21)"><tspan>Single words</tspan></text>
   </g>
-  <path d="M0 0h1v510H0zm126 0h1v510h-1zm0" fill="none"/>
+  <path d="M0 0h1v360H0zm126 0h1v360h-1zm0" fill="none"/>
 </svg>

@@ -1,0 +1,338 @@
+ver. 3.1
+
+
+
+Database: small (_v3.1_ngram4_stride3_mix25_noadd_avg3223-2984_176756_pro)
+Database mode: array
+tatoeba-50.txt      - Correct ratio: 96.99%   Duration: 4.7280819 / Subset 50: Correct ratio: 97.2% 
+eld-test.txt        - Correct ratio: 99.67%   Duration: 1.6364512
+sentences_v3.txt    - Correct ratio: 99.21%   Duration: 1.3500438
+word-pairs_v3.txt   - Correct ratio: 91.14%   Duration: 0.4381632
+single-words_v3.txt - Correct ratio: 75.5%   Duration: 0.3427179
+Average duration: 1.6990916
+Sentences accuracy average: 98.623%
+Total accuracy average: 92.502%
+Load & detect() time: 0.0004 sec
+Memory usage: 0.36 MB (All PHP loaded)
+Peak Memory used: 0.44 MB
+OPcache enabled: YES
+OPcache DB Hit: Probably Yes
+PHP ver.: 7.4.4
+PHP SAPI: apache2handler
+php.ini memory_limit: 7144M
+php.ini opcache.interned_strings_buffer: 150 MB
+php.ini opcache.memory_consumption: 1200 MB
+#### UNCACHED
+Load & detect() time: 0.1345 sec
+Memory usage: 46.34 MB (All PHP loaded)
+Peak Memory used: 78.24 MB
+
+Database: small
+Database mode: bytes
+tatoeba-50.txt      - Correct ratio: 96.99%   Duration: 10.889272
+eld-test.txt        - Correct ratio: 99.67%   Duration: 4.2791027
+sentences_v3.txt    - Correct ratio: 99.21%   Duration: 3.5384097
+word-pairs_v3.txt   - Correct ratio: 91.13%   Duration: 0.8846982
+single-words_v3.txt - Correct ratio: 75.49%   Duration: 0.5891727
+Average duration: 4.03613106
+Sentences accuracy average: 98.623%
+Total accuracy average: 92.499%
+Load & detect() time: 0.0178 sec
+Memory usage: 2.22 MB (All PHP loaded)
+Peak Memory used: 2.3 MB
+OPcache enabled: YES
+OPcache DB Hit: NOT possible
+PHP ver.: 7.4.4
+PHP SAPI: apache2handler
+php.ini memory_limit: 7144M
+php.ini opcache.interned_strings_buffer: 150 MB
+php.ini opcache.memory_consumption: 1200 MB
+
+Database: small
+Database mode: string
+tatoeba-50.txt      - Correct ratio: 96.99%   Duration: 10.889272
+eld-test.txt        - Correct ratio: 99.67%   Duration: 4.2791027
+sentences_v3.txt    - Correct ratio: 99.21%   Duration: 3.5384097
+word-pairs_v3.txt   - Correct ratio: 91.13%   Duration: 0.8846982
+single-words_v3.txt - Correct ratio: 75.49%   Duration: 0.5891727
+Average duration: 4.03613106
+Sentences accuracy average: 98.623%
+Total accuracy average: 92.499%
+Load & detect() time: 0.0003 sec
+Memory usage: 0.35 MB (All PHP loaded)
+Peak Memory used: 0.45 MB
+OPcache enabled: YES
+OPcache DB Hit: Probably Yes
+PHP ver.: 7.4.4
+PHP SAPI: apache2handler
+php.ini memory_limit: 7144M
+php.ini opcache.interned_strings_buffer: 150 MB
+php.ini opcache.memory_consumption: 1200 MB
+#### UNCACHED
+Load & detect() time: 0.012 sec
+Memory usage: 2.22 MB (All PHP loaded)
+Peak Memory used: 3.08 MB
+
+
+
+
+Database: medium (_v3.1_ngram4_stride4_mix25_noadd_avg13954-12514_176756_pro)
+Database mode: array
+tatoeba-50.txt      - Correct ratio: 97.82%   Duration: 5.169368 / Subset 50: Correct ratio: 98.04% 
+eld-test.txt        - Correct ratio: 99.71%   Duration: 1.7925627
+sentences_v3.txt    - Correct ratio: 99.34%   Duration: 1.5168524
+word-pairs_v3.txt   - Correct ratio: 93.14%   Duration: 0.4721324
+single-words_v3.txt - Correct ratio: 80.4%   Duration: 0.3647269
+Average duration: 1.86312848
+Sentences accuracy average: 98.955%
+Total accuracy average: 94.081%
+Load & detect() time: 0.0003 sec
+Memory usage: 0.35 MB (All PHP loaded)
+Peak Memory used: 0.43 MB
+OPcache enabled: YES
+OPcache DB Hit: Probably No
+PHP ver.: 7.4.4
+PHP SAPI: apache2handler
+php.ini memory_limit: 7144M
+php.ini opcache.interned_strings_buffer: 150 MB
+php.ini opcache.memory_consumption: 1200 MB
+#### UNCACHED
+Load & detect() time: 0.4936 sec
+Memory usage: 136.69 MB (All PHP loaded)
+Peak Memory used: 287.28 MB
+
+Database: medium
+Database mode: bytes
+tatoeba-50.txt      - Correct ratio: 97.82%   Duration: 13.3889303
+eld-test.txt        - Correct ratio: 99.71%   Duration: 5.104042
+sentences_v3.txt    - Correct ratio: 99.34%   Duration: 4.3403225
+word-pairs_v3.txt   - Correct ratio: 93.14%   Duration: 1.0301699
+single-words_v3.txt - Correct ratio: 80.4%   Duration: 0.6644262
+Average duration: 4.90557818
+Sentences accuracy average: 98.954%
+Total accuracy average: 94.081%
+Load & detect() time: 0.0067 sec
+Memory usage: 8.36 MB (All PHP loaded)
+Peak Memory used: 8.44 MB
+OPcache enabled: YES
+OPcache DB Hit: NOT possible
+PHP ver.: 7.4.4
+PHP SAPI: apache2handler
+php.ini memory_limit: 7144M
+php.ini opcache.interned_strings_buffer: 150 MB
+php.ini opcache.memory_consumption: 1200 MB
+
+Database: medium
+Database mode: string
+tatoeba-50.txt      - Correct ratio: 97.82%   Duration: 13.3517572
+eld-test.txt        - Correct ratio: 99.71%   Duration: 5.0906687
+sentences_v3.txt    - Correct ratio: 99.34%   Duration: 4.3370018
+word-pairs_v3.txt   - Correct ratio: 93.14%   Duration: 1.026573
+single-words_v3.txt - Correct ratio: 80.4%   Duration: 0.6585867
+Average duration: 4.89291748
+Sentences accuracy average: 98.954%
+Total accuracy average: 94.081%
+Load & detect() time: 0.0003 sec
+Memory usage: 0.37 MB (All PHP loaded)
+Peak Memory used: 0.44 MB
+OPcache enabled: YES
+OPcache DB Hit: Probably Yes
+PHP ver.: 7.4.4
+PHP SAPI: apache2handler
+php.ini memory_limit: 7144M
+php.ini opcache.interned_strings_buffer: 150 MB
+php.ini opcache.memory_consumption: 1200 MB
+#### UNCACHED
+Load & detect() time: 0.0383 sec
+Memory usage: 8.37 MB (All PHP loaded)
+Peak Memory used: 12.39 MB
+
+
+
+
+Database: large (_v3.1_ngram6_stride6_mix25_noadd_avg29835-26797_176756_pro)
+Database mode: array
+tatoeba-50.txt      - Correct ratio: 98.56%   Duration: 4.4111512 / Subset 50: Correct ratio: 98.67% 
+eld-test.txt        - Correct ratio: 99.76%   Duration: 1.4752145
+sentences_v3.txt    - Correct ratio: 99.42%   Duration: 1.2342205
+word-pairs_v3.txt   - Correct ratio: 94.7%   Duration: 0.4116514
+single-words_v3.txt - Correct ratio: 83.41%   Duration: 0.3284294
+Average duration: 1.5721334
+Sentences accuracy average: 99.246%
+Total accuracy average: 95.17%
+Load & detect() time: 0.0002 sec
+Memory usage: 0.35 MB (All PHP loaded)
+Peak Memory used: 0.43 MB
+OPcache enabled: YES
+OPcache DB Hit: Probably No
+PHP ver.: 7.4.4
+PHP SAPI: apache2handler
+php.ini memory_limit: 7144M
+php.ini opcache.interned_strings_buffer: 150 MB
+php.ini opcache.memory_consumption: 1200 MB
+#### UNCACHED
+Load & detect() time: 1.3545 sec
+Memory usage: 546.65 MB (All PHP loaded)
+Peak Memory used: 968.72 MB
+
+Database: large
+Database mode: bytes
+tatoeba-50.txt      - Correct ratio: 98.56%   Duration: 9.5102673
+eld-test.txt        - Correct ratio: 99.76%   Duration: 3.4655949
+sentences_v3.txt    - Correct ratio: 99.42%   Duration: 2.8623573
+word-pairs_v3.txt   - Correct ratio: 94.7%   Duration: 0.6821815
+single-words_v3.txt - Correct ratio: 83.41%   Duration: 0.4757545
+Average duration: 3.3992311
+Sentences accuracy average: 99.245%
+Total accuracy average: 95.17%
+Load & detect() time: 0.0227 sec
+Memory usage: 22.36 MB (All PHP loaded)
+Peak Memory used: 22.44 MB
+OPcache enabled: YES
+OPcache DB Hit: NOT possible
+PHP ver.: 7.4.4
+PHP SAPI: apache2handler
+php.ini memory_limit: 7144M
+php.ini opcache.interned_strings_buffer: 150 MB
+php.ini opcache.memory_consumption: 1200 MB
+
+Database: large
+Database mode: string
+tatoeba-50.txt      - Correct ratio: 98.56%   Duration: 9.5102673
+eld-test.txt        - Correct ratio: 99.76%   Duration: 3.4655949
+sentences_v3.txt    - Correct ratio: 99.42%   Duration: 2.8623573
+word-pairs_v3.txt   - Correct ratio: 94.7%   Duration: 0.6821815
+single-words_v3.txt - Correct ratio: 83.41%   Duration: 0.4757545
+Average duration: 3.3992311
+Sentences accuracy average: 99.245%
+Total accuracy average: 95.17%
+Load & detect() time: 0.0003 sec
+Memory usage: 0.35 MB (All PHP loaded)
+Peak Memory used: 0.44 MB
+OPcache enabled: YES
+OPcache DB Hit: Probably No
+PHP ver.: 7.4.4
+PHP SAPI: apache2handler
+php.ini memory_limit: 7144M
+php.ini opcache.interned_strings_buffer: 150 MB
+php.ini opcache.memory_consumption: 1200 MB
+#### UNCACHED
+Load & detect() time: 0.1107 sec
+Memory usage: 22.37 MB (All PHP loaded)
+Peak Memory used: 32.39 MB
+
+Database: large
+Database mode: disk
+tatoeba-50.txt      - Correct ratio: 98.56%   Duration: 57.828029
+eld-test.txt        - Correct ratio: 99.76%   Duration: 24.8164242
+sentences_v3.txt    - Correct ratio: 99.42%   Duration: 19.8305153
+word-pairs_v3.txt   - Correct ratio: 94.7%   Duration: 3.8949735
+single-words_v3.txt - Correct ratio: 83.41%   Duration: 2.295208
+Average duration: 21.73303
+Sentences accuracy average: 99.245%
+Total accuracy average: 95.17%
+Load & detect() time: 0.0012 sec
+Memory usage: 0.37 MB (All PHP loaded)
+Peak Memory used: 0.44 MB
+OPcache enabled: YES
+OPcache DB Hit: NOT possible
+PHP ver.: 7.4.4
+PHP SAPI: apache2handler
+php.ini memory_limit: 7144M
+php.ini opcache.interned_strings_buffer: 150 MB
+php.ini opcache.memory_consumption: 1200 MB
+
+
+
+
+Database: extralarge (_v3.1_ngram6_stride5_mix25_noadd_avg68061-66961_176756_pro)
+Database mode: array
+tatoeba-50.txt      - Correct ratio: 98.7%   Duration: 4.7090925 / Subset 50: Correct ratio: 98.81% 
+eld-test.txt        - Correct ratio: 99.78%   Duration: 1.6081927
+sentences_v3.txt    - Correct ratio: 99.49%   Duration: 1.3312627
+word-pairs_v3.txt   - Correct ratio: 95.32%   Duration: 0.4361785
+single-words_v3.txt - Correct ratio: 85.04%   Duration: 0.3426879
+Average duration: 1.68548286
+Sentences accuracy average: 99.322%
+Total accuracy average: 95.666%
+Load & detect() time: 0.0002 sec
+Memory usage: 0.35 MB (All PHP loaded)
+Peak Memory used: 0.43 MB
+OPcache enabled: YES
+OPcache DB Hit: Probably Yes
+PHP ver.: 7.4.4
+PHP SAPI: apache2handler
+php.ini memory_limit: 7144M
+php.ini opcache.interned_strings_buffer: 150 MB
+php.ini opcache.memory_consumption: 1200 MB
+#### UNCACHED
+Load & detect() time: 3.2006 sec
+Memory usage: 1143.13 MB (All PHP loaded)
+Peak Memory used: 2047.75 MB
+
+Database: extralarge
+Database mode: bytes
+tatoeba-50.txt      - Correct ratio: 98.7%   Duration: 10.8204948
+eld-test.txt        - Correct ratio: 99.78%   Duration: 4.0342375
+sentences_v3.txt    - Correct ratio: 99.49%   Duration: 3.3557642
+word-pairs_v3.txt   - Correct ratio: 95.32%   Duration: 0.7709474
+single-words_v3.txt - Correct ratio: 85.03%   Duration: 0.5309074
+Average duration: 3.90247026
+Sentences accuracy average: 99.322%
+Total accuracy average: 95.664%
+Load & detect() time: 0.0387 sec
+Memory usage: 40.36 MB (All PHP loaded)
+Peak Memory used: 40.44 MB
+OPcache enabled: YES
+OPcache DB Hit: NOT possible
+PHP ver.: 7.4.4
+PHP SAPI: apache2handler
+php.ini memory_limit: 7144M
+php.ini opcache.interned_strings_buffer: 150 MB
+php.ini opcache.memory_consumption: 1200 MB
+
+Database: extralarge
+Database mode: string
+tatoeba-50.txt      - Correct ratio: 98.7%   Duration: 10.8204948
+eld-test.txt        - Correct ratio: 99.78%   Duration: 4.0342375
+sentences_v3.txt    - Correct ratio: 99.49%   Duration: 3.3557642
+word-pairs_v3.txt   - Correct ratio: 95.32%   Duration: 0.7709474
+single-words_v3.txt - Correct ratio: 85.03%   Duration: 0.5309074
+Average duration: 3.90247026
+Sentences accuracy average: 99.322%
+Total accuracy average: 95.664%
+Load & detect() time: 0.0004 sec
+Memory usage: 0.35 MB (All PHP loaded)
+Peak Memory used: 0.43 MB
+OPcache enabled: YES
+OPcache DB Hit: Probably No
+PHP ver.: 7.4.4
+PHP SAPI: apache2handler
+php.ini memory_limit: 7144M
+php.ini opcache.interned_strings_buffer: 150 MB
+php.ini opcache.memory_consumption: 1200 MB
+#### UNCACHED
+Load & detect() time: 0.2035 sec
+Memory usage: 40.37 MB (All PHP loaded)
+Peak Memory used: 56.39 MB
+
+Database: extralarge
+Database mode: disk
+tatoeba-50.txt      - Correct ratio: 98.7%   Duration: 64.7415104
+eld-test.txt        - Correct ratio: 99.78%   Duration: 27.4988145
+sentences_v3.txt    - Correct ratio: 99.49%   Duration: 22.45503
+word-pairs_v3.txt   - Correct ratio: 95.32%   Duration: 4.3662157
+single-words_v3.txt - Correct ratio: 85.03%   Duration: 2.5575975
+Average duration: 24.32495362
+Sentences accuracy average: 99.322%
+Total accuracy average: 95.664%
+Load & detect() time: 0.0012 sec
+Memory usage: 0.37 MB (All PHP loaded)
+Peak Memory used: 0.44 MB
+OPcache enabled: YES
+OPcache DB Hit: NOT possible
+PHP ver.: 7.4.4
+PHP SAPI: apache2handler
+php.ini memory_limit: 7144M
+php.ini opcache.interned_strings_buffer: 150 MB
+php.ini opcache.memory_consumption: 1200 MB

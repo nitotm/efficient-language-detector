@@ -84,10 +84,10 @@ class LanguageData
             $folder .= 'subset/';
             if (!file_exists($folder . $fileBaseName . '.php')) {
                 if ($this->databaseMode !== EldMode::MODE_ARRAY && in_array(
-                        $fileBaseName,
-                        [EldDataFile::MEDIUM, EldDataFile::LARGE],
-                        true
-                    )) {
+                    $fileBaseName,
+                    [EldDataFile::MEDIUM, EldDataFile::LARGE],
+                    true
+                )) {
                     throw new InvalidArgumentException(
                         "Database modes 'string', 'bytes', 'disk' do not ship with size "
                         . $fileBaseName . ", build with BlobDataBuilder()."
@@ -181,7 +181,6 @@ class LanguageData
                 $end_block_size = strlen(self::BLOB_DOC_ID) + 1;
                 fseek($this->indexStream, -$end_block_size, SEEK_END);
                 $indexCheck = fread($this->indexStream, $end_block_size) === self::BLOB_DOC_ID . ';';
-                //$indexCheck = stream_get_contents($this->indexStream, $end_block_size) === self::BLOB_DOC_ID . ';';
                 fseek($this->dataStream, -$end_block_size, SEEK_END);
                 $dataCheck = fread($this->dataStream, $end_block_size) === self::BLOB_DOC_ID . ';';
             }
@@ -196,11 +195,6 @@ class LanguageData
         $this->loadOutputScheme($schemeInput);
         $this->isInitialized = true;
     }
-
-    /*
-    * getFreeMemory() problem: Database could be cached, so we might not need free memory
-    */
-    // private function getFreeMemory() {
 
     private function getDatabaseMode(string $modeInput): string
     {

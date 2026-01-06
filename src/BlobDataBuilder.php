@@ -69,9 +69,19 @@ class BlobDataBuilder extends LanguageData
         $countData = 0;
         // $dataSlotSize = 3;
 
-        // $highestScore = max(array_map('max', $this->ngrams)); v3 XL: 26.48, L: 30.9, M: 6.57, S: 2.09
-        // A variable could be stored to get a dynamic divisor, but for now max 31 -> 65535 / 31 ≈ 2100
-        $floatMultiplier = 2100;
+        $highestScore = max(array_map('max', $this->ngrams));
+        // A variable could be stored to get a dynamic divisor, 65535 / 2000 = max score 32.78
+        $floatMultiplier = 2000;
+        $max16bits = 65535; // 2^16 -1
+        $maximumScore = $max16bits/$floatMultiplier;
+
+        if ($highestScore > $maximumScore) {
+            // If we compressed scores here, we would need to redo scores averages with benchmark
+            throw new OutOfRangeException(
+                "Max score overflows blob database: $highestScore (max: " . round($maximumScore, 2) . '). ' .
+                '#Dev: compress scores, pow: ' . round(log($maximumScore) / log($highestScore), 4)
+            );
+        }
 
         // To make use of OPcache lets make it a PHP file for 'string' on RAM mode
         $nowDocHeader = "<?php\nreturn <<<'" . self::BLOB_DOC_ID . "'\n"; // make it long enough to avoid collisions
@@ -91,11 +101,7 @@ class BlobDataBuilder extends LanguageData
                 if ($language < 0 || $language > 255) {
                     throw new OutOfRangeException("language 8-bit value must be 0-255: " . $language);
                 }
-                if ($scoreInt < 0 || $scoreInt > 65535) {
-                    throw new OutOfRangeException(
-                        "score 16-bit value must be 0-65535: " . $scoreInt . " converted from: " . $score
-                    );
-                }
+
                 $blobData .= pack('Cn', $language, $scoreInt);
                 $countData++;
             }
@@ -110,11 +116,11 @@ class BlobDataBuilder extends LanguageData
 
         echo 'Completed: ' . $saveFolder . $this->fileName . '.data.php' . self::NEW_LINE;
 
-        /* Build index file
+        /* Build index
              File contains fixed size sequence of ngram identifier, data position, data length, its position in the
-              file is decided by the ngram hash. Total of 8 bytes per index point.
+              file is decided by the ngram hash. Total of 7 bytes per index point.
 
-             Ngram identifier: 4 raw bytes, better than 32bit int? seems safe enough since has already matched hash
+             Ngram identifier: 3 raw bytes, +99.9% safe at eld benchmark, 4 bytes would be 100%
              Data offset: Unsigned 24-bit integer      3 bytes   0–16,777,215 Big-endian
              Data points: Unsigned 8-bit integer   C   1 byte    0–255
          */
@@ -135,16 +141,19 @@ class BlobDataBuilder extends LanguageData
             $M = $ngramsCount * 5;
         } elseif ($ngramsCount < 30000) {
             $M = $ngramsCount * 4;
-        } elseif ($ngramsCount < 100000) {
+        } elseif ($ngramsCount < 100000) { // targets small
             $M = $ngramsCount * 3;
+        } elseif ($ngramsCount > 2000000) { // targets extralarge
+            $M = (int)ceil($ngramsCount * 1.7);
         } else {
             // M = 2 * N  →  load factor ≈ 0.5
             // Expected avg. succ probes 1.5, unsucc probes 4, 'extralarge' v3 index size ~40mb
             $M = $ngramsCount * 2;
         }
 
-        $slotSize = 8;
+        $slotSize = 7; // use 8, for 4 bytes fingerprint tested to be 100% at eld benchmarks
         $hashTableSize = $M * $slotSize;
+        $emptySlot = str_repeat("\0", $slotSize);
 
         // Create file filled with zeros in one shot
         file_put_contents(
@@ -171,9 +180,10 @@ class BlobDataBuilder extends LanguageData
                 $current = fread($fp, $slotSize);
 
                 // Empty slot
-                if ($current === "\0\0\0\0\0\0\0\0") {
+                if ($current === $emptySlot) {
                     // Write our two 32-bit values (little-endian, works everywhere)
-                    $packed = str_pad(substr($ngram, 0, 4), 4, "\0") .
+                    //$packed = str_pad(substr($ngram, 0, 4), 4, "\0") . // 4 bytes fingerprint
+                    $packed = str_pad(substr($ngram, 1, 3), 3, "\0") .
                         //pack('C3', $dataPosition>>16, $dataPosition>>8, $dataPosition).
                         substr(pack('N', $dataPosition), 1) .
                         pack('C', $countScores);

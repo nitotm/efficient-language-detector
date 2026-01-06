@@ -28,26 +28,6 @@ $table_time = [
     'defaultFill' => '#dfd',
     'rows' => [
         [
-            'label' => 'ELD-S-array',
-            'cells' => [
-                ['value' => '4.7"'],
-                ['value' => '1.6"'],
-                ['value' => '1.4"'],
-                ['value' => '0.45"'],
-                ['value' => '0.34"']
-            ]
-        ],
-        [
-            'label' => 'ELD-M-array',
-            'cells' => [
-                ['value' => '5.3"'],
-                ['value' => '1.8"'],
-                ['value' => '1.5"'],
-                ['value' => '0.48"'],
-                ['value' => '0.37"']
-            ]
-        ],
-        [
             'label' => 'ELD-L-array',
             'cells' => [
                 ['value' => '4.4"'],
@@ -58,43 +38,33 @@ $table_time = [
             ]
         ],
         [
-            'label' => 'ELD-XL-array',
+            'label' => 'ELD-L-string',
             'cells' => [
-                ['value' => '4.7"'],
-                ['value' => '1.6"'],
-                ['value' => '1.3"'],
-                ['value' => '0.43"'],
-                ['value' => '0.34"']
+                ['value' => '9.5"'],
+                ['value' => '3.5"'],
+                ['value' => '2.9"'],
+                ['value' => '0.68"'],
+                ['value' => '0.48"']
             ]
         ],
         [
-            'label' => 'ELD-XL-string',
+            'label' => 'ELD-L-bytes',
             'cells' => [
-                ['value' => '11"'],
-                ['value' => '3.9"'],
-                ['value' => '3.2"'],
-                ['value' => '0.76"'],
-                ['value' => '0.52"']
+                ['value' => '9.5"'],
+                ['value' => '3.5"'],
+                ['value' => '2.9"'],
+                ['value' => '0.68"'],
+                ['value' => '0.48"']
             ]
         ],
         [
-            'label' => 'ELD-XL-bytes',
+            'label' => 'ELD-L-disk',
             'cells' => [
-                ['value' => '11"'],
-                ['value' => '3.9"'],
-                ['value' => '3.2"'],
-                ['value' => '0.76"'],
-                ['value' => '0.52"']
-            ]
-        ],
-        [
-            'label' => 'ELD-XL-disk',
-            'cells' => [
-                ['value' => '63"', 'fill' => '#fec'],
-                ['value' => '27"', 'fill' => '#fec'],
-                ['value' => '22"', 'fill' => '#fec'],
-                ['value' => '4.3"', 'fill' => '#ffc'],
-                ['value' => '2.5"', 'fill' => '#ffc']
+                ['value' => '58"', 'fill' => '#fec'],
+                ['value' => '25"', 'fill' => '#fec'],
+                ['value' => '20"', 'fill' => '#fec'],
+                ['value' => '3.9"', 'fill' => '#ffc'],
+                ['value' => '2.3"', 'fill' => '#ffc']
             ]
         ],
         [
@@ -167,7 +137,7 @@ $table_time = [
                 ['value' => '3.2"', 'fill' => '#ffc']
             ]
         ],
-        [
+/*        [
             'label' => 'ELD-S_JS',
             'cells' => [['value' => '-'], ['value' => '-'], ['value' => '-'], ['value' => '-'], ['value' => '-']]
         ],
@@ -180,8 +150,93 @@ $table_time = [
                 ['value' => '-', 'fill' => '#ffc'],
                 ['value' => '-', 'fill' => '#ffc']
             ]
-        ],
+        ],*/
     ],
+];
+
+// ------------------ CONFIG (edit this) ------------------
+// Table layout (widths in px)
+$table_time_extra = [
+    'width' => 600,
+    'labelWidth' => 126,                   // width of the left label column
+    'colWidths' => [93, 93, 93, 93, 102],  // widths for the data columns (sum + labelWidth should equal width)
+    'rowHeight' => 30,                     // each row rectangle height
+    'headerHeight' => 30,                  // top header band height (contains column titles)
+    'fontFamily' => 'Arial, Helvetica, sans-serif',
+    'fontSize' => 17,
+    'headerName' => 'Seconds',
+    'headerTitles' => [                    // column titles (for data columns)
+        'Tatoeba-50',
+        'ELD test',
+        'Sentences',
+        'Word pairs',
+        'Single words'
+    ],
+    // rows: each row has a 'label' and 'cells' array, each cell may have 'value' and optional 'fill'
+    // If cell 'fill' is omitted, defaultFill will be used.
+    'defaultFill' => '#dfd',
+    'rows' => [
+       [
+            'label' => 'ELD-S-array',
+            'cells' => [
+                ['value' => '4.7"'],
+                ['value' => '1.6"'],
+                ['value' => '1.4"'],
+                ['value' => '0.44"'],
+                ['value' => '0.34"']
+            ]
+        ],
+        [
+            'label' => 'ELD-M-array',
+            'cells' => [
+                ['value' => '5.2"'],
+                ['value' => '1.8"'],
+                ['value' => '1.5"'],
+                ['value' => '0.47"'],
+                ['value' => '0.37"']
+            ]
+        ],
+        [
+            'label' => 'ELD-XL-array',
+            'cells' => [
+                ['value' => '4.7"'],
+                ['value' => '1.6"'],
+                ['value' => '1.3"'],
+                ['value' => '0.44"'],
+                ['value' => '0.34"']
+            ]
+        ],
+        [
+            'label' => 'ELD-XL-string',
+            'cells' => [
+                ['value' => '11"'],
+                ['value' => '4.0"'],
+                ['value' => '3.4"'],
+                ['value' => '0.77"'],
+                ['value' => '0.53"']
+            ]
+        ],
+        [
+            'label' => 'ELD-XL-bytes',
+            'cells' => [
+                ['value' => '11"'],
+                ['value' => '4.0"'],
+                ['value' => '3.4"'],
+                ['value' => '0.77"'],
+                ['value' => '0.53"']
+            ]
+        ],
+        [
+            'label' => 'ELD-XL-disk',
+            'cells' => [
+                ['value' => '65"', 'fill' => '#fec'],
+                ['value' => '27"', 'fill' => '#fec'],
+                ['value' => '22"', 'fill' => '#fec'],
+                ['value' => '4.4"', 'fill' => '#ffc'],
+                ['value' => '2.6"', 'fill' => '#ffc']
+            ]
+        ],
+    ]
 ];
 
 $table_accuracy = [
@@ -199,41 +254,41 @@ $table_accuracy = [
         [
             'label' => 'ELD-S',
             'cells' => [
-                ['value' => '96.8%', 'fill' => '#ffc'],
+                ['value' => '97.2%', 'fill' => '#ffc'],
                 ['value' => '99.7%', 'fill' => '#dfd'],
                 ['value' => '99.2%', 'fill' => '#dfd'],
-                ['value' => '90.9%', 'fill' => '#fec'],
-                ['value' => '75.1%', 'fill' => '#fee'],
+                ['value' => '91.1%', 'fill' => '#fec'],
+                ['value' => '75.5%', 'fill' => '#fee'],
             ]
         ],
         [
             'label' => 'ELD-M',
             'cells' => [
-                ['value' => '97.9%', 'fill' => '#ffc'],
+                ['value' => '98.0%', 'fill' => '#dfd'],
                 ['value' => '99.7%', 'fill' => '#dfd'],
                 ['value' => '99.3%', 'fill' => '#dfd'],
-                ['value' => '93.0%', 'fill' => '#fec'],
-                ['value' => '80.1%', 'fill' => '#fee'],
+                ['value' => '93.1%', 'fill' => '#fec'],
+                ['value' => '80.4%', 'fill' => '#fee'],
             ]
         ],
         [
             'label' => 'ELD-L',
             'cells' => [
-                ['value' => '98.3%', 'fill' => '#dfd'],
+                ['value' => '98.7%', 'fill' => '#dfd'],
                 ['value' => '99.8%', 'fill' => '#dfd'],
                 ['value' => '99.4%', 'fill' => '#dfd'],
-                ['value' => '94.8%', 'fill' => '#fec'],
-                ['value' => '83.5%', 'fill' => '#fee'],
+                ['value' => '94.7%', 'fill' => '#fec'],
+                ['value' => '83.4%', 'fill' => '#fee'],
             ]
         ],
         [
             'label' => 'ELD-XL',
             'cells' => [
-                ['value' => '98.5%', 'fill' => '#dfd'],
+                ['value' => '98.8%', 'fill' => '#dfd'],
                 ['value' => '99.8%', 'fill' => '#dfd'],
                 ['value' => '99.5%', 'fill' => '#dfd'],
-                ['value' => '95.4%', 'fill' => '#ffc'],
-                ['value' => '85.1%', 'fill' => '#fee'],
+                ['value' => '95.3%', 'fill' => '#ffc'],
+                ['value' => '85.0%', 'fill' => '#fee'],
             ]
         ],
         [
@@ -310,6 +365,7 @@ $table_accuracy = [
 ];
 
 $table = &$table_time;
+//$table = &$table_time_extra;
 //$table = &$table_accuracy;
 
 // ------------------ END CONFIG ------------------

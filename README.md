@@ -22,12 +22,6 @@ ELD is also available (outdated versions) in [Javascript](https://github.com/nit
 5. [Testing](#testing)
 6. [Languages](#languages)
 
-> Changes from ELD v2 to v3:
-> * detect()->language now returns string `'und'` for *undetermined* instead of `NULL`
-> * Databases are not compatible, and bigger, medium v2 ≈ small v3
-> * dynamicLangSubset() function is removed
-> * Function cleanText() is now named enableTextCleanup()
-
 ## Installation
 
 ```bash
@@ -39,42 +33,30 @@ $ composer require nitotm/efficient-language-detector
 (Only *small* DB install under construction)  
 
 
-### Configuration
+### ELD execution options
 
 - ELD has database execution Modes: `array`, `string`, `bytes`, `disk`  
-- ELD database Sizes: `small`, `medium`, `large`, `extralarge`  
-- Modes `string`, `bytes`, `disk` only ship with database sizes: `small` & `extralarge`, but others can be built with `BlobDataBuilder()`  
+- ELD database Sizes: `small`, `medium`, `large`, `extralarge` 
+- Confused? No worries, use default with no arguments. [How to use](#how-to-use)
 
 **Low memory Modes**  
-For Modes `string`, `bytes` and `disk`, all size databases can run under *128MB*  
-`disk` mode with `extralarge` size, can run with 8MB setting `memory_limit=8M`, as it only uses 0.5MB  
+For Modes `string`, `bytes` and `disk`, all size databases can run with *128MB* default setting  
+`disk` mode with `extralarge` size, can run with almost no RAM as it only uses 0.5MB  
+`string` and `bytes` are a great choice for general use, as they are just ~2x slower than `array`  
 
-**Fastest Mode: Array**  
+**Fastest Mode: Array** (higher memory usage)  
 For `array` Mode it is recommended to use OPcache, specially for the larger databases to reduce load times  
 We need to set `opcache.interned_strings_buffer`, `opcache.memory_consumption` high enough for each database  
-Recommended value in parentheses. Check [Databases](#databases) for more info.
 
-| Setting for `'array'` mode | Small           | Medium             | Large         | Extralarge     |
-|----------------------------|-----------------|--------------------|---------------|----------------|
-| `memory_limit`             | \>= 128         | \>= 340            | \>= 1060      | \>= 2200       |
-| `opcache.interned...`      | \>= 8      (16) | \>= 16        (32) | \>= 60   (70) | \>= 116  (128) |
-| `opcache.memory`           | \>= 64    (128) | \>= 128      (230) | \>= 360 (450) | \>= 750  (820) |
-
+Check [Databases](#databases) for more info.  
 
 ## How to use?
 
 `detect()` expects a UTF-8 string and returns an object with a `language` property, containing an *ISO 639-1* code (or other selected scheme), or `'und'` for undetermined language.
 ```php
-// require_once 'manual_loader.php'; To load ELD without autoloader. Update path.
-use Nitotm\Eld\{LanguageDetector, EldDataFile, EldScheme, EldMode};
+use Nitotm\Eld\LanguageDetector;
 
-// LanguageDetector(databaseFile: ?string, outputFormat: ?string, mode: string)
-$eld = new LanguageDetector(EldDataFile::SMALL, EldScheme::ISO639_1, EldMode::MODE_ARRAY);
-// Database files: 'small', 'medium', 'large', 'extralarge'. Check memory requirements
-// Database modes: 'array', 'string', 'bytes', 'disk'.
-// Schemes: 'ISO639_1', 'ISO639_2T', 'ISO639_1_BCP47', 'ISO639_2T_BCP47' and 'FULL_TEXT'
-// Modes 'string', 'bytes' & 'disk' only ship with DB sizes 'small' & 'extralarge'
-// Constants are not mandatory, LanguageDetector('small'); will also work
+$eld = new LanguageDetector();
 
 $eld->detect('Hola, cómo te llamas?');
 // object( language => string, scores() => array<string, float>, isReliable() => bool )
@@ -82,6 +64,18 @@ $eld->detect('Hola, cómo te llamas?');
 
 $eld->detect('Hola, cómo te llamas?')->language;
 // 'es'
+```
+To select database **Size** and **Mode**, or language output scheme. We can import `Eld...` constants to see avalible options.
+```php
+use Nitotm\Eld\{LanguageDetector, EldDataFile, EldScheme, EldMode};
+
+// LanguageDetector(databaseFile: ?string, outputFormat: ?string, mode: string)
+$eld = new LanguageDetector(EldDataFile::SMALL, EldScheme::ISO639_1, EldMode::MODE_ARRAY);
+
+// Database Size files: 'small', 'medium', 'large', 'extralarge'.
+// Schemes: 'ISO639_1', 'ISO639_2T', 'ISO639_1_BCP47', 'ISO639_2T_BCP47' and 'FULL_TEXT'
+// Database Modes: 'array', 'string', 'bytes', 'disk'. Check memory requirements for 'array'
+// Constants are not mandatory, LanguageDetector('small'); will also work
 ```
 
 #### Languages subsets
@@ -107,7 +101,7 @@ $eld_subset = new Nitotm\Eld\LanguageDetector('small_6_mfss5z1t');
 
 // Build a binary database for modes 'string', 'bytes' & 'disk', from any 'array' database
 // Memory requirements for 'array' database input apply 
-$eldBuilder = new BlobDataBuilder('large'); // or subset 'small_6_mfss5z1t'
+$eldBuilder = new Nitotm\Eld\BlobDataBuilder('large'); // or subset 'small_6_mfss5z1t'
 // Create subset directly: new BlobDataBuilder('extralarge', ['en', 'es', 'de', 'it']);
 $eldBuilder->buildDatabase();
 ```
@@ -155,13 +149,16 @@ Benchmarks:
 <!--- Time table
 |                       | Tatoeba-50   | ELD test     | Sentences    | Word pairs   | Single words |
 |:----------------------|:------------:|:------------:|:------------:|:------------:|:------------:|
-| **Nito-ELD-S-array**  |     4.7"     |      1.6"    |      1.4"    |     0.45"    |     0.34"    |
-| **Nito-ELD-M-array**  |     5.3"     |      1.8"    |      1.5"    |     0.48"    |     0.37"    |
+| **Nito-ELD-S-array**  |     4.7"     |      1.6"    |      1.4"    |     0.44"    |     0.34"    |
+| **Nito-ELD-M-array**  |     5.2"     |      1.8"    |      1.5"    |     0.47"    |     0.37"    |
 | **Nito-ELD-L-array**  |     4.4"     |      1.5"    |      1.2"    |     0.41"    |     0.33"    |
-| **Nito-ELD-XL-array** |     4.7"     |      1.6"    |      1.3"    |     0.43"    |     0.34"    |
-| **Nito-ELD-XL-string**|    11"       |      3.9"    |      3.2"    |     0.76"    |     0.52"    |
-| **Nito-ELD-XL-bytes** |    11"       |      3.9"    |      3.2"    |     0.76"    |     0.52"    |
-| **Nito-ELD-XL-disk**  |    63"       |     27"      |     22"      |     4.3"     |     2.5"     |
+| **Nito-ELD-L-string** |     9.5"     |      3.5"    |      2.9"    |     0.68"    |     0.48"    |
+| **Nito-ELD-L-bytes**  |     9.5"     |      3.5"    |      2.9"    |     0.68"    |     0.48"    |
+| **Nito-ELD-L-disk**   |    58"       |     25"      |     20"      |     3.9"     |     2.3"     |
+| **Nito-ELD-XL-array** |     4.7"     |      1.6"    |      1.3"    |     0.44"    |     0.34"    |
+| **Nito-ELD-XL-string**|    11"       |      4.0"    |      3.4"    |     0.77"    |     0.53"    |
+| **Nito-ELD-XL-bytes** |    11"       |      4.0"    |      3.4"    |     0.77"    |     0.53"    |
+| **Nito-ELD-XL-disk**  |    65"       |     27"      |     22"      |     4.4"     |     2.6"     |
 | **Lingua**            |    98"       |     27"      |     24"      |     8.2"     |     5.9"     |
 | **fasttext-subset**   |    12"       |      2.7"    |      2.3"    |     1.2"     |     1.1"     |
 | **fasttext-all**      |     --       |      2.4"    |      2.0"    |     0.91"    |     0.73"    |
@@ -170,15 +167,16 @@ Benchmarks:
 | **patrickschur**      |   227"       |     74"      |     63"      |    18"       |    11"       |
 | **franc**             |    43"       |     10"      |      9"      |     4.1"     |     3.2"     |
 -->
-<img alt="time table" width="800" src="https://raw.githubusercontent.com/nitotm/efficient-language-detector/main/misc/table_time_v3.svg">
+Time execution benchmark for ELD size `large` ( check others sizes at [extra-becnhmaks](https://raw.githubusercontent.com/nitotm/efficient-language-detector/main/misc/table_time_extra_v3.svg) )  
+<img alt="timetable" width="800" src="https://raw.githubusercontent.com/nitotm/efficient-language-detector/main/misc/table_time_v3.svg">
 
 <!-- Accuracy table
 |                     | Tatoeba-50 | ELD test     | Sentences    | Word pairs   | Single words |
 |:--------------------|:----------:|:------------:|:------------:|:------------:|:------------:|
-| **Nito-ELD-S**      |   96.8%    | 99.7%        | 99.2%        | 90.9%        | 75.1%        |
-| **Nito-ELD-M**      |   97.9%    | 99.7%        | 99.3%        | 93.0%        | 80.1%        |
-| **Nito-ELD-L**      |   98.3%    | 99.8%        | 99.4%        | 94.8%        | 83.5%        |
-| **Nito-ELD-XL**     |   98.5%    | 99.8%        | 99.5%        | 95.4%        | 85.1%        |
+| **Nito-ELD-S**      |   97.2%    | 99.7%        | 99.2%        | 91.1%        | 75.5%        |
+| **Nito-ELD-M**      |   98.0%    | 99.7%        | 99.3%        | 93.1%        | 80.4%        |
+| **Nito-ELD-L**      |   98.7%    | 99.8%        | 99.4%        | 94.7%        | 83.4%        |
+| **Nito-ELD-XL**     |   98.8%    | 99.8%        | 99.5%        | 95.3%        | 85.0%        |
 | **Lingua**          |   96.1%    | 99.2%        | 98.7%        | 93.4%        | 80.7%        |
 | **fasttext-subset** |   94.1%    | 98.0%        | 97.9%        | 83.1%        | 67.8%        |
 | **fasttext-all**    |     --     | 97.4%        | 97.6%        | 81.5%        | 65.7%        |
@@ -198,28 +196,36 @@ Benchmarks:
 ## Databases
 
 ### Low memory database modes 
-Special mention to `'disk'` mode, while slower, is the fastest uncached load & detect for up to a 100 detections.  
+
 Modes `'bytes'` and `'string'` are very similar, they differ on how they are load, and are just 2x slower than **Array**  
-Modes `'string'`, `'bytes'` & `'disk'` only ship with DB sizes `'small'` & `'extralarge'`  
+Mode `'string'` can be OPcache'd, more expensive compilation, but then instant load, `'bytes'` has always a steady ~fast load  
+Special mention to `'disk'` mode, while slower, is the fastest uncached load & detect for up to 100 detections  
 
-| Mode                     | Disk          | Bytes        | String      | String        |
-|--------------------------|---------------|--------------|-------------|---------------|
-| Database Size option     | Extralarge    | Extralarge   | Extralarge  | Small         |
-| Pros                     | Lowest memory | Equilibrated | Cacheable   | Cacheable     |
-| Cons                     | Slowest       | Un-cacheable | Memory peak | Less accurate |
-| File size                | 50 MB         | 50 MB        | 50 MB       | 3 MB          |
-| Memory usage             | 0.4 MB        | 52 MB        | 52 MB       | 5 MB          |
-| Memory usage Cached      | 0.4 MB        | 52 MB        | 0.4 MB + OP | 0.4 MB + OP   |
-| Memory peak              | 0.6 MB        | 52 MB        | 80 MB       | 8 MB          |
-| Memory peak Cached       | 0.5 MB        | 52 MB        | 0.4 MB + OP | 0.4 MB + OP   |
-| OPcache used memory      | -             | -            | 50 MB       | 0 MB          |
-| OPcache used interned    | -             | -            | 0.4 MB      | 3 MB          |
-| Load & detect() Uncached | 0.0012 sec    | 0.04 sec     | 0.25 sec    | 0.016 sec     |
-| Load & detect() Cached   | 0.0011 sec    | 0.04 sec     | 0.0003 sec  | 0.0003 sec    |
-| **Settings**             |               |              |             |               |
-| `memory_limit` Minimum   | \>= 4         | \>= 128      | \>= 128     | \>= 16        |
-| `opcache.memory`         | -             | -            | \>= 128     | \>= 16        |
+| Mode                     | Disk          | Bytes        | String      | Bytes        | String      |
+|--------------------------|---------------|--------------|-------------|--------------|-------------|
+| Database Size option     | Extralarge    | Extralarge   | Extralarge  | Large        | Large       |
+| File size                | 39 MB         | 39 MB        | 39 MB       | 20 MB        | 20 MB       |
+| Memory usage             | 0.4 MB        | 40 MB        | 40 MB       | 22 MB        | 22 MB       |
+| Memory usage Cached      | 0.4 MB        | 40 MB        | 0.4 MB + OP | 22 MB        | 0.4 MB + OP |
+| Memory peak              | 0.4 MB        | 40 MB        | 56 MB       | 22 MB        | 32 MB       |
+| Memory peak Cached       | 0.4 MB        | 40 MB        | 0.4 MB + OP | 22 MB        | 0.4 MB + OP |
+| OPcache used memory      | -             | -            | 39 MB       | -            | 20 MB       |
+| OPcache used interned    | -             | -            | 0.4 MB      | -            | 0.4 MB      |
+| Load & detect() Uncached | 0.0012 sec    | 0.04 sec     | 0.25 sec    | 0.02 sec     | 0.11 sec    |
+| Load & detect() Cached   | 0.0011 sec    | 0.04 sec     | 0.0003 sec  | 0.02 sec     | 0.0003 sec  |
 
+| Mode                     | Bytes         | String        | Bytes         | String        |
+|--------------------------|---------------|---------------|---------------|---------------|
+| Database Size option     | Medium        | Medium        | Small         | Small         |
+| File size                | 6 MB          | 6 MB          | 2 MB          | 2 MB          |
+| Memory usage             | 8 MB          | 8 MB          | 2 MB          | 2 MB          |
+| Memory usage Cached      | 8 MB          | 0.4 MB + OP   | 2 MB          | 0.4 MB + OP   |
+| Memory peak              | 8 MB          | 12 MB         | 2 MB          | 3 MB          |
+| Memory peak Cached       | 8 MB          | 0.4 MB + OP   | 2 MB          | 0.4 MB + OP   |
+| OPcache used memory      | -             | 0 MB          | -             | 0 MB          |
+| OPcache used interned    | -             | 6 MB          | -             | 2 MB          |
+| Load & detect() Uncached | 0.007 sec     | 0.04 sec      | 0.016 sec     | 0.016 sec     |
+| Load & detect() Cached   | 0.007 sec     | 0.0003 sec    | 0.0003 sec    | 0.0003 sec    |
 
 ### Fastest mode *Array*, but memory hungry
 
@@ -227,14 +233,14 @@ Modes `'string'`, `'bytes'` & `'disk'` only ship with DB sizes `'small'` & `'ext
 |----------------------------|-----------------|--------------------|---------------|----------------|
 | Pros                       | Lowest memory   | Equilibrated       | Fastest       | Most accurate  |
 | Cons                       | Least accurate  | Slowest (but fast) | High memory   | Highest memory |
-| File size                  | 3 MB            | 10 MB              | 32 MB         | 71 MB          |
-| Memory usage               | 45 MB           | 135 MB             | 554 MB        | 1189 MB        |
+| File size                  | 3 MB            | 9 MB               | 28 MB         | 64 MB          |
+| Memory usage               | 46 MB           | 137 MB             | 547 MB        | 1143 MB        |
 | Memory usage Cached        | 0.4 MB + OP     | 0.4 MB + OP        | 0.4 MB + OP   | 0.4 MB + OP    |
-| Memory peak                | 77 MB           | 282 MB             | 977 MB        | 2083 MB        |
+| Memory peak                | 78 MB           | 287 MB             | 969 MB        | 2047 MB        |
 | Memory peak Cached         | 0.4 MB + OP     | 0.4 MB + OP        | 0.4 MB + OP   | 0.4 MB + OP    |
-| OPcache used memory        | 21 MB           | 69 MB              | 244 MB        | 539 MB         |
-| OPcache used interned      | 4 MB            | 10 MB              | 45 MB         | 98 MB          |
-| Load & detect() Uncached   | 0.14 sec        | 0.5 sec            | 1.5 sec       | 3.4 sec        |
+| OPcache used memory        | 21 MB           | 70 MB              | 242 MB        | 516 MB         |
+| OPcache used interned      | 4 MB            | 10 MB              | 45 MB         | 91 MB          |
+| Load & detect() Uncached   | 0.13 sec        | 0.5 sec            | 1.4 sec       | 3.2 sec        |
 | Load & detect() Cached     | 0.0003 sec      | 0.0003 sec         | 0.0003 sec    | 0.0003 sec     |
 | **Settings** (Recommended) |                 |                    |               |                |
 | `memory_limit`             | \>= 128         | \>= 340            | \>= 1060      | \>= 2200       |
