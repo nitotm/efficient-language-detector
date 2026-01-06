@@ -167,7 +167,7 @@ Benchmarks:
 | **patrickschur**      |   227"       |     74"      |     63"      |    18"       |    11"       |
 | **franc**             |    43"       |     10"      |      9"      |     4.1"     |     3.2"     |
 -->
-Time execution benchmark for ELD size `large` ( check others sizes at [extra-becnhmaks](https://raw.githubusercontent.com/nitotm/efficient-language-detector/main/misc/table_time_extra_v3.svg) )  
+Time execution benchmark for ELD size `large` ( check others sizes at <a href="https://raw.githubusercontent.com/nitotm/efficient-language-detector/main/misc/table_time_extra_v3.svg" target="_blank">more benchmarks</a> )  
 <img alt="timetable" width="800" src="https://raw.githubusercontent.com/nitotm/efficient-language-detector/main/misc/table_time_v3.svg">
 
 <!-- Accuracy table
