@@ -37,7 +37,7 @@ single-words_v3.txt - Correct ratio: 75.49%   Duration: 0.5891727
 Average duration: 4.03613106
 Sentences accuracy average: 98.623%
 Total accuracy average: 92.499%
-Load & detect() time: 0.0178 sec
+Load & detect() time: 0.0018 sec
 Memory usage: 2.22 MB (All PHP loaded)
 Peak Memory used: 2.3 MB
 OPcache enabled: YES
@@ -111,7 +111,7 @@ single-words_v3.txt - Correct ratio: 80.4%   Duration: 0.6644262
 Average duration: 4.90557818
 Sentences accuracy average: 98.954%
 Total accuracy average: 94.081%
-Load & detect() time: 0.0067 sec
+Load & detect() time: 0.0058 sec
 Memory usage: 8.36 MB (All PHP loaded)
 Peak Memory used: 8.44 MB
 OPcache enabled: YES

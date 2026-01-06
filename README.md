@@ -224,8 +224,8 @@ Special mention to `'disk'` mode, while slower, is the fastest uncached load & d
 | Memory peak Cached       | 8 MB          | 0.4 MB + OP   | 2 MB          | 0.4 MB + OP   |
 | OPcache used memory      | -             | 0 MB          | -             | 0 MB          |
 | OPcache used interned    | -             | 6 MB          | -             | 2 MB          |
-| Load & detect() Uncached | 0.007 sec     | 0.04 sec      | 0.016 sec     | 0.016 sec     |
-| Load & detect() Cached   | 0.007 sec     | 0.0003 sec    | 0.0003 sec    | 0.0003 sec    |
+| Load & detect() Uncached | 0.006 sec     | 0.04 sec      | 0.002 sec     | 0.016 sec     |
+| Load & detect() Cached   | 0.006 sec     | 0.0003 sec    | 0.002 sec     | 0.0003 sec    |
 
 ### Fastest mode *Array*, but memory hungry
 
