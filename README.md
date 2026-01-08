@@ -40,7 +40,7 @@ $ composer require nitotm/efficient-language-detector
 - Confused? No worries, use default with no arguments. [How to use](#how-to-use)
 
 **Low memory Modes**  
-For Modes `string`, `bytes` and `disk`, all size databases can run with *128MB* default setting  
+For Modes `string`, `bytes` and `disk`, all size databases can run with *128MB* PHP default setting  
 `disk` mode with `extralarge` size, can run with almost no RAM as it only uses 0.5MB  
 `string` and `bytes` are a great choice for general use, as they are just ~2x slower than `array`  
 
@@ -199,7 +199,7 @@ Time execution benchmark for ELD size `large` ( check others sizes at <a href="h
 
 Modes `'bytes'` and `'string'` are very similar, they differ on how they are load, and are just 2x slower than **Array**  
 Mode `'string'` can be OPcache'd, more expensive compilation, but then instant load, `'bytes'` has always a steady ~fast load  
-Special mention to `'disk'` mode, while slower, is the fastest uncached load & detect for up to 100 detections  
+Special mention to `'disk'` mode, while slower, is the fastest uncached load & detect for the larger databases
 
 | Mode                     | Disk          | Bytes        | String      | Bytes        | String      |
 |--------------------------|---------------|--------------|-------------|--------------|-------------|
@@ -224,7 +224,7 @@ Special mention to `'disk'` mode, while slower, is the fastest uncached load & d
 | Memory peak Cached       | 8 MB          | 0.4 MB + OP   | 2 MB          | 0.4 MB + OP   |
 | OPcache used memory      | -             | 0 MB          | -             | 0 MB          |
 | OPcache used interned    | -             | 6 MB          | -             | 2 MB          |
-| Load & detect() Uncached | 0.006 sec     | 0.04 sec      | 0.002 sec     | 0.016 sec     |
+| Load & detect() Uncached | 0.006 sec     | 0.04 sec      | 0.003 sec     | 0.016 sec     |
 | Load & detect() Cached   | 0.006 sec     | 0.0003 sec    | 0.002 sec     | 0.0003 sec    |
 
 ### Fastest mode *Array*, but memory hungry

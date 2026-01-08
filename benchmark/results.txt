@@ -47,6 +47,8 @@ PHP SAPI: apache2handler
 php.ini memory_limit: 7144M
 php.ini opcache.interned_strings_buffer: 150 MB
 php.ini opcache.memory_consumption: 1200 MB
+#### UNCACHED
+Load & detect() time: 0.0026 sec
 
 Database: small
 Database mode: string
