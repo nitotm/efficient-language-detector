@@ -124,10 +124,11 @@ class LanguageDetector extends LanguageData
             // Processing whole-word n-grams separately improves speed measurably
             if ($len <= $ngramLength) {
                 // fastest way to set and add to index key without checking if exist
-                // $tmp = &$byteNgrams[' ' . $word . ' ']; // $countNgrams++; $tmp++;
+                // $tmp = &$byteNgrams[' ' . $word . ' ']; $countNgrams++; $tmp++;
+                // NOTE $tmp count is commented out as it is only necessary if we use $frequency at calculateScores()
                 $byteNgrams[' ' . $word . ' '] = true;
             } else {
-                // $tmp = &$byteNgrams[' ' . substr($word, 0, $ngramLength)]; // $tmp++;
+                // $tmp = &$byteNgrams[' ' . substr($word, 0, $ngramLength)]; $tmp++;
                 $byteNgrams[' ' . substr($word, 0, $ngramLength)] = true;
 
                 for ($j = $ngramStride; ($j + $ngramLength) < $len; $j += $ngramStride) { // ++$countNgrams, ++$tmp
@@ -138,7 +139,6 @@ class LanguageDetector extends LanguageData
                 // $countNgrams+=2; $tmp++; We would count at least 2 ngrams, start and ending ngram.
                 $byteNgrams[substr($word, $len - $ngramLength) . ' '] = true;
             }
-            // $tmp++; Unnecessary as long as we do not use $frequency at calculateScores()
             // if ( $countNgrams > 100) { break; } Unnecessary as long as we cut $text at <=1000 bytes
         }
 
@@ -203,7 +203,7 @@ class LanguageDetector extends LanguageData
                     throw new RuntimeException('Incorrect Blob data');
                 }
 
-                // 4 bytes Ngram identifier (safe enough) + 3 bytes data offset + 1 byte data points length
+                // 3 bytes Ngram identifier (99.99% safe) + 3 bytes data offset + 1 byte data points length
                 if ($index[0] === $bytes[1] &&
                     $index[1] === $bytes[2] &&
                     $index[2] === ($bytes[3] ?? "\0") // min ngram size across all databases is 3 bytes
