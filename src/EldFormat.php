@@ -15,5 +15,7 @@ namespace Nitotm\Eld;
     E_USER_DEPRECATED
 );
 */
-// Create an alias: EldFormat -> EldScheme
-\class_alias(EldScheme::class, EldFormat::class);
+final class EldFormat extends EldScheme
+{
+    // alias: EldFormat -> EldScheme
+}

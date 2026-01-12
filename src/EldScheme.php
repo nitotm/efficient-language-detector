@@ -8,7 +8,7 @@
 
 namespace Nitotm\Eld;
 
-final class EldScheme
+class EldScheme // TODO make it final when EldFormat is removed
 {
     // Language return scheme options
     public const ISO639_1 = 'ISO639_1';
