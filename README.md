@@ -87,8 +87,8 @@ Calling `langSubset()` once, will set the subset.
   - To make use of pre-built subsets in modes `string`, `bytes` & `disk`, getting lower memory usage and increased speed, it is possible by manually converting an `array` database, using `BlobDataBuilder()` 
 - Check available [Languages](#languages) below.
 ```php
-// It accepts any ISO codes.
-// langSubset(languages: [], save: true, encode: true); Will return subset file name if saved
+// It accepts any ISO codes. In "array" mode it will return a subset file name, if saved
+// langSubset(languages: [], save: true, encode: true);
 $eld->langSubset(['en', 'es', 'fr', 'it', 'nl', 'de']);
 // Object ( success => bool, languages => ?array, error => ?string, file => ?string )
 // ( success => true, languages => ['en', 'es'...], error => NULL, file => 'small_6_mfss...' )
@@ -97,7 +97,7 @@ $eld->langSubset(['en', 'es', 'fr', 'it', 'nl', 'de']);
 $eld->langSubset();
 
 // Load pre-saved subset directly, just like a default database
-$eld_subset = new Nitotm\Eld\LanguageDetector('small_6_mfss5z1t');
+$eld_subset = new Nitotm\Eld\LanguageDetector('small_6_mfss5z1t', null, 'array');
 
 // Build a binary database for modes 'string', 'bytes' & 'disk', from any 'array' database
 // Memory requirements for 'array' database input apply 
