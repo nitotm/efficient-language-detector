@@ -24,7 +24,7 @@ class LanguageDetector extends LanguageData
     public function __construct(
         ?string $databaseFile = null,
         ?string $outputFormat = null, // TODO v4, rename to $outputScheme / $scheme
-        string $mode = EldMode::MODE_ARRAY
+        string $mode = EldMode::MODE_STRING
     ) {
         $this->databaseInput = $databaseFile;
         $this->schemeInput = $outputFormat;

@@ -56,7 +56,7 @@ Check [Databases](#databases) for more info.
 ```php
 use Nitotm\Eld\LanguageDetector;
 
-$eld = new LanguageDetector();
+$eld = new LanguageDetector(); // Default Size: 'large', Mode: 'string' (since v3.2)
 
 $eld->detect('Hola, cómo te llamas?');
 // object( language => string, scores() => array<string, float>, isReliable() => bool )

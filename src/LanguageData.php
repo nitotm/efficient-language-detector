@@ -63,12 +63,12 @@ class LanguageData
     protected function loadData(
         ?string $databaseInput = null,
         ?string $schemeInput = null,
-        string $modeInput = 'array',
+        string $modeInput = 'string',
         bool $static = true
     ): void {
         $folder = $this->ngramsFolder;
         // Normalize file name or use default file
-        $fileBaseName = ($databaseInput === null ? EldDataFile::SMALL : preg_replace(
+        $fileBaseName = ($databaseInput === null ? EldDataFile::LARGE : preg_replace(
             '/\.php$/',
             '',
             strtolower($databaseInput)
@@ -83,18 +83,24 @@ class LanguageData
         if (!file_exists($folder . $fileBaseName . '.php')) {
             $folder .= 'subset/';
             if (!file_exists($folder . $fileBaseName . '.php')) {
-                if ($this->databaseMode !== EldMode::MODE_ARRAY && in_array(
-                    $fileBaseName,
-                    [EldDataFile::MEDIUM, EldDataFile::LARGE],
-                    true
+                if ($this->databaseMode !== EldMode::MODE_ARRAY && file_exists(
+                    $this->ngramsFolder . 'subset/' . $fileBaseName . '.php'
                 )) {
+                    // TODO remove auto select array mode (included for compatibility with new defaults), for ver. 4.0
+                    $this->databaseMode = EldMode::MODE_ARRAY;
+                    $folder = $this->ngramsFolder . 'subset/';
+                    trigger_error(
+                        'Subset database Mode "array" found. Reverting to "array" mode. Select "array" mode to remove warning."',
+                        E_USER_WARNING
+                    );
+                } else {
                     throw new InvalidArgumentException(
-                        "Database modes 'string', 'bytes', 'disk' do not ship with size "
-                        . $fileBaseName . ", build with BlobDataBuilder()."
+                        sprintf(
+                            'Database file "%s" not found. (i): "array" database is not compatible with "string", "bytes" & "disk" database.',
+                            $fileBaseName
+                        )
                     );
                 }
-
-                throw new InvalidArgumentException(sprintf('Database file "%s" not found', $fileBaseName));
             }
         }
 

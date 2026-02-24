@@ -25,7 +25,7 @@ $tests->addTest('Create ELD instance', function () {
 }, true);
 
 $tests->addTest('Simple language detection', function () {
-    $eld = new Nitotm\Eld\LanguageDetector('small');
+    $eld = new Nitotm\Eld\LanguageDetector();
 
     $result = $eld->detect('Hola, cómo te llamas?');
 
@@ -166,8 +166,8 @@ $tests->addTest('Create langSubset(), disable it, and detect', function () {
     }
 });
 
-$tests->addTest('Check if langSubset() is able to save subset file', function () {
-    $eld = new Nitotm\Eld\LanguageDetector('small');
+$tests->addTest('Check if langSubset() is able to save subset file in "array" mode', function () {
+    $eld = new Nitotm\Eld\LanguageDetector('small', null, 'array');
     $file = __DIR__ . '/../resources/ngrams/subset/small_1_1ni.php';
 
     if (file_exists($file) && !unlink($file)) {
@@ -184,7 +184,7 @@ $tests->addTest('Check if langSubset() is able to save subset file', function ()
 });
 
 $tests->addTest('Create instance with different ngrams database, and detect', function () {
-    $eld = new Nitotm\Eld\LanguageDetector('small_1_1ni');
+    $eld = new Nitotm\Eld\LanguageDetector('small_1_1ni', null, 'array');
 
     $result = $eld->detect('How are you? Bien, gracias');
 
