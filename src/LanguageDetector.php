@@ -77,7 +77,7 @@ class LanguageDetector extends LanguageData
     public function cleanText(string $str): string
     {
         // Remove URLS
-        $str = preg_replace('@[hw]((ttps?://(www\.)?)|ww\.)([^\s/?.#-]+\.?)+(/\S*)?@i', ' ', $str);
+        $str = preg_replace('@[hw](?:(?:ttps?:\/\/(?:www\.)?)|ww\.)[^\s]+@i', ' ', $str);
         // Remove emails
         $str = preg_replace('/[a-zA-Z0-9.!$%&’+_`-]+@[A-Za-z0-9.-]+\.[A-Za-z0-9-]{2,64}/u', ' ', $str ?? '');
         // Remove .com domains
