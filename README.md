@@ -5,7 +5,6 @@
 ![supported PHP versions](https://img.shields.io/badge/PHP-%3E%3D%207.4-blue)
 [![license](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![supported languages](https://img.shields.io/badge/supported%20languages-60-brightgreen.svg)](#languages)
-![version](https://img.shields.io/badge/ver.-3.0-blue)
 	
 </div>
 
