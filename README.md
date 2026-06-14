@@ -180,7 +180,7 @@ Time execution benchmark for ELD size `large` ( check others sizes at <a href="h
 | **fasttext-subset** |   94.1%    | 98.0%        | 97.9%        | 83.1%        | 67.8%        |
 | **fasttext-all**    |     --     | 97.4%        | 97.6%        | 81.5%        | 65.7%        |
 | **CLD2** *          |   92.1% *  | 98.1%        | 97.4%        | 85.6%        | 70.7%        |
-| **Lingua-low**      |    89.3    | 97.3%        | 96.3%        | 84.1%        | 68.6%        |
+| **Lingua-low**      |   89.3     | 97.3%        | 96.3%        | 84.1%        | 68.6%        |
 | **patrickschur**    |   84.1%    | 94.8%        | 93.6%        | 71.9%        | 57.1%        |
 | **franc**           |   76.9%    | 93.8%        | 92.3%        | 67.0%        | 53.8%        |
 -->
