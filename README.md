@@ -8,6 +8,11 @@
 	
 </div>
 
+**What is a language detector?**  
+It is a tool that identifies which language a text is written in. For example, `detect("Hola")` returns "es" for Spanish.
+
+---
+
 Efficient language detector (*Nito-ELD* or *ELD*) is a fast and accurate natural language detection software, written 100% in PHP, with a speed comparable to fast C++ compiled detectors, and accuracy rivaling the best detectors to date.
 
 It has no dependencies, easy installation, all it's needed is PHP with the **mb** extension.  
@@ -127,15 +132,14 @@ There is a CLI wrapper (BETA version)
 
 I compared *ELD* with a different variety of detectors, as there are not many in PHP.
 
-| URL                                                      | Version      | Language     |
-|:---------------------------------------------------------|:-------------|:-------------|
-| https://github.com/nitotm/efficient-language-detector/   | 3.1.0        | PHP          |
-| https://github.com/pemistahl/lingua-py                   | 2.0.2        | Python       |
-| https://github.com/facebookresearch/fastText             | 0.9.2        | C++          |
-| https://github.com/CLD2Owners/cld2                       | Aug 21, 2015 | C++          |
-| https://github.com/patrickschur/language-detection       | 5.3.0        | PHP          |
-| https://github.com/wooorm/franc                          | 7.2.0        | Javascript   |
-
+| URL                                                      | Version      | Core Language |
+|:---------------------------------------------------------|:-------------|:--------------|
+| https://github.com/nitotm/efficient-language-detector/   | 3.1.0        | PHP           |
+| https://github.com/pemistahl/lingua-py                   | 2.0.2        | Rust          |
+| https://github.com/facebookresearch/fastText             | 0.9.2        | C++           |
+| https://github.com/CLD2Owners/cld2                       | Aug 21, 2015 | C++           |
+| https://github.com/patrickschur/language-detection       | 5.3.0        | PHP           |
+| https://github.com/wooorm/franc                          | 7.2.0        | Javascript    |
 
 Benchmarks:
 * **Tatoeba**: *20MB*, short sentences from Tatoeba, 50 languages supported by all contenders, up to 10k lines each.  
