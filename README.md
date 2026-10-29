@@ -295,4 +295,4 @@ It is the default ELD language scheme. `outputScheme: 'ISO639_1'`
 
 If you wish to donate for open source improvements, hire me for private modifications, request alternative dataset training, or contact me, please use the following link: https://linktr.ee/nitotm
 
-If ELD has been useful to you, please consider giving the repository a star. It helps others discover ELD gives me a clear signal to keep maintaining and improving it.
+If ELD has been useful to you, please consider giving the repository a star. It helps others discover ELD, and gives me a clear signal to keep maintaining and improving it.
